@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- saved from url=(0063)file:///C:/Users/Gegee/Downloads/gurvan_tooroi_giftcard_10.html -->
-<html lang="mn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Гурван Тоорой — Бэлгийн Карт</title>
-<link href="./index_files/css2" rel="stylesheet">
-<script src="./index_files/html2canvas.min.js.download"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root {
   --forest:#1C2B1A; --forest2:#243322; --pine:#3D5C3A; --moss:#5A7A55;
@@ -275,9 +275,9 @@ tr:hover td{background:rgba(90,122,85,.04);}
     </div>
   </div>
   <div class="nav-pills">
-    <button class="np active" id="navBuy" onclick="showPage(&#39;buy&#39;,this)">Бэлэг Карт</button>
-    <button class="np" id="navVerify" onclick="showPage(&#39;verify&#39;,this)">Шалгах</button>
-    <button class="np" id="adminNavBtn" onclick="showPage(&#39;admin&#39;,this)" style="display:none">Удирдлага <span class="badge-dot" id="pendingDot"></span></button>
+    <button class="np active" id="navBuy" onclick="showPage('buy',this)">Бэлэг Карт</button>
+    <button class="np" id="navVerify" onclick="showPage('verify',this)">Шалгах</button>
+    <button class="np" id="adminNavBtn" onclick="showPage('admin',this)" style="display:none">Удирдлага <span class="badge-dot" id="pendingDot"></span></button>
   </div>
 </nav>
 
@@ -305,7 +305,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
         <div class="amt-note">Жинхэнэ амралт</div>
       </div>
       <div class="amt-custom" id="customTile" onclick="selCustom()">
-        <span style="font-family:&#39;Space Mono&#39;,monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text)">+ Өөр дүн</span>
+        <span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text)">+ Өөр дүн</span>
         <input type="number" id="customInp" placeholder="Дүн оруулна уу..." onclick="event.stopPropagation()" oninput="customChanged()" style="display:none;margin-top:10px;text-align:center;">
       </div>
     </div>
@@ -334,7 +334,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
         </div>
         <div class="gc-meta">
           <div id="prev-rec" class="hl"></div>
-          <div id="prev-exp">Хүчинтэй: 5/21/2027</div>
+          <div id="prev-exp">Хүчинтэй: —</div>
         </div>
       </div>
     </div>
@@ -345,7 +345,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
       <div class="panel-t">🎁 Бэлгийн мэдээлэл</div>
       <div class="fg">
         <label>Хүлээн авагч (заавал биш)</label>
-        <input type="text" id="f-rec" placeholder="Жш: Болд &amp; Сарнай гэр бүл" oninput="refreshPreview()">
+        <input type="text" id="f-rec" placeholder="Жш: Болд & Сарнай гэр бүл" oninput="refreshPreview()">
       </div>
       <div class="fg">
         <label>Мессеж (заавал биш)</label>
@@ -358,7 +358,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
         <div class="fg">
           <label>Хүчинтэй хугацаа</label>
           <select id="f-valid" onchange="refreshPreview()">
-            <option value="365" selected="">1 жил</option>
+            <option value="365" selected>1 жил</option>
             <option value="730">2 жил</option>
             <option value="180">6 сар</option>
           </select>
@@ -366,7 +366,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
         <div class="fg">
           <label>Хэрэглэх тоо</label>
           <select id="f-uses">
-            <option value="1" selected="">1 удаа</option>
+            <option value="1" selected>1 удаа</option>
             <option value="2">2 удаа</option>
             <option value="3">3 удаа</option>
             <option value="unlimited">Хязгааргүй</option>
@@ -414,15 +414,15 @@ tr:hover td{background:rgba(90,122,85,.04);}
     </div>
     <div id="pinErr" class="pin-err">Буруу PIN код байна</div>
     <button class="btn-main" onclick="checkPin()">Нэвтрэх</button>
-    <p style="color:var(--text);font-size:11px;margin-top:14px;font-family:&#39;Space Mono&#39;,monospace;letter-spacing:1px">Анхны PIN: 1234</p>
+    <p style="color:var(--text);font-size:11px;margin-top:14px;font-family:'Space Mono',monospace;letter-spacing:1px">Анхны PIN: 1234</p>
   </div>
 
   <div id="adminContent" style="display:none">
     <div class="admin-wrap">
       <div class="admin-hdr">
         <div>
-          <div style="font-family:&#39;Space Mono&#39;,monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--moss);margin-bottom:6px">Удирдлага</div>
-          <div style="font-family:&#39;Playfair Display&#39;,serif;font-size:30px;font-weight:300;color:var(--cream)">Бэлгийн Карт</div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--moss);margin-bottom:6px">Удирдлага</div>
+          <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:300;color:var(--cream)">Бэлгийн Карт</div>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn-outline" onclick="toggleSett()">⚙ Тохиргоо</button>
@@ -440,9 +440,9 @@ tr:hover td{background:rgba(90,122,85,.04);}
 
       <!-- ADMIN TABS -->
       <div class="admin-tabs">
-        <button class="at active" onclick="switchAdminTab(&#39;pending&#39;,this)">⏳ Хүлээгдэж байгаа <span class="cnt" id="pendingCnt">0</span></button>
-        <button class="at" onclick="switchAdminTab(&#39;all&#39;,this)">📋 Бүх карт</button>
-        <button class="at" onclick="switchAdminTab(&#39;create&#39;,this)">+ Гараар үүсгэх</button>
+        <button class="at active" onclick="switchAdminTab('pending',this)">⏳ Хүлээгдэж байгаа <span class="cnt" id="pendingCnt">0</span></button>
+        <button class="at" onclick="switchAdminTab('all',this)">📋 Бүх карт</button>
+        <button class="at" onclick="switchAdminTab('create',this)">+ Гараар үүсгэх</button>
       </div>
 
       <div id="adminAlert" class="alert"></div>
@@ -534,18 +534,18 @@ tr:hover td{background:rgba(90,122,85,.04);}
       </div>
     </div>
     <div style="margin-bottom:10px">
-      <div style="font-family:&#39;Space Mono&#39;,monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text);margin-bottom:8px;text-align:center">Банкаа сонгоно уу</div>
+      <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text);margin-bottom:8px;text-align:center">Банкаа сонгоно уу</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <button class="btn-khan" onclick="openBank(&#39;khanbank&#39;)" style="margin:0;font-size:9px;padding:11px 8px">🏦 Khan Bank</button>
-        <button class="btn-khan" onclick="openBank(&#39;tdb&#39;)" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#8B0000,#B22222)">🏦 TDB Банк</button>
-        <button class="btn-khan" onclick="openBank(&#39;golomt&#39;)" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#1A5C1A,#2E8B2E)">🏦 Голомт Банк</button>
-        <button class="btn-khan" onclick="openBank(&#39;state&#39;)" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#4A0080,#6A0DAD)">🏦 Төрийн Банк</button>
-        <button class="btn-khan" onclick="openBank(&#39;mbank&#39;)" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#CC4400,#E85D00)">🏦 М Банк</button>
-        <button class="btn-khan" onclick="openBank(&#39;xacbank&#39;)" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#005580,#0077AA)">🏦 Хас Банк</button>
+        <button class="btn-khan" onclick="openBank('khanbank')" style="margin:0;font-size:9px;padding:11px 8px">🏦 Khan Bank</button>
+        <button class="btn-khan" onclick="openBank('tdb')" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#8B0000,#B22222)">🏦 TDB Банк</button>
+        <button class="btn-khan" onclick="openBank('golomt')" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#1A5C1A,#2E8B2E)">🏦 Голомт Банк</button>
+        <button class="btn-khan" onclick="openBank('state')" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#4A0080,#6A0DAD)">🏦 Төрийн Банк</button>
+        <button class="btn-khan" onclick="openBank('mbank')" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#CC4400,#E85D00)">🏦 М Банк</button>
+        <button class="btn-khan" onclick="openBank('xacbank')" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#005580,#0077AA)">🏦 Хас Банк</button>
       </div>
     </div>
     <button class="btn-confirm" onclick="confirmPay()">✓ Төлбөр хийсэн — Дараагийн алхам</button>
-    <button class="btn-cancel" onclick="closeModal(&#39;payModal&#39;)">Цуцлах</button>
+    <button class="btn-cancel" onclick="closeModal('payModal')">Цуцлах</button>
   </div>
 </div>
 
@@ -559,7 +559,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
     </p>
     <button class="btn-main" style="margin-bottom:10px" onclick="openInSafari()">🧭 Safari-д нээх</button>
     <div id="inAppMsg" style="background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.25);border-radius:10px;padding:14px;font-size:13px;color:var(--cream);line-height:1.8;margin-bottom:12px"></div>
-    <button class="btn-cancel" onclick="closeModal(&#39;inAppModal&#39;)">Хаах</button>
+    <button class="btn-cancel" onclick="closeModal('inAppModal')">Хаах</button>
   </div>
 </div>
 
@@ -593,8 +593,8 @@ tr:hover td{background:rgba(90,122,85,.04);}
         </div>
       </div>
     </div>
-    <p style="text-align:center;font-size:12px;color:var(--text);font-family:&#39;Space Mono&#39;,monospace;letter-spacing:1px;margin-top:8px">Гүйлгээний утга: <span id="pcp-ref" style="color:var(--gold)"></span></p>
-    <button class="btn-cancel" style="margin-top:16px" onclick="closeModal(&#39;pendingModal&#39;)">Хаах</button>
+    <p style="text-align:center;font-size:12px;color:var(--text);font-family:'Space Mono',monospace;letter-spacing:1px;margin-top:8px">Гүйлгээний утга: <span id="pcp-ref" style="color:var(--gold)"></span></p>
+    <button class="btn-cancel" style="margin-top:16px" onclick="closeModal('pendingModal')">Хаах</button>
   </div>
 </div>
 
@@ -625,7 +625,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
       <button class="btn-outline" onclick="copyCode()">📋 Код хуулах</button>
       <button class="btn-gold" onclick="saveCardImage()">📷 Зураг хадгалах</button>
     </div>
-    <button class="btn-cancel" style="margin-top:10px" onclick="closeModal(&#39;cardModal&#39;)">Хаах</button>
+    <button class="btn-cancel" style="margin-top:10px" onclick="closeModal('cardModal')">Хаах</button>
   </div>
 </div>
 
@@ -1118,6 +1118,5 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.addEventListener('hashchange', checkHash);
 });
 </script>
-
-
-</body></html>
+</body>
+</html>
