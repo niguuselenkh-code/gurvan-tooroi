@@ -530,6 +530,14 @@ tr:hover td{background:rgba(90,122,85,.04);}
       </div>
     </div>
     <button class="btn-khan" onclick="openBank('khanbank')">📱 Khan Bank апп нээх</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+      <button class="btn-khan" onclick="openBank('tdb')" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#8B0000,#B22222)">TDB</button>
+      <button class="btn-khan" onclick="openBank('golomt')" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#1A5C1A,#2E8B2E)">Голомт</button>
+      <button class="btn-khan" onclick="openBank('state')" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#4A0080,#6A0DAD)">Төрийн</button>
+      <button class="btn-khan" onclick="openBank('mbank')" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#CC4400,#E85D00)">М Банк</button>
+      <button class="btn-khan" onclick="openBank('xacbank')" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#005580,#0077AA)">Хас Банк</button>
+      <button class="btn-khan" onclick="openBank('tdb')" style="margin:0;font-size:8px;padding:9px 4px;background:rgba(90,90,90,.5)">Бусад</button>
+    </div>
     <button class="btn-confirm" onclick="confirmPay()">✓ Төлбөр хийсэн — Дараагийн алхам</button>
     <button class="btn-cancel" onclick="closeModal('payModal')">Цуцлах</button>
   </div>
@@ -720,7 +728,7 @@ async function startPayment(){
   };
   document.getElementById('pm-amt').textContent=selAmt_.toLocaleString()+'₮';
   document.getElementById('pm-desc').textContent='Гурван Тоорой бэлгийн карт'+(pendingCard.recipient?' — '+pendingCard.recipient:'');
-  document.getElementById('pm-acc').textContent=s.account;
+  document.getElementById('pm-acc').textContent=s.account||'Тохиргоонд данс оруулна уу';
   document.getElementById('pm-ref').textContent=pendingCard.payRef;
   openModal('payModal');
 }
@@ -775,9 +783,11 @@ async function openBank(bank){
 
 async function confirmPay(){
   if(!pendingCard)return;
-  await window.fbSaveCard(pendingCard);
+  const savedId = await window.fbSaveCard(pendingCard);
+  const savedCard = {...pendingCard, _id: savedId};
   closeModal('payModal');
-  // Show pending notice with hidden code
+
+  // Хүлээгдэж байна дэлгэц харуулна
   document.getElementById('pcp-val').textContent=pendingCard.amount.toLocaleString()+'₮';
   document.getElementById('pcp-code').textContent='••••-••••';
   document.getElementById('pcp-rec').textContent=pendingCard.recipient||'';
@@ -786,6 +796,20 @@ async function confirmPay(){
   openModal('pendingModal');
   updatePendingDot();
   pendingCard=null;
+
+  // Firebase realtime listener — менежер баталгаажуулахад автоматаар карт нээгдэнэ
+  if(savedId && window.firebaseReady){
+    const cardRef = firebase.database().ref('cards/' + savedId);
+    const listener = cardRef.on('value', (snap) => {
+      if(!snap.exists()) return;
+      const card = {...snap.val(), _id: savedId};
+      if(card.status === 'active'){
+        cardRef.off('value', listener); // listener зогсооно
+        closeModal('pendingModal');
+        showApprovedCard(card); // код нээгдсэн карт харуулна
+      }
+    });
+  }
 }
 
 // SHOW APPROVED CARD
