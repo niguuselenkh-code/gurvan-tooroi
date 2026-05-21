@@ -677,8 +677,9 @@ function refreshPreview(){
 }
 
 // CODE GEN
-function genCode(){
-  const used=getCards().map(c=>c.code);
+async function genCode(){
+  const allCards=await getCards();
+  const used=allCards.map(c=>c.code);
   let code;
   do {
     const a=Math.random().toString(36).substring(2,6).toUpperCase();
@@ -707,7 +708,7 @@ async function startPayment(){
   const days=parseInt(document.getElementById('f-valid').value);
   const exp=new Date(); exp.setDate(exp.getDate()+days);
   pendingCard={
-    code:genCode(),       // Картын нууц код — баталгаажсаны дараа л харагдана
+    code:await genCode(),       // Картын нууц код — баталгаажсаны дараа л харагдана
     payRef:genPayRef(),   // Гүйлгээний утга — картын кодоос өөр
     amount:selAmt_,
     recipient:document.getElementById('f-rec').value,
@@ -891,7 +892,7 @@ async function doMarkUsed(){
   document.getElementById('useBtn').style.display='none';
   document.getElementById('vr-icon').textContent='✅';
   document.getElementById('vr-title').textContent='Амжилттай ашигласан болгов!';
-  document.getElementById('vr-tbl').innerHTML=drows(cards[idx]);
+  document.getElementById('vr-tbl').innerHTML=drows(card);
   verifyCode_=null;
 }
 
@@ -1047,7 +1048,7 @@ async function doManualCreate(){
   if(!amt||amt<1000){alert('Дүн оруулна уу');return;}
   const days=parseInt(document.getElementById('mc-days').value)||365;
   const exp=new Date(); exp.setDate(exp.getDate()+days);
-  const card={code:genCode(),amount:amt,recipient:document.getElementById('mc-rec').value,message:'',expiryDate:exp.toISOString(),useCount:document.getElementById('mc-uses').value,usedTimes:0,status:'active',createdAt:new Date().toISOString()};
+  const card={code:await genCode(),amount:amt,recipient:document.getElementById('mc-rec').value,message:'',expiryDate:exp.toISOString(),useCount:document.getElementById('mc-uses').value,usedTimes:0,status:'active',createdAt:new Date().toISOString()};
   await window.fbSaveCard(card);
   refreshAdmin(); updatePendingDot();
   showAdminAlert('Карт үүслээ: '+card.code,'ok');
