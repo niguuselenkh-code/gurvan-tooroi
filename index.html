@@ -597,7 +597,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
   <div class="modal" style="max-width:520px">
     <div class="modal-t">🎉 Карт бэлэн боллоо!</div>
     <div class="sc-wrap">
-      <div class="gc" id="finalCard" style="width:380px;height:216px;padding:22px 26px">
+      <div class="gc" id="finalCard" style="width:380px;height:240px;padding:22px 26px">
         <div class="gc-shimmer"></div>
         <div class="gc-trees"></div>
         <div class="gc-top">
@@ -607,7 +607,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
         <div class="gc-center">
           <div class="gc-val-lbl">Дүн</div>
           <div class="gc-val" id="fc-val"></div>
-          <div id="fc-msg-inner" style="display:none;font-style:italic;font-size:11px;color:var(--sage);margin-top:4px;max-width:280px;margin-left:auto;margin-right:auto;"></div>
+          <div id="fc-msg-inner" style="display:none;font-style:italic;font-size:12px;color:var(--gold2);margin-top:6px;max-width:300px;margin-left:auto;margin-right:auto;line-height:1.4;"></div>
         </div>
         <div class="gc-bottom">
           <div><div class="gc-code-lbl">Нууц код</div><div class="gc-code-val" id="fc-code"></div></div>
@@ -820,14 +820,17 @@ function showApprovedCard(card){
   document.getElementById('fc-exp').textContent='Хүчинтэй: '+new Date(card.expiryDate).toLocaleDateString('mn-MN');
   const msgInner=document.getElementById('fc-msg-inner');
   const msg=document.getElementById('fc-msg');
+  const valEl=document.getElementById('fc-val');
   if(card.message){
     msgInner.style.display='block';
     msgInner.textContent='"'+card.message+'"';
     msg.style.display='block';
     msg.textContent='"'+card.message+'"';
+    valEl.style.fontSize='32px'; // мессеж байхад дүн жижгэрнэ
   } else {
     msgInner.style.display='none';
     msg.style.display='none';
+    valEl.style.fontSize='42px';
   }
   openModal('cardModal');
 }
