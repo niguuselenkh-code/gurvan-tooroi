@@ -599,6 +599,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
         <div class="gc-center">
           <div class="gc-val-lbl">Дүн</div>
           <div class="gc-val" id="fc-val"></div>
+          <div id="fc-msg-inner" style="display:none;font-style:italic;font-size:11px;color:var(--sage);margin-top:4px;max-width:280px;margin-left:auto;margin-right:auto;"></div>
         </div>
         <div class="gc-bottom">
           <div><div class="gc-code-lbl">Нууц код</div><div class="gc-code-val" id="fc-code"></div></div>
@@ -700,6 +701,7 @@ function genPayRef(){
 
 // PAYMENT
 async function startPayment(){
+  if(!window.firebaseReady){alert('Түр хүлээнэ үү, систем ачаалж байна...');return;}
   if(!selAmt_||selAmt_<1000){alert('Дүн сонгоно уу');return;}
   const s=await getSett();
   const days=parseInt(document.getElementById('f-valid').value);
@@ -791,9 +793,17 @@ function showApprovedCard(card){
   document.getElementById('fc-code').textContent=card.code;
   document.getElementById('fc-rec').textContent=card.recipient||'';
   document.getElementById('fc-exp').textContent='Хүчинтэй: '+new Date(card.expiryDate).toLocaleDateString('mn-MN');
+  const msgInner=document.getElementById('fc-msg-inner');
   const msg=document.getElementById('fc-msg');
-  if(card.message){msg.style.display='block';msg.textContent='"'+card.message+'"';}
-  else msg.style.display='none';
+  if(card.message){
+    msgInner.style.display='block';
+    msgInner.textContent='"'+card.message+'"';
+    msg.style.display='block';
+    msg.textContent='"'+card.message+'"';
+  } else {
+    msgInner.style.display='none';
+    msg.style.display='none';
+  }
   openModal('cardModal');
 }
 
