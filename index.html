@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<!-- saved from url=(0062)file:///C:/Users/Gegee/Downloads/gurvan_tooroi_giftcard_8.html -->
+<html lang="mn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Гурван Тоорой — Бэлгийн Карт</title>
+<link href="./Belgiin card_files/css2" rel="stylesheet">
+<script src="./Belgiin card_files/html2canvas.min.js.download"></script>
+<style>
+:root {
+  --forest:#1C2B1A; --forest2:#243322; --pine:#3D5C3A; --moss:#5A7A55;
+  --sage:#8FAB88; --mist:#C4D4BF; --cream:#F5F0E8;
+  --gold:#C8A84B; --gold2:#E0C06A;
+  --text:#7A9175; --tl:#5A7055;
+  --danger:#8A3A3A; --warn:#8A6A1A; --ok:#3A6A3A;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Crimson Pro',serif;background:var(--forest);color:var(--cream);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 30%,rgba(90,122,85,.08) 0%,transparent 60%),radial-gradient(ellipse at 85% 70%,rgba(72,100,67,.06) 0%,transparent 60%);pointer-events:none;z-index:0;}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(28,43,26,.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(90,122,85,.2);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-icon{font-size:22px;}
+.brand-text{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:var(--mist);letter-spacing:2px;}
+.brand-sub{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--moss);display:block;margin-top:1px;}
+.nav-pills{display:flex;gap:3px;background:rgba(0,0,0,.2);padding:3px;border-radius:30px;border:1px solid rgba(90,122,85,.15);}
+.np{padding:7px 18px;border:none;background:transparent;color:var(--text);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border-radius:25px;transition:all .25s;position:relative;}
+.np.active{background:var(--pine);color:var(--mist);}
+.np:hover:not(.active){color:var(--mist);background:rgba(90,122,85,.1);}
+.np .badge-dot{position:absolute;top:5px;right:8px;width:7px;height:7px;background:#E8A020;border-radius:50%;display:none;}
+.np .badge-dot.show{display:block;}
+
+.page{display:none;position:relative;z-index:1;}
+.page.active{display:block;animation:rise .35s ease;}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* BUY PAGE */
+.buy-hero{text-align:center;padding:52px 40px 36px;}
+.hero-eye{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--moss);margin-bottom:14px;}
+.hero-t{font-family:'Playfair Display',serif;font-size:46px;font-weight:300;color:var(--cream);line-height:1.15;margin-bottom:12px;}
+.hero-t em{font-style:italic;color:var(--gold2);}
+.hero-s{font-size:16px;color:var(--sage);font-weight:300;line-height:1.6;max-width:460px;margin:0 auto;}
+
+.amounts-wrap{max-width:660px;margin:0 auto 32px;padding:0 40px;}
+.sec-lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--moss);margin-bottom:12px;text-align:center;}
+.amt-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+.amt-tile{border:1px solid rgba(90,122,85,.25);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(36,51,34,.5);position:relative;overflow:hidden;}
+.amt-tile::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(200,168,75,.08) 0%,transparent 70%);opacity:0;transition:opacity .2s;}
+.amt-tile:hover{border-color:rgba(200,168,75,.4);}
+.amt-tile:hover::before,.amt-tile.sel::before{opacity:1;}
+.amt-tile.sel{border-color:var(--gold);background:rgba(200,168,75,.08);}
+.amt-n{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;color:var(--gold);margin-bottom:3px;}
+.amt-note{font-size:11px;color:var(--text);font-family:'Space Mono',monospace;}
+.amt-custom{grid-column:1/-1;border:1px dashed rgba(90,122,85,.25);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:transparent;}
+.amt-custom.sel{border-color:var(--gold);border-style:solid;}
+
+.form-wrap{max-width:660px;margin:0 auto;padding:0 40px 40px;}
+.panel{background:rgba(36,51,34,.6);border:1px solid rgba(90,122,85,.18);border-radius:16px;padding:26px;margin-bottom:14px;backdrop-filter:blur(4px);}
+.panel-t{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;color:var(--mist);margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid rgba(90,122,85,.15);}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.fg{margin-bottom:14px;}
+.fg:last-child{margin-bottom:0;}
+label{display:block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text);margin-bottom:7px;}
+input,select,textarea{width:100%;background:rgba(0,0,0,.2);border:1px solid rgba(90,122,85,.22);border-radius:8px;padding:11px 14px;color:var(--cream);font-family:'Crimson Pro',serif;font-size:15px;outline:none;transition:border-color .2s,background .2s;}
+input:focus,select:focus,textarea:focus{border-color:var(--moss);background:rgba(90,122,85,.06);}
+select option{background:var(--forest2);}
+textarea{resize:none;}
+
+/* CARD PREVIEW */
+.gc-wrap{display:flex;justify-content:center;padding:20px 40px;}
+.gc{width:440px;height:248px;border-radius:18px;position:relative;overflow:hidden;background:linear-gradient(145deg,#0F1D0E 0%,#1A2E18 45%,#0D1A0C 100%);border:1px solid rgba(143,171,136,.25);box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(143,171,136,.1);display:flex;flex-direction:column;justify-content:space-between;padding:26px 30px 22px;transition:transform .3s ease;}
+.gc:hover{transform:translateY(-3px) rotate(.3deg);}
+.gc-trees{position:absolute;bottom:0;left:0;right:0;height:100px;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 440 100'%3E%3Cpolygon points='30,100 50,60 70,100' fill='%23fff'/%3E%3Cpolygon points='40,70 55,35 70,70' fill='%23fff'/%3E%3Cpolygon points='90,100 115,55 140,100' fill='%23fff'/%3E%3Cpolygon points='100,65 118,25 136,65' fill='%23fff'/%3E%3Cpolygon points='160,100 180,62 200,100' fill='%23fff'/%3E%3Cpolygon points='220,100 245,50 270,100' fill='%23fff'/%3E%3Cpolygon points='230,65 248,20 266,65' fill='%23fff'/%3E%3Cpolygon points='290,100 310,58 330,100' fill='%23fff'/%3E%3Cpolygon points='350,100 375,52 400,100' fill='%23fff'/%3E%3Cpolygon points='360,68 377,28 394,68' fill='%23fff'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:cover;}
+.gc-shimmer{position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(200,168,75,.04),transparent);animation:shimmer 4s ease-in-out infinite;}
+@keyframes shimmer{0%{left:-60%}100%{left:140%}}
+.gc-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1;}
+.gc-brand-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:400;color:var(--mist);letter-spacing:3px;text-transform:uppercase;}
+.gc-brand-mn{font-family:'Crimson Pro',serif;font-size:11px;color:var(--sage);letter-spacing:1px;margin-top:2px;font-style:italic;}
+.gc-badge{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);border:1px solid rgba(200,168,75,.3);padding:4px 9px;border-radius:20px;background:rgba(200,168,75,.06);}
+.gc-center{text-align:center;position:relative;z-index:1;}
+.gc-val-lbl{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:3px;text-transform:uppercase;color:var(--text);margin-bottom:4px;}
+.gc-val{font-family:'Playfair Display',serif;font-size:42px;font-weight:300;color:var(--gold);line-height:1;letter-spacing:-1px;}
+.gc-bottom{display:flex;justify-content:space-between;align-items:flex-end;position:relative;z-index:1;}
+.gc-code-lbl{font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--text);margin-bottom:3px;}
+.gc-code-val{font-family:'Space Mono',monospace;font-size:15px;color:var(--cream);letter-spacing:3px;}
+.gc-code-val.hidden{color:rgba(196,212,191,.3);letter-spacing:4px;}
+.gc-meta{text-align:right;font-family:'Space Mono',monospace;font-size:8px;color:var(--text);line-height:1.9;}
+.gc-meta .hl{color:var(--gold2);}
+
+/* STATUS BADGE ON CARD */
+.gc-status{position:absolute;top:14px;right:14px;z-index:2;}
+.status-pill{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:20px;}
+.sp-pending{background:rgba(138,106,26,.3);color:#E8C060;border:1px solid rgba(200,160,60,.3);}
+.sp-active{background:rgba(40,100,40,.25);color:#80C880;border:1px solid rgba(60,140,60,.3);}
+
+/* BUTTONS */
+.btn-main{width:100%;padding:15px;background:linear-gradient(135deg,var(--pine),var(--moss));border:1px solid rgba(143,171,136,.3);border-radius:12px;color:var(--cream);font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:all .25s;}
+.btn-main:hover{background:linear-gradient(135deg,var(--moss),#7A9E72);transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.btn-outline{padding:10px 22px;background:transparent;border:1px solid rgba(90,122,85,.3);border-radius:8px;color:var(--sage);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-outline:hover{border-color:var(--sage);color:var(--cream);}
+.btn-gold{padding:11px 24px;background:linear-gradient(135deg,#8B6914,var(--gold));border:none;border-radius:8px;color:var(--forest);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;font-weight:700;}
+.btn-gold:hover{background:linear-gradient(135deg,var(--gold),var(--gold2));transform:translateY(-1px);}
+.btn-danger{padding:8px 16px;background:rgba(120,40,40,.2);border:1px solid rgba(120,40,40,.35);border-radius:7px;color:#C07070;font-family:'Space Mono',monospace;font-size:9px;cursor:pointer;transition:all .2s;letter-spacing:1px;}
+.btn-danger:hover{background:rgba(120,40,40,.35);}
+.btn-approve{padding:8px 16px;background:rgba(40,100,40,.2);border:1px solid rgba(40,100,40,.35);border-radius:7px;color:#80C880;font-family:'Space Mono',monospace;font-size:9px;cursor:pointer;transition:all .2s;letter-spacing:1px;}
+.btn-approve:hover{background:rgba(40,100,40,.35);}
+
+/* VERIFY PAGE */
+.v-center{max-width:500px;margin:0 auto;padding:48px 40px;text-align:center;}
+.page-t{font-family:'Playfair Display',serif;font-size:32px;font-weight:300;color:var(--cream);margin-bottom:8px;}
+.page-s{font-size:15px;color:var(--sage);margin-bottom:28px;}
+.emblem{width:72px;height:72px;margin:0 auto 22px;border-radius:50%;background:rgba(90,122,85,.12);border:1px solid rgba(90,122,85,.25);display:flex;align-items:center;justify-content:center;font-size:28px;}
+.code-big{text-align:center!important;font-family:'Space Mono',monospace!important;font-size:20px!important;letter-spacing:5px!important;text-transform:uppercase!important;padding:16px!important;}
+.vr{border-radius:14px;padding:26px;margin-top:20px;display:none;}
+.vr.show{display:block;animation:rise .3s ease;}
+.vr-ok{background:rgba(40,90,40,.15);border:1px solid rgba(70,130,70,.3);}
+.vr-err{background:rgba(90,40,40,.15);border:1px solid rgba(130,70,70,.3);}
+.vr-icon{font-size:38px;margin-bottom:10px;}
+.vr-title{font-family:'Playfair Display',serif;font-size:23px;font-weight:400;margin-bottom:14px;}
+.vr-ok .vr-title{color:#90C890;}
+.vr-err .vr-title{color:#C08080;}
+.dtbl{width:100%;font-size:13px;}
+.dtbl td{padding:7px 4px;border-bottom:1px solid rgba(255,255,255,.05);}
+.dtbl td:first-child{color:var(--text);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;text-align:left;}
+.dtbl td:last-child{color:var(--cream);text-align:right;}
+.use-btn{width:100%;padding:13px;margin-top:16px;background:linear-gradient(135deg,#3D6E3A,#5A8A55);border:none;border-radius:10px;color:var(--cream);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;display:none;}
+.use-btn:hover{background:linear-gradient(135deg,#4A7E47,#6A9A65);}
+
+/* ADMIN */
+.admin-wrap{max-width:1000px;margin:0 auto;padding:40px;}
+.pin-gate{max-width:340px;margin:70px auto;text-align:center;}
+.pin-row{display:flex;gap:10px;justify-content:center;margin:24px 0;}
+.pin-box{width:54px;height:54px;text-align:center;font-size:22px;background:rgba(0,0,0,.25);border:1px solid rgba(90,122,85,.25);border-radius:10px;color:var(--cream);font-family:'Space Mono',monospace;outline:none;transition:border-color .2s;}
+.pin-box:focus{border-color:var(--moss);}
+.pin-err{color:#C08080;font-size:12px;font-family:'Space Mono',monospace;letter-spacing:1px;display:none;margin-top:8px;}
+.pin-err.show{display:block;}
+.admin-hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:26px;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px;}
+.stat{background:rgba(36,51,34,.6);border:1px solid rgba(90,122,85,.15);border-radius:10px;padding:18px;text-align:center;}
+.stat-n{font-family:'Playfair Display',serif;font-size:30px;font-weight:300;color:var(--gold);line-height:1;margin-bottom:4px;}
+.stat-l{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text);}
+
+/* TABS inside admin */
+.admin-tabs{display:flex;gap:0;margin-bottom:18px;border-bottom:1px solid rgba(90,122,85,.2);}
+.at{padding:10px 22px;border:none;background:transparent;color:var(--text);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-1px;position:relative;}
+.at.active{color:var(--gold);border-bottom-color:var(--gold);}
+.at .cnt{display:inline-block;background:var(--gold);color:var(--forest);border-radius:10px;font-size:8px;padding:1px 6px;margin-left:6px;font-weight:700;}
+.at-content{display:none;}
+.at-content.active{display:block;animation:rise .25s ease;}
+
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;padding:10px 14px;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text);border-bottom:1px solid rgba(90,122,85,.15);}
+td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--cream);}
+tr:hover td{background:rgba(90,122,85,.04);}
+.bdg{display:inline-block;padding:3px 10px;border-radius:20px;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;}
+.b-active{background:rgba(40,100,40,.2);color:#80C880;border:1px solid rgba(40,100,40,.3);}
+.b-used{background:rgba(70,70,70,.2);color:#909090;border:1px solid rgba(70,70,70,.3);}
+.b-expired{background:rgba(100,40,40,.2);color:#C08080;border:1px solid rgba(100,40,40,.3);}
+.b-pending{background:rgba(130,100,20,.2);color:#E0B040;border:1px solid rgba(130,100,20,.3);}
+
+.alert{padding:11px 16px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;}
+.alert.show{display:block;}
+.a-ok{background:rgba(40,100,40,.15);border:1px solid rgba(40,100,40,.3);color:#90C890;}
+.a-err{background:rgba(100,40,40,.15);border:1px solid rgba(100,40,40,.3);color:#C09090;}
+
+.sett-panel{display:none;margin-top:18px;background:rgba(36,51,34,.5);border:1px solid rgba(90,122,85,.15);border-radius:14px;padding:24px;}
+.empty-state{text-align:center;padding:40px;color:var(--text);font-size:13px;font-style:italic;}
+.act-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+
+/* MODALS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);z-index:200;align-items:center;justify-content:center;}
+.overlay.open{display:flex;}
+.modal{background:var(--forest2);border:1px solid rgba(90,122,85,.2);border-radius:20px;padding:36px;width:440px;max-width:95vw;animation:rise .3s ease;}
+.modal-t{font-family:'Playfair Display',serif;font-size:25px;font-weight:300;color:var(--mist);margin-bottom:22px;text-align:center;}
+.pay-amt-box{text-align:center;padding:22px;background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.18);border-radius:12px;margin-bottom:22px;}
+.pay-amt{font-family:'Playfair Display',serif;font-size:42px;font-weight:300;color:var(--gold);line-height:1;}
+.pay-desc{font-size:13px;color:var(--sage);margin-top:6px;}
+.pay-steps{margin-bottom:22px;}
+.pay-step{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid rgba(90,122,85,.1);}
+.step-c{width:26px;height:26px;background:var(--pine);border:1px solid rgba(143,171,136,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;color:var(--mist);flex-shrink:0;margin-top:1px;}
+.step-b{font-size:13px;color:var(--sage);line-height:1.6;}
+.step-b strong{color:var(--cream);display:block;margin-bottom:1px;font-weight:400;}
+.step-hl{color:var(--gold);font-family:'Space Mono',monospace;font-size:12px;letter-spacing:2px;}
+.btn-khan{width:100%;padding:14px;background:linear-gradient(135deg,#1B3D7B,#2451A0);color:white;border:none;border-radius:10px;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-bottom:10px;}
+.btn-khan:hover{background:linear-gradient(135deg,#2451A0,#3060BF);}
+.btn-confirm{width:100%;padding:13px;background:rgba(90,122,85,.2);border:1px solid rgba(90,122,85,.35);border-radius:10px;color:var(--mist);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-bottom:8px;}
+.btn-confirm:hover{background:rgba(90,122,85,.35);}
+.btn-cancel{width:100%;padding:10px;background:transparent;border:1px solid rgba(90,122,85,.15);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.btn-cancel:hover{color:var(--sage);border-color:rgba(90,122,85,.3);}
+
+/* PENDING CARD view - code hidden */
+.pending-notice{background:rgba(130,100,20,.12);border:1px solid rgba(200,160,40,.2);border-radius:12px;padding:18px 20px;margin-bottom:16px;display:flex;gap:14px;align-items:flex-start;}
+.pn-icon{font-size:22px;flex-shrink:0;}
+.pn-text{font-size:14px;color:var(--sage);line-height:1.6;}
+.pn-text strong{color:var(--gold2);display:block;margin-bottom:3px;font-weight:400;font-family:'Playfair Display',serif;font-size:16px;}
+
+/* SUCCESS CARD modal */
+.sc-wrap{display:flex;justify-content:center;margin:14px 0;}
+.copy-row{display:flex;gap:10px;margin-top:14px;}
+.copy-row button{flex:1;}
+
+@media(max-width:640px){
+  nav{padding:0 16px;}
+  .hero-t{font-size:32px;}
+  .buy-hero,.amounts-wrap,.form-wrap,.v-center,.admin-wrap{padding-left:16px;padding-right:16px;}
+  .gc{width:310px;height:178px;padding:16px 18px;}
+  .gc-val{font-size:30px;}
+  .fr{grid-template-columns:1fr;}
+  .amt-grid{grid-template-columns:1fr 1fr;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <img src="data:image/jpeg;base64,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" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid rgba(200,168,75,.3);">
+    <div>
+      <div class="brand-text">Гурван Тоорой</div>
+      <span class="brand-sub">Амралтын Газар</span>
+    </div>
+  </div>
+  <div class="nav-pills">
+    <button class="np active" id="navBuy" onclick="showPage(&#39;buy&#39;,this)">Бэлэг Карт</button>
+    <button class="np" id="navVerify" onclick="showPage(&#39;verify&#39;,this)">Шалгах</button>
+    <button class="np" id="adminNavBtn" onclick="showPage(&#39;admin&#39;,this)" style="display:none">Удирдлага <span class="badge-dot" id="pendingDot"></span></button>
+  </div>
+</nav>
+
+<!-- ============ BUY ============ -->
+<div id="page-buy" class="page active">
+  <div class="buy-hero">
+    <div class="hero-eye">Онцгой Бэлэг</div>
+    <h1 class="hero-t">Найздаа <em>амралт</em> бэлэглээрэй</h1>
+    <p class="hero-s">Гурван Тоорой дахь тайван агшинг хайртай хүндээ бэлэглэ</p>
+  </div>
+
+  <div class="amounts-wrap">
+    <div class="sec-lbl">Дүн сонгох</div>
+    <div class="amt-grid">
+      <div class="amt-tile" onclick="selAmt(200000,this)">
+        <div class="amt-n">200,000₮</div>
+        <div class="amt-note">Хөөрхөн бэлэг</div>
+      </div>
+      <div class="amt-tile sel" onclick="selAmt(400000,this)">
+        <div class="amt-n">400,000₮</div>
+        <div class="amt-note">Янзын бэлэг</div>
+      </div>
+      <div class="amt-tile" onclick="selAmt(600000,this)">
+        <div class="amt-n">600,000₮</div>
+        <div class="amt-note">Жинхэнэ амралт</div>
+      </div>
+      <div class="amt-custom" id="customTile" onclick="selCustom()">
+        <span style="font-family:&#39;Space Mono&#39;,monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text)">+ Өөр дүн</span>
+        <input type="number" id="customInp" placeholder="Дүн оруулна уу..." onclick="event.stopPropagation()" oninput="customChanged()" style="display:none;margin-top:10px;text-align:center;">
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD PREVIEW -->
+  <div class="gc-wrap">
+    <div class="gc" id="previewCard">
+      <div class="gc-shimmer"></div>
+      <div class="gc-trees"></div>
+      <div class="gc-top">
+        <div>
+          <div class="gc-brand-name">Gurvan Tooroi</div>
+          <div class="gc-brand-mn">Гурван Тоорой</div>
+        </div>
+        <div class="gc-badge">Gift Voucher</div>
+      </div>
+      <div class="gc-center">
+        <div class="gc-val-lbl">Дүн</div>
+        <div class="gc-val" id="prev-val">400,000₮</div>
+      </div>
+      <div class="gc-bottom">
+        <div>
+          <div class="gc-code-lbl">Нууц код</div>
+          <div class="gc-code-val hidden" id="prev-code">••••-••••</div>
+        </div>
+        <div class="gc-meta">
+          <div id="prev-rec" class="hl"></div>
+          <div id="prev-exp">Хүчинтэй: 5/21/2027</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-wrap">
+    <div class="panel">
+      <div class="panel-t">🎁 Бэлгийн мэдээлэл</div>
+      <div class="fg">
+        <label>Хүлээн авагч (заавал биш)</label>
+        <input type="text" id="f-rec" placeholder="Жш: Болд &amp; Сарнай гэр бүл" oninput="refreshPreview()">
+      </div>
+      <div class="fg">
+        <label>Мессеж (заавал биш)</label>
+        <textarea id="f-msg" rows="2" placeholder="Жш: Хүүхэдтэй болсонд баяр хүргэе! 🎉"></textarea>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-t">⚙ Тохиргоо</div>
+      <div class="fr">
+        <div class="fg">
+          <label>Хүчинтэй хугацаа</label>
+          <select id="f-valid" onchange="refreshPreview()">
+            <option value="365" selected="">1 жил</option>
+            <option value="730">2 жил</option>
+            <option value="180">6 сар</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Хэрэглэх тоо</label>
+          <select id="f-uses">
+            <option value="1" selected="">1 удаа</option>
+            <option value="2">2 удаа</option>
+            <option value="3">3 удаа</option>
+            <option value="unlimited">Хязгааргүй</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <button class="btn-main" onclick="startPayment()">🏦 Khan Bank-аар төлж карт авах</button>
+  </div>
+</div>
+
+<!-- ============ VERIFY ============ -->
+<div id="page-verify" class="page">
+  <div class="v-center">
+    <div class="emblem">🎫</div>
+    <h2 class="page-t">Карт шалгах</h2>
+    <p class="page-s">Нууц кодоо оруулж баталгаажуулна уу</p>
+    <div class="panel">
+      <div class="fg">
+        <label>Нууц код</label>
+        <input type="text" id="v-code" class="code-big" placeholder="XXXX-XXXX" oninput="this.value=this.value.toUpperCase()" maxlength="9">
+      </div>
+      <button class="btn-main" onclick="doVerify()" style="margin-top:4px">Шалгах</button>
+    </div>
+    <div id="verifyRes" class="vr">
+      <div class="vr-icon" id="vr-icon"></div>
+      <div class="vr-title" id="vr-title"></div>
+      <table class="dtbl" id="vr-tbl"></table>
+      <button class="use-btn" id="useBtn" onclick="doMarkUsed()">✓ Ашигласан болгох</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADMIN ============ -->
+<div id="page-admin" class="page">
+  <div id="pinGate" class="pin-gate">
+    <div class="emblem" style="margin:0 auto 20px">🔐</div>
+    <h2 class="page-t">Удирдлага</h2>
+    <p style="color:var(--sage);font-size:14px;margin-top:6px">PIN код оруулна уу</p>
+    <div class="pin-row">
+      <input type="password" class="pin-box" maxlength="1" oninput="pinNav(this,0)">
+      <input type="password" class="pin-box" maxlength="1" oninput="pinNav(this,1)">
+      <input type="password" class="pin-box" maxlength="1" oninput="pinNav(this,2)">
+      <input type="password" class="pin-box" maxlength="1" oninput="pinNav(this,3)">
+    </div>
+    <div id="pinErr" class="pin-err">Буруу PIN код байна</div>
+    <button class="btn-main" onclick="checkPin()">Нэвтрэх</button>
+    <p style="color:var(--text);font-size:11px;margin-top:14px;font-family:&#39;Space Mono&#39;,monospace;letter-spacing:1px">Анхны PIN: 1234</p>
+  </div>
+
+  <div id="adminContent" style="display:none">
+    <div class="admin-wrap">
+      <div class="admin-hdr">
+        <div>
+          <div style="font-family:&#39;Space Mono&#39;,monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--moss);margin-bottom:6px">Удирдлага</div>
+          <div style="font-family:&#39;Playfair Display&#39;,serif;font-size:30px;font-weight:300;color:var(--cream)">Бэлгийн Карт</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-outline" onclick="toggleSett()">⚙ Тохиргоо</button>
+          <button class="btn-outline" onclick="lockAdmin()">🔒 Гарах</button>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat"><div class="stat-n" id="s-total">0</div><div class="stat-l">Нийт карт</div></div>
+        <div class="stat"><div class="stat-n" id="s-pending">0</div><div class="stat-l">Хүлээгдэж байна</div></div>
+        <div class="stat"><div class="stat-n" id="s-active">0</div><div class="stat-l">Идэвхтэй</div></div>
+        <div class="stat"><div class="stat-n" id="s-revenue">0₮</div><div class="stat-l">Нийт борлуулалт</div></div>
+      </div>
+
+      <!-- ADMIN TABS -->
+      <div class="admin-tabs">
+        <button class="at active" onclick="switchAdminTab(&#39;pending&#39;,this)">⏳ Хүлээгдэж байгаа <span class="cnt" id="pendingCnt">0</span></button>
+        <button class="at" onclick="switchAdminTab(&#39;all&#39;,this)">📋 Бүх карт</button>
+        <button class="at" onclick="switchAdminTab(&#39;create&#39;,this)">+ Гараар үүсгэх</button>
+      </div>
+
+      <div id="adminAlert" class="alert"></div>
+
+      <!-- PENDING TAB -->
+      <div id="tab-pending" class="at-content active">
+        <div class="panel" style="padding:0;overflow:hidden">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Захиалсан огноо</th><th>Дүн</th><th>Хүлээн авагч</th><th>Гүйлгээний утга</th><th>Үйлдэл</th></tr></thead>
+              <tbody id="pendingTbody"><tr><td colspan="5"><div class="empty-state">Хүлээгдэж байгаа захиалга байхгүй</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALL CARDS TAB -->
+      <div id="tab-all" class="at-content">
+        <div class="act-row">
+          <button class="btn-gold" style="font-size:9px;padding:9px 18px" onclick="exportCSV()">↓ CSV татах</button>
+          <button class="btn-danger" onclick="clearOld()">Дуусагдсан устгах</button>
+        </div>
+        <div class="panel" style="padding:0;overflow:hidden">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Код</th><th>Дүн</th><th>Хүлээн авагч</th><th>Дуусах</th><th>Ашиглалт</th><th>Статус</th><th></th></tr></thead>
+              <tbody id="allTbody"><tr><td colspan="7"><div class="empty-state">Карт байхгүй</div></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CREATE TAB -->
+      <div id="tab-create" class="at-content">
+        <div class="panel" style="max-width:500px">
+          <div class="panel-t">+ Гараар карт үүсгэх</div>
+          <div class="fg"><label>Дүн (₮)</label><input type="number" id="mc-amt" placeholder="400000"></div>
+          <div class="fg"><label>Хүлээн авагч</label><input type="text" id="mc-rec" placeholder="Нэр (заавал биш)"></div>
+          <div class="fr">
+            <div class="fg"><label>Хүчинтэй хоног</label><input type="number" id="mc-days" value="365"></div>
+            <div class="fg"><label>Хэрэглэх тоо</label>
+              <select id="mc-uses">
+                <option value="1">1 удаа</option><option value="2">2 удаа</option>
+                <option value="3">3 удаа</option><option value="unlimited">Хязгааргүй</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-main" style="margin-top:8px" onclick="doManualCreate()">Үүсгэх</button>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="settPanel" class="sett-panel">
+        <div class="panel-t" style="border-bottom:1px solid rgba(90,122,85,.15);padding-bottom:12px;margin-bottom:18px">⚙ Тохиргоо</div>
+        <div class="fr">
+          <div class="fg"><label>Khan Bank данс</label><input type="text" id="s-acc" placeholder="9XXXXXXXX"></div>
+          <div class="fg"><label>Газрын нэр</label><input type="text" id="s-name" placeholder="Гурван Тоорой"></div>
+        </div>
+        <div class="fr">
+          <div class="fg"><label>Шинэ PIN</label><input type="password" id="s-pin" placeholder="4 оронтой тоо" maxlength="4"></div>
+          <div class="fg"><label>PIN баталгаажуулах</label><input type="password" id="s-pin2" placeholder="Давтах" maxlength="4"></div>
+        </div>
+        <button class="btn-gold" onclick="saveSett()">Хадгалах</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAYMENT MODAL ============ -->
+<div class="overlay" id="payModal">
+  <div class="modal">
+    <div class="modal-t">🏦 Khan Bank Төлбөр</div>
+    <div class="pay-amt-box">
+      <div class="pay-amt" id="pm-amt"></div>
+      <div class="pay-desc" id="pm-desc"></div>
+    </div>
+    <div class="pay-steps">
+      <div class="pay-step">
+        <div class="step-c">1</div>
+        <div class="step-b"><strong>Khan Bank апп нээнэ үү</strong>Утасны Khan Bank апп дээр нэвтэрнэ</div>
+      </div>
+      <div class="pay-step">
+        <div class="step-c">2</div>
+        <div class="step-b"><strong>Шилжүүлэг хийнэ үү</strong>Данс: <span class="step-hl" id="pm-acc">—</span></div>
+      </div>
+      <div class="pay-step">
+        <div class="step-c">3</div>
+        <div class="step-b"><strong>Гүйлгээний утганд заавал бичнэ үү</strong><span class="step-hl" id="pm-ref">GC-XXXXXXXX</span></div>
+      </div>
+    </div>
+    <div style="margin-bottom:10px">
+      <div style="font-family:&#39;Space Mono&#39;,monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text);margin-bottom:8px;text-align:center">Банкаа сонгоно уу</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn-khan" onclick="openBank(&#39;khanbank&#39;)" style="margin:0;font-size:9px;padding:11px 8px">🏦 Khan Bank</button>
+        <button class="btn-khan" onclick="openBank(&#39;tdb&#39;)" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#8B0000,#B22222)">🏦 TDB Банк</button>
+        <button class="btn-khan" onclick="openBank(&#39;golomt&#39;)" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#1A5C1A,#2E8B2E)">🏦 Голомт Банк</button>
+        <button class="btn-khan" onclick="openBank(&#39;state&#39;)" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#4A0080,#6A0DAD)">🏦 Төрийн Банк</button>
+        <button class="btn-khan" onclick="openBank(&#39;mbank&#39;)" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#CC4400,#E85D00)">🏦 М Банк</button>
+        <button class="btn-khan" onclick="openBank(&#39;xacbank&#39;)" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#005580,#0077AA)">🏦 Хас Банк</button>
+      </div>
+    </div>
+    <button class="btn-confirm" onclick="confirmPay()">✓ Төлбөр хийсэн — Дараагийн алхам</button>
+    <button class="btn-cancel" onclick="closeModal(&#39;payModal&#39;)">Цуцлах</button>
+  </div>
+</div>
+
+<!-- IN-APP BROWSER WARNING -->
+<div class="overlay" id="inAppModal">
+  <div class="modal" style="text-align:center">
+    <div style="font-size:48px;margin-bottom:16px">📱</div>
+    <div class="modal-t" style="color:var(--gold2)">Браузерт нээнэ үү</div>
+    <p style="font-size:14px;color:var(--sage);line-height:1.8;margin-bottom:16px">
+      Банкны аппыг нээхийн тулд энэ хуудсыг <strong style="color:var(--cream)">Safari эсвэл Chrome</strong>-д нээнэ үү.
+    </p>
+    <button class="btn-main" style="margin-bottom:10px" onclick="openInSafari()">🧭 Safari-д нээх</button>
+    <div id="inAppMsg" style="background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.25);border-radius:10px;padding:14px;font-size:13px;color:var(--cream);line-height:1.8;margin-bottom:12px"></div>
+    <button class="btn-cancel" onclick="closeModal(&#39;inAppModal&#39;)">Хаах</button>
+  </div>
+</div>
+
+
+<div class="overlay" id="pendingModal">
+  <div class="modal">
+    <div class="modal-t">⏳ Баталгаажуулалт хүлээгдэж байна</div>
+    <div class="pending-notice">
+      <div class="pn-icon">🔔</div>
+      <div class="pn-text">
+        <strong>Таны захиалга хүлээн авагдлаа!</strong>
+        Менежер гүйлгээг шалгаад баталгаажуулна. Баталгаажсаны дараа нууц код нээгдэж, карт бэлэн болно.
+      </div>
+    </div>
+    <!-- Preview card with hidden code -->
+    <div class="sc-wrap">
+      <div class="gc" id="pendingCardPreview" style="width:360px;height:205px;padding:20px 24px">
+        <div class="gc-shimmer"></div>
+        <div class="gc-trees"></div>
+        <div class="gc-top">
+          <div><div class="gc-brand-name">Gurvan Tooroi</div><div class="gc-brand-mn">Гурван Тоорой</div></div>
+          <div class="gc-badge">Gift Voucher</div>
+        </div>
+        <div class="gc-center">
+          <div class="gc-val-lbl">Дүн</div>
+          <div class="gc-val" id="pcp-val"></div>
+        </div>
+        <div class="gc-bottom">
+          <div><div class="gc-code-lbl">Нууц код</div><div class="gc-code-val hidden" id="pcp-code">••••-••••</div></div>
+          <div class="gc-meta"><div id="pcp-rec" class="hl"></div><div id="pcp-exp"></div></div>
+        </div>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:12px;color:var(--text);font-family:&#39;Space Mono&#39;,monospace;letter-spacing:1px;margin-top:8px">Гүйлгээний утга: <span id="pcp-ref" style="color:var(--gold)"></span></p>
+    <button class="btn-cancel" style="margin-top:16px" onclick="closeModal(&#39;pendingModal&#39;)">Хаах</button>
+  </div>
+</div>
+
+<!-- ============ SUCCESS CARD MODAL ============ -->
+<div class="overlay" id="cardModal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-t">🎉 Карт бэлэн боллоо!</div>
+    <div class="sc-wrap">
+      <div class="gc" id="finalCard" style="width:380px;height:216px;padding:22px 26px">
+        <div class="gc-shimmer"></div>
+        <div class="gc-trees"></div>
+        <div class="gc-top">
+          <div><div class="gc-brand-name">Gurvan Tooroi</div><div class="gc-brand-mn">Гурван Тоорой</div></div>
+          <div class="gc-badge">Gift Voucher</div>
+        </div>
+        <div class="gc-center">
+          <div class="gc-val-lbl">Дүн</div>
+          <div class="gc-val" id="fc-val"></div>
+        </div>
+        <div class="gc-bottom">
+          <div><div class="gc-code-lbl">Нууц код</div><div class="gc-code-val" id="fc-code"></div></div>
+          <div class="gc-meta"><div id="fc-rec" class="hl"></div><div id="fc-exp"></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="fc-msg" style="display:none;text-align:center;padding:12px;background:rgba(90,122,85,.08);border:1px solid rgba(90,122,85,.2);border-radius:8px;font-style:italic;font-size:14px;color:var(--sage);margin-top:8px"></div>
+    <div class="copy-row">
+      <button class="btn-outline" onclick="copyCode()">📋 Код хуулах</button>
+      <button class="btn-gold" onclick="saveCardImage()">📷 Зураг хадгалах</button>
+    </div>
+    <button class="btn-cancel" style="margin-top:10px" onclick="closeModal(&#39;cardModal&#39;)">Хаах</button>
+  </div>
+</div>
+
+<script>
+const DB='gt_v2'; const SET='gt_set_v2';
+const getCards=()=>JSON.parse(localStorage.getItem(DB)||'[]');
+const setCards=d=>localStorage.setItem(DB,JSON.stringify(d));
+const getSett=()=>JSON.parse(localStorage.getItem(SET)||'{"account":"9XXXXXXXX","name":"Гурван Тоорой","pin":"1234"}');
+const setSett=d=>localStorage.setItem(SET,JSON.stringify(d));
+
+let selAmt_=400000, pendingCard=null, verifyCode_=null;
+
+// NAV
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.np').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(el)el.classList.add('active');
+  if(id==='admin')refreshAdmin();
+  updatePendingDot();
+}
+
+function updatePendingDot(){
+  const n=getCards().filter(c=>c.status==='pending').length;
+  const dot=document.getElementById('pendingDot');
+  dot.classList.toggle('show',n>0);
+}
+
+// AMOUNTS
+function selAmt(amt,tile){
+  selAmt_=amt;
+  document.querySelectorAll('.amt-tile').forEach(t=>t.classList.remove('sel'));
+  document.getElementById('customTile').classList.remove('sel');
+  document.getElementById('customInp').style.display='none';
+  tile.classList.add('sel');
+  refreshPreview();
+}
+function selCustom(){
+  document.querySelectorAll('.amt-tile').forEach(t=>t.classList.remove('sel'));
+  document.getElementById('customTile').classList.add('sel');
+  const inp=document.getElementById('customInp');
+  inp.style.display='block'; inp.focus();
+}
+function customChanged(){
+  selAmt_=parseInt(document.getElementById('customInp').value)||0;
+  refreshPreview();
+}
+
+// PREVIEW
+function refreshPreview(){
+  const rec=document.getElementById('f-rec').value;
+  const days=parseInt(document.getElementById('f-valid').value);
+  const exp=new Date(); exp.setDate(exp.getDate()+days);
+  document.getElementById('prev-val').textContent=selAmt_?selAmt_.toLocaleString()+'₮':'—';
+  document.getElementById('prev-rec').textContent=rec||'';
+  document.getElementById('prev-exp').textContent='Хүчинтэй: '+exp.toLocaleDateString('mn-MN');
+}
+
+// CODE GEN
+function genCode(){
+  const used=getCards().map(c=>c.code);
+  let code;
+  do {
+    const a=Math.random().toString(36).substring(2,6).toUpperCase();
+    const b=Math.random().toString(36).substring(2,6).toUpperCase();
+    code=a+'-'+b;
+  } while(used.includes(code));
+  return code;
+}
+
+// Гүйлгээний утга үүсгэх (картын кодоос ТУСДАА — огноо+цаг+random)
+function genPayRef(){
+  const now=new Date();
+  const d=now.getFullYear().toString().slice(2)
+    +String(now.getMonth()+1).padStart(2,'0')
+    +String(now.getDate()).padStart(2,'0');
+  const t=String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0');
+  const r=Math.random().toString(36).substring(2,5).toUpperCase();
+  return 'GT-'+d+'-'+t+r;
+}
+
+// PAYMENT
+function startPayment(){
+  if(!selAmt_||selAmt_<1000){alert('Дүн сонгоно уу');return;}
+  const s=getSett();
+  const days=parseInt(document.getElementById('f-valid').value);
+  const exp=new Date(); exp.setDate(exp.getDate()+days);
+  pendingCard={
+    code:genCode(),       // Картын нууц код — баталгаажсаны дараа л харагдана
+    payRef:genPayRef(),   // Гүйлгээний утга — картын кодоос өөр
+    amount:selAmt_,
+    recipient:document.getElementById('f-rec').value,
+    message:document.getElementById('f-msg').value,
+    expiryDate:exp.toISOString(),
+    useCount:document.getElementById('f-uses').value,
+    usedTimes:0, status:'pending',
+    createdAt:new Date().toISOString()
+  };
+  document.getElementById('pm-amt').textContent=selAmt_.toLocaleString()+'₮';
+  document.getElementById('pm-desc').textContent='Гурван Тоорой бэлгийн карт'+(pendingCard.recipient?' — '+pendingCard.recipient:'');
+  document.getElementById('pm-acc').textContent=s.account;
+  document.getElementById('pm-ref').textContent=pendingCard.payRef;
+  openModal('payModal');
+}
+
+function openInSafari(){
+  // Safari deep link - forces open in Safari on iOS
+  const url = window.location.href;
+  window.location.href = 'x-safari-' + url;
+  setTimeout(() => {
+    // Fallback: copy link and tell user
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Линк хуулагдлаа! Safari-г нээгээд хаягийн мөрөнд буулгана уу.');
+    }).catch(() => {
+      alert('Safari-г нээгээд дараах хаягийг оруулна уу:\n\n' + url);
+    });
+  }, 1000);
+}
+
+function isInAppBrowser(){
+  const ua=navigator.userAgent||'';
+  return /FBAN|FBAV|Instagram|Messenger|Line|Twitter|MicroMessenger/i.test(ua);
+}
+
+function openBank(bank){
+  if(isInAppBrowser()){
+    const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isAndroid=/Android/i.test(navigator.userAgent);
+    let guide='';
+    if(isIOS) guide='📱 Доод талын <strong>⬜ товч → "Safari-д нээх"</strong> дарна уу';
+    else if(isAndroid) guide='📱 Дээд талын <strong>⋮ → "Chrome-д нээх"</strong> дарна уу';
+    else guide='📱 Браузерийнхаа <strong>"Гадаад браузерт нээх"</strong> товчийг дарна уу';
+
+    document.getElementById('inAppMsg').innerHTML=guide;
+    document.getElementById('inAppModal').classList.add('open');
+    return;
+  }
+  const s=getSett();
+  const amt=selAmt_;
+  const ref=encodeURIComponent(pendingCard.payRef);
+  const acc=s.account;
+  const links={
+    khanbank: `khanbank://transfer?account=${acc}&amount=${amt}&description=${ref}`,
+    tdb:      `tdbpay://transfer?account=${acc}&amount=${amt}&description=${ref}`,
+    golomt:   `golomt://transfer?account=${acc}&amount=${amt}&description=${ref}`,
+    state:    `statebank://transfer?account=${acc}&amount=${amt}&description=${ref}`,
+    mbank:    `mbank://transfer?account=${acc}&amount=${amt}&description=${ref}`,
+    xacbank:  `xacbank://transfer?account=${acc}&amount=${amt}&description=${ref}`,
+  };
+  window.location.href=links[bank]||links.khanbank;
+  setTimeout(()=>{window.location.href='https://www.khanbank.com';},1500);
+}
+
+function confirmPay(){
+  if(!pendingCard)return;
+  const cards=getCards();
+  cards.push(pendingCard);
+  setCards(cards);
+  closeModal('payModal');
+  // Show pending notice with hidden code
+  document.getElementById('pcp-val').textContent=pendingCard.amount.toLocaleString()+'₮';
+  document.getElementById('pcp-code').textContent='••••-••••';
+  document.getElementById('pcp-rec').textContent=pendingCard.recipient||'';
+  document.getElementById('pcp-exp').textContent='Хүчинтэй: '+new Date(pendingCard.expiryDate).toLocaleDateString('mn-MN');
+  document.getElementById('pcp-ref').textContent=pendingCard.payRef;
+  openModal('pendingModal');
+  updatePendingDot();
+  pendingCard=null;
+}
+
+// SHOW APPROVED CARD
+function showApprovedCard(card){
+  document.getElementById('fc-val').textContent=card.amount.toLocaleString()+'₮';
+  document.getElementById('fc-code').textContent=card.code;
+  document.getElementById('fc-rec').textContent=card.recipient||'';
+  document.getElementById('fc-exp').textContent='Хүчинтэй: '+new Date(card.expiryDate).toLocaleDateString('mn-MN');
+  const msg=document.getElementById('fc-msg');
+  if(card.message){msg.style.display='block';msg.textContent='"'+card.message+'"';}
+  else msg.style.display='none';
+  openModal('cardModal');
+}
+
+function copyCode(){
+  const code=document.getElementById('fc-code').textContent;
+  navigator.clipboard.writeText(code).then(()=>alert('Код хуулагдлаа: '+code));
+}
+
+function saveCardImage(){
+  const card=document.getElementById('finalCard');
+  html2canvas(card,{backgroundColor:null,scale:2,useCORS:true,logging:false}).then(canvas=>{
+    const a=document.createElement('a');
+    a.download='gurvan_tooroi_gift_card.png';
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+  });
+}
+
+// VERIFY
+function doVerify(){
+  const input=document.getElementById('v-code').value.trim().toUpperCase();
+  const res=document.getElementById('verifyRes');
+  const useBtn=document.getElementById('useBtn');
+  res.className='vr show'; useBtn.style.display='none'; verifyCode_=null;
+
+  if(!input){
+    res.classList.add('vr-err');
+    document.getElementById('vr-icon').textContent='❌';
+    document.getElementById('vr-title').textContent='Код оруулна уу';
+    document.getElementById('vr-tbl').innerHTML=''; return;
+  }
+  const card=getCards().find(c=>c.code===input);
+  if(!card){
+    res.classList.add('vr-err');
+    document.getElementById('vr-icon').textContent='🔍';
+    document.getElementById('vr-title').textContent='Карт олдсонгүй';
+    document.getElementById('vr-tbl').innerHTML='<tr><td colspan="2" style="text-align:center;color:var(--text)">Бүртгэлд энэ код байхгүй</td></tr>'; return;
+  }
+  if(card.status==='pending'){
+    res.classList.add('vr-err');
+    document.getElementById('vr-icon').textContent='⏳';
+    document.getElementById('vr-title').textContent='Баталгаажаагүй байна';
+    document.getElementById('vr-tbl').innerHTML='<tr><td colspan="2" style="text-align:center;color:var(--text)">Энэ карт менежерийн баталгаажуулалт хүлээж байна</td></tr>'; return;
+  }
+  const now=new Date(), exp=new Date(card.expiryDate);
+  const max=card.useCount==='unlimited'?Infinity:parseInt(card.useCount);
+  if(now>exp){
+    res.classList.add('vr-err');
+    document.getElementById('vr-icon').textContent='⏰';
+    document.getElementById('vr-title').textContent='Хугацаа дууссан';
+    document.getElementById('vr-tbl').innerHTML=drows(card); return;
+  }
+  if(card.usedTimes>=max){
+    res.classList.add('vr-err');
+    document.getElementById('vr-icon').textContent='🚫';
+    document.getElementById('vr-title').textContent='Ашиглагдсан карт';
+    document.getElementById('vr-tbl').innerHTML=drows(card); return;
+  }
+  res.classList.add('vr-ok');
+  document.getElementById('vr-icon').textContent='✅';
+  document.getElementById('vr-title').textContent='Хүчинтэй карт';
+  document.getElementById('vr-tbl').innerHTML=drows(card);
+  verifyCode_=card.code; useBtn.style.display='block';
+}
+
+function drows(c){
+  const exp=new Date(c.expiryDate).toLocaleDateString('mn-MN');
+  const ml=c.useCount==='unlimited'?'∞':c.useCount;
+  return `<tr><td>Дүн</td><td>${c.amount.toLocaleString()}₮</td></tr>
+  <tr><td>Хүлээн авагч</td><td>${c.recipient||'—'}</td></tr>
+  <tr><td>Дуусах огноо</td><td>${exp}</td></tr>
+  <tr><td>Ашигласан / Нийт</td><td>${c.usedTimes} / ${ml}</td></tr>`;
+}
+
+function doMarkUsed(){
+  if(!verifyCode_)return;
+  const cards=getCards(), idx=cards.findIndex(c=>c.code===verifyCode_);
+  if(idx<0)return;
+  cards[idx].usedTimes=(cards[idx].usedTimes||0)+1;
+  const max=cards[idx].useCount==='unlimited'?Infinity:parseInt(cards[idx].useCount);
+  if(cards[idx].usedTimes>=max)cards[idx].status='used';
+  setCards(cards);
+  document.getElementById('useBtn').style.display='none';
+  document.getElementById('vr-icon').textContent='✅';
+  document.getElementById('vr-title').textContent='Амжилттай ашигласан болгов!';
+  document.getElementById('vr-tbl').innerHTML=drows(cards[idx]);
+  verifyCode_=null;
+}
+
+// ADMIN PIN
+function pinNav(el,idx){
+  if(el.value.length===1&&idx<3)document.querySelectorAll('.pin-box')[idx+1].focus();
+  if(idx===3&&el.value.length===1)checkPin();
+}
+function checkPin(){
+  const entered=Array.from(document.querySelectorAll('.pin-box')).map(p=>p.value).join('');
+  const s=getSett();
+  if(entered===s.pin){
+    document.getElementById('pinGate').style.display='none';
+    document.getElementById('adminContent').style.display='block';
+    refreshAdmin(); loadSettForm();
+  } else {
+    const e=document.getElementById('pinErr'); e.classList.add('show');
+    document.querySelectorAll('.pin-box').forEach(p=>{p.value='';p.style.borderColor='rgba(180,60,60,.5)';});
+    document.querySelectorAll('.pin-box')[0].focus();
+    setTimeout(()=>{e.classList.remove('show');document.querySelectorAll('.pin-box').forEach(p=>p.style.borderColor='');},2200);
+  }
+}
+function lockAdmin(){
+  document.getElementById('pinGate').style.display='block';
+  document.getElementById('adminContent').style.display='none';
+  document.querySelectorAll('.pin-box').forEach(p=>p.value='');
+}
+
+// ADMIN TABS
+function switchAdminTab(name,el){
+  document.querySelectorAll('.at').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.at-content').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ADMIN REFRESH
+function refreshAdmin(){
+  const cards=getCards();
+  const now=new Date();
+  const pending=cards.filter(c=>c.status==='pending');
+  const active=cards.filter(c=>{
+    if(c.status==='pending')return false;
+    const exp=new Date(c.expiryDate);
+    const max=c.useCount==='unlimited'?Infinity:parseInt(c.useCount);
+    return now<=exp&&c.usedTimes<max;
+  });
+  const revenue=cards.filter(c=>c.status!=='pending').reduce((s,c)=>s+c.amount,0);
+
+  document.getElementById('s-total').textContent=cards.length;
+  document.getElementById('s-pending').textContent=pending.length;
+  document.getElementById('s-active').textContent=active.length;
+  document.getElementById('s-revenue').textContent=revenue>=1000000?(revenue/1000000).toFixed(1)+'M₮':revenue.toLocaleString()+'₮';
+
+  const pcnt=document.getElementById('pendingCnt');
+  pcnt.textContent=pending.length;
+  pcnt.style.display=pending.length?'inline-block':'none';
+
+  // PENDING TABLE
+  const ptbody=document.getElementById('pendingTbody');
+  if(!pending.length){
+    ptbody.innerHTML='<tr><td colspan="5"><div class="empty-state">Хүлээгдэж байгаа захиалга байхгүй</div></td></tr>';
+  } else {
+    ptbody.innerHTML=cards.map((c,i)=>{
+      if(c.status!=='pending')return '';
+      const d=new Date(c.createdAt).toLocaleDateString('mn-MN');
+      return `<tr>
+        <td style="font-size:12px">${d}</td>
+        <td style="color:var(--gold);font-family:'Playfair Display',serif;font-size:16px">${c.amount.toLocaleString()}₮</td>
+        <td>${c.recipient||'—'}</td>
+        <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gold2)">${c.payRef||'—'}</td>
+        <td style="display:flex;gap:6px">
+          <button class="btn-approve" onclick="approveCard(${i})">✓ Баталгаажуулах</button>
+          <button class="btn-danger" onclick="delCard(${i})">✕</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ALL TABLE
+  const atbody=document.getElementById('allTbody');
+  if(!cards.length){
+    atbody.innerHTML='<tr><td colspan="7"><div class="empty-state">Карт байхгүй</div></td></tr>';
+  } else {
+    atbody.innerHTML=cards.slice().reverse().map((c,ri)=>{
+      const realIdx=cards.length-1-ri;
+      const exp=new Date(c.expiryDate);
+      const max=c.useCount==='unlimited'?Infinity:parseInt(c.useCount);
+      let bdg,lbl;
+      if(c.status==='pending'){bdg='b-pending';lbl='Хүлээгдэж байна';}
+      else if(now>exp){bdg='b-expired';lbl='Дууссан';}
+      else if(c.usedTimes>=max){bdg='b-used';lbl='Ашигласан';}
+      else{bdg='b-active';lbl='Идэвхтэй';}
+      const codeDisp=c.status==='pending'?'<span style="color:rgba(196,212,191,.3)">••••-••••</span>':
+        `<span style="font-family:'Space Mono',monospace;letter-spacing:2px;color:var(--gold);font-size:12px">${c.code}</span>`;
+      return `<tr>
+        <td>${codeDisp}</td>
+        <td>${c.amount.toLocaleString()}₮</td>
+        <td>${c.recipient||'—'}</td>
+        <td style="font-size:12px">${exp.toLocaleDateString('mn-MN')}</td>
+        <td style="text-align:center">${c.usedTimes}/${c.useCount==='unlimited'?'∞':c.useCount}</td>
+        <td><span class="bdg ${bdg}">${lbl}</span></td>
+        <td><button class="btn-danger" onclick="delCard(${realIdx})">✕</button></td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+function approveCard(idx){
+  const cards=getCards();
+  if(!cards[idx])return;
+  cards[idx].status='active';
+  cards[idx].approvedAt=new Date().toISOString();
+  setCards(cards);
+  refreshAdmin();
+  updatePendingDot();
+  showAdminAlert('Карт баталгаажлаа ✓ — Код: '+cards[idx].code,'ok');
+  // Show the approved card
+  showApprovedCard(cards[idx]);
+}
+
+function delCard(idx){
+  if(!confirm('Устгах уу?'))return;
+  const cards=getCards(); cards.splice(idx,1); setCards(cards);
+  refreshAdmin(); updatePendingDot();
+}
+
+function clearOld(){
+  const cards=getCards(), now=new Date();
+  const keep=cards.filter(c=>{
+    if(c.status==='pending')return true;
+    const exp=new Date(c.expiryDate);
+    const max=c.useCount==='unlimited'?Infinity:parseInt(c.useCount);
+    return now<=exp&&c.usedTimes<max;
+  });
+  const n=cards.length-keep.length;
+  setCards(keep); refreshAdmin(); updatePendingDot();
+  showAdminAlert(n+' карт устгагдлаа','ok');
+}
+
+function exportCSV(){
+  const cards=getCards();
+  if(!cards.length){showAdminAlert('Карт байхгүй','err');return;}
+  const hdr='Код,Дүн,Хүлээн авагч,Дуусах огноо,Ашигласан,Нийт,Статус';
+  const rows=cards.map(c=>[c.code,c.amount,c.recipient||'',new Date(c.expiryDate).toLocaleDateString('mn-MN'),c.usedTimes,c.useCount,c.status].join(','));
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\ufeff'+[hdr,...rows].join('\n')],{type:'text/csv;charset=utf-8'}));
+  a.download='gurvan_tooroi_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+function doManualCreate(){
+  const amt=parseInt(document.getElementById('mc-amt').value);
+  if(!amt||amt<1000){alert('Дүн оруулна уу');return;}
+  const days=parseInt(document.getElementById('mc-days').value)||365;
+  const exp=new Date(); exp.setDate(exp.getDate()+days);
+  const card={code:genCode(),amount:amt,recipient:document.getElementById('mc-rec').value,message:'',expiryDate:exp.toISOString(),useCount:document.getElementById('mc-uses').value,usedTimes:0,status:'active',createdAt:new Date().toISOString()};
+  const cards=getCards(); cards.push(card); setCards(cards);
+  refreshAdmin(); updatePendingDot();
+  showAdminAlert('Карт үүслээ: '+card.code,'ok');
+  showApprovedCard(card);
+}
+
+function toggleSett(){
+  const p=document.getElementById('settPanel');
+  p.style.display=p.style.display==='none'?'block':'none';
+}
+function loadSettForm(){
+  const s=getSett();
+  document.getElementById('s-acc').value=s.account;
+  document.getElementById('s-name').value=s.name;
+}
+function saveSett(){
+  const np=document.getElementById('s-pin').value;
+  const np2=document.getElementById('s-pin2').value;
+  if(np&&np!==np2){alert('PIN таарахгүй');return;}
+  if(np&&!/^\d{4}$/.test(np)){alert('4 оронтой тоо оруулна уу');return;}
+  const s=getSett();
+  s.account=document.getElementById('s-acc').value||s.account;
+  s.name=document.getElementById('s-name').value||s.name;
+  if(np)s.pin=np;
+  setSett(s); showAdminAlert('Тохиргоо хадгалагдлаа ✓','ok');
+}
+
+function showAdminAlert(msg,type){
+  const el=document.getElementById('adminAlert');
+  el.textContent=msg; el.className='alert a-'+type+' show';
+  setTimeout(()=>el.classList.remove('show'),3500);
+}
+
+// MODAL
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});
+});
+
+// INIT
+document.addEventListener('DOMContentLoaded',()=>{
+  // Хуудас нээгдэхэд шууд Safari-д үсрэх
+  if(isInAppBrowser()){
+    const url = window.location.href;
+    // iOS: x-safari-https:// схемээр Safari нээнэ
+    if(/iPhone|iPad|iPod/i.test(navigator.userAgent)){
+      window.location.href = url.replace('https://', 'x-safari-https://');
+    } else {
+      // Android: intent схемээр Chrome нээнэ
+      const encoded = encodeURIComponent(url);
+      window.location.href = `intent://${url.replace('https://','')}#Intent;scheme=https;package=com.android.chrome;end`;
+    }
+  }
+
+  refreshPreview(); updatePendingDot();
+  document.getElementById('f-rec').addEventListener('input',refreshPreview);
+  document.getElementById('f-valid').addEventListener('change',refreshPreview);
+
+  // #admin hash-аар удирдлага нуугдсан байна
+  function checkHash(){
+    if(window.location.hash==='#admin'){
+      document.getElementById('adminNavBtn').style.display='block';
+      showPage('admin', document.getElementById('adminNavBtn'));
+    }
+  }
+  checkHash();
+  window.addEventListener('hashchange', checkHash);
+});
+</script>
+
+
+</body></html>
