@@ -211,10 +211,9 @@ tr:hover td{background:rgba(90,122,85,.04);}
   .stats-row{grid-template-columns:1fr 1fr;}
 }
 </style>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, set, get, push, update, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
   const firebaseConfig = {
     apiKey: "AIzaSyBDXpdc0LD9KlHmwtCe7XR1zqUYK3yt7EE",
     authDomain: "gurvan-tooroi.firebaseapp.com",
@@ -225,43 +224,41 @@ tr:hover td{background:rgba(90,122,85,.04);}
     appId: "1:619212517350:web:d4b5d8d2e1267f037a7027"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-  // Firebase wrapper functions - replaces localStorage
   window.fbGetCards = async () => {
-    const snap = await get(ref(db, 'cards'));
+    const snap = await db.ref('cards').get();
     if (!snap.exists()) return [];
     const data = snap.val();
     return Object.entries(data).map(([id, card]) => ({...card, _id: id}));
   };
 
   window.fbSaveCard = async (card) => {
-    const newRef = push(ref(db, 'cards'));
-    await set(newRef, card);
+    const newRef = db.ref('cards').push();
+    await newRef.set(card);
     return newRef.key;
   };
 
   window.fbUpdateCard = async (id, data) => {
-    await update(ref(db, 'cards/' + id), data);
+    await db.ref('cards/' + id).update(data);
   };
 
   window.fbDeleteCard = async (id) => {
-    await remove(ref(db, 'cards/' + id));
+    await db.ref('cards/' + id).remove();
   };
 
   window.fbGetSettings = async () => {
-    const snap = await get(ref(db, 'settings'));
+    const snap = await db.ref('settings').get();
     if (!snap.exists()) return {account:'9XXXXXXXX', name:'Гурван Тоорой', pin:'1234'};
     return snap.val();
   };
 
   window.fbSaveSettings = async (s) => {
-    await set(ref(db, 'settings'), s);
+    await db.ref('settings').set(s);
   };
 
   window.firebaseReady = true;
-  window.dispatchEvent(new Event('firebaseReady'));
 </script>
 </head>
 <body>
@@ -339,8 +336,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
       </div>
     </div>
   </div>
-
-  <div class="form-wrap">
+  <div id="prev-msg-box" style="display:none;max-width:440px;margin:-10px auto 0;text-align:center;padding:10px 16px;background:rgba(90,122,85,.08);border:1px solid rgba(90,122,85,.2);border-radius:0 0 12px 12px;font-style:italic;font-size:14px;color:var(--sage)"></div>
     <div class="panel">
       <div class="panel-t">🎁 Бэлгийн мэдээлэл</div>
       <div class="fg">
@@ -374,7 +370,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
         </div>
       </div>
     </div>
-    <button class="btn-main" onclick="startPayment()">🏦 Khan Bank-аар төлж карт авах</button>
+    <button class="btn-main" onclick="startPayment()">🏦 Банкаар төлж карт авах</button>
   </div>
 </div>
 
@@ -514,7 +510,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
 <!-- ============ PAYMENT MODAL ============ -->
 <div class="overlay" id="payModal">
   <div class="modal">
-    <div class="modal-t">🏦 Khan Bank Төлбөр</div>
+    <div class="modal-t">🏦 Төлбөр</div>
     <div class="pay-amt-box">
       <div class="pay-amt" id="pm-amt"></div>
       <div class="pay-desc" id="pm-desc"></div>
@@ -533,17 +529,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
         <div class="step-b"><strong>Гүйлгээний утганд заавал бичнэ үү</strong><span class="step-hl" id="pm-ref">GC-XXXXXXXX</span></div>
       </div>
     </div>
-    <div style="margin-bottom:10px">
-      <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--text);margin-bottom:8px;text-align:center">Банкаа сонгоно уу</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <button class="btn-khan" onclick="openBank('khanbank')" style="margin:0;font-size:9px;padding:11px 8px">🏦 Khan Bank</button>
-        <button class="btn-khan" onclick="openBank('tdb')" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#8B0000,#B22222)">🏦 TDB Банк</button>
-        <button class="btn-khan" onclick="openBank('golomt')" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#1A5C1A,#2E8B2E)">🏦 Голомт Банк</button>
-        <button class="btn-khan" onclick="openBank('state')" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#4A0080,#6A0DAD)">🏦 Төрийн Банк</button>
-        <button class="btn-khan" onclick="openBank('mbank')" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#CC4400,#E85D00)">🏦 М Банк</button>
-        <button class="btn-khan" onclick="openBank('xacbank')" style="margin:0;font-size:9px;padding:11px 8px;background:linear-gradient(135deg,#005580,#0077AA)">🏦 Хас Банк</button>
-      </div>
-    </div>
+    <button class="btn-khan" onclick="openBank('khanbank')">📱 Khan Bank апп нээх</button>
     <button class="btn-confirm" onclick="confirmPay()">✓ Төлбөр хийсэн — Дараагийн алхам</button>
     <button class="btn-cancel" onclick="closeModal('payModal')">Цуцлах</button>
   </div>
@@ -678,11 +664,15 @@ function customChanged(){
 // PREVIEW
 function refreshPreview(){
   const rec=document.getElementById('f-rec').value;
+  const msg=document.getElementById('f-msg').value;
   const days=parseInt(document.getElementById('f-valid').value);
   const exp=new Date(); exp.setDate(exp.getDate()+days);
   document.getElementById('prev-val').textContent=selAmt_?selAmt_.toLocaleString()+'₮':'—';
   document.getElementById('prev-rec').textContent=rec||'';
   document.getElementById('prev-exp').textContent='Хүчинтэй: '+exp.toLocaleDateString('mn-MN');
+  const msgBox=document.getElementById('prev-msg-box');
+  if(msg){msgBox.style.display='block';msgBox.textContent='"'+msg+'"';}
+  else{msgBox.style.display='none';}
 }
 
 // CODE GEN
@@ -1105,6 +1095,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   refreshPreview(); updatePendingDot();
   document.getElementById('f-rec').addEventListener('input',refreshPreview);
+  document.getElementById('f-msg').addEventListener('input',refreshPreview);
   document.getElementById('f-valid').addEventListener('change',refreshPreview);
 
   // #admin hash-аар удирдлага нуугдсан байна
