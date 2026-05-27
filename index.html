@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="mn">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0062)file:///C:/Users/Gegee/Downloads/gurvan_tooroi_giftcard_1.html -->
+<html lang="mn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Гурван Тоорой — Бэлгийн Карт</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link href="./gurvan tooroi_files/css2" rel="stylesheet">
+<script src="./gurvan tooroi_files/html2canvas.min.js.download"></script>
 <style>
 :root {
   --forest:#1C2B1A; --forest2:#243322; --pine:#3D5C3A; --moss:#5A7A55;
@@ -211,8 +211,8 @@ tr:hover td{background:rgba(90,122,85,.04);}
   .stats-row{grid-template-columns:1fr 1fr;}
 }
 </style>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="./gurvan tooroi_files/firebase-app-compat.js.download"></script>
+<script src="./gurvan tooroi_files/firebase-database-compat.js.download"></script>
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyBDXpdc0LD9KlHmwtCe7XR1zqUYK3yt7EE",
@@ -272,9 +272,9 @@ tr:hover td{background:rgba(90,122,85,.04);}
     </div>
   </div>
   <div class="nav-pills">
-    <button class="np active" id="navBuy" onclick="showPage('buy',this)">Бэлэг Карт</button>
-    <button class="np" id="navVerify" onclick="showPage('verify',this)">Шалгах</button>
-    <button class="np" id="adminNavBtn" onclick="showPage('admin',this)" style="display:none">Удирдлага <span class="badge-dot" id="pendingDot"></span></button>
+    <button class="np active" id="navBuy" onclick="showPage(&#39;buy&#39;,this)">Бэлэг Карт</button>
+    <button class="np" id="navVerify" onclick="showPage(&#39;verify&#39;,this)">Шалгах</button>
+    <button class="np" id="adminNavBtn" onclick="showPage(&#39;admin&#39;,this)" style="display:none">Удирдлага <span class="badge-dot" id="pendingDot"></span></button>
   </div>
 </nav>
 
@@ -286,6 +286,16 @@ tr:hover td{background:rgba(90,122,85,.04);}
     <p class="hero-s">Гурван Тоорой дахь тайван агшинг хайртай хүндээ бэлэглэ</p>
   </div>
 
+  <!-- TYPE TOGGLE -->
+  <div style="max-width:400px;margin:0 auto 24px;padding:0 40px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button id="typeGift" onclick="setCardType(&#39;gift&#39;)" style="padding:12px;border:1px solid var(--gold);border-radius:10px;background:rgba(200,168,75,.1);color:var(--gold);font-family:&#39;Space Mono&#39;,monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer">🎁 Бэлгийн карт</button>
+      <button id="typeVoucher" onclick="setCardType(&#39;voucher&#39;)" style="padding:12px;border:1px solid rgba(90,122,85,.3);border-radius:10px;background:transparent;color:var(--text);font-family:&#39;Space Mono&#39;,monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer">🎫 Эрхийн бичиг</button>
+    </div>
+  </div>
+
+  <!-- GIFT CARD SECTION -->
+  <div id="giftSection">
   <div class="amounts-wrap">
     <div class="sec-lbl">Дүн сонгох</div>
     <div class="amt-grid">
@@ -302,10 +312,36 @@ tr:hover td{background:rgba(90,122,85,.04);}
         <div class="amt-note">Жинхэнэ амралт</div>
       </div>
       <div class="amt-custom" id="customTile" onclick="selCustom()">
-        <span style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text)">+ Өөр дүн</span>
+        <span style="font-family:&#39;Space Mono&#39;,monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text)">+ Өөр дүн</span>
         <input type="number" id="customInp" placeholder="Дүн оруулна уу..." onclick="event.stopPropagation()" oninput="customChanged()" style="display:none;margin-top:10px;text-align:center;">
       </div>
     </div>
+  </div>
+  </div>
+
+  <!-- VOUCHER SECTION -->
+  <div id="voucherSection" style="display:none">
+  <div class="amounts-wrap">
+    <div class="sec-lbl">Хөнгөлөлтийн хувь сонгох</div>
+    <div class="amt-grid">
+      <div class="amt-tile" onclick="selDiscount(5,this)">
+        <div class="amt-n">5%</div>
+        <div class="amt-note">Хөнгөлөлт</div>
+      </div>
+      <div class="amt-tile sel" onclick="selDiscount(10,this)">
+        <div class="amt-n">10%</div>
+        <div class="amt-note">Хөнгөлөлт</div>
+      </div>
+      <div class="amt-tile" onclick="selDiscount(15,this)">
+        <div class="amt-n">15%</div>
+        <div class="amt-note">Хөнгөлөлт</div>
+      </div>
+      <div class="amt-tile" onclick="selDiscount(20,this)">
+        <div class="amt-n">20%</div>
+        <div class="amt-note">Хөнгөлөлт</div>
+      </div>
+    </div>
+  </div>
   </div>
 
   <!-- CARD PREVIEW -->
@@ -318,10 +354,10 @@ tr:hover td{background:rgba(90,122,85,.04);}
           <div class="gc-brand-name">Gurvan Tooroi</div>
           <div class="gc-brand-mn">Гурван Тоорой</div>
         </div>
-        <div class="gc-badge">Gift Voucher</div>
+        <div class="gc-badge" id="prev-badge">Gift Voucher</div>
       </div>
       <div class="gc-center">
-        <div class="gc-val-lbl">Дүн</div>
+        <div class="gc-val-lbl" id="prev-val-lbl">Дүн</div>
         <div class="gc-val" id="prev-val">400,000₮</div>
       </div>
       <div class="gc-bottom">
@@ -331,7 +367,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
         </div>
         <div class="gc-meta">
           <div id="prev-rec" class="hl"></div>
-          <div id="prev-exp">Хүчинтэй: —</div>
+          <div id="prev-exp">Хүчинтэй: 5/27/2027</div>
         </div>
       </div>
     </div>
@@ -341,7 +377,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
       <div class="panel-t">🎁 Бэлгийн мэдээлэл</div>
       <div class="fg">
         <label>Хүлээн авагч (заавал биш)</label>
-        <input type="text" id="f-rec" placeholder="Жш: Болд & Сарнай гэр бүл" oninput="refreshPreview()">
+        <input type="text" id="f-rec" placeholder="Жш: Болд &amp; Сарнай гэр бүл" oninput="refreshPreview()">
       </div>
       <div class="fg">
         <label>Мессеж (заавал биш)</label>
@@ -354,7 +390,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
         <div class="fg">
           <label>Хүчинтэй хугацаа</label>
           <select id="f-valid" onchange="refreshPreview()">
-            <option value="365" selected>1 жил</option>
+            <option value="365" selected="">1 жил</option>
             <option value="730">2 жил</option>
             <option value="180">6 сар</option>
           </select>
@@ -362,7 +398,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
         <div class="fg">
           <label>Хэрэглэх тоо</label>
           <select id="f-uses">
-            <option value="1" selected>1 удаа</option>
+            <option value="1" selected="">1 удаа</option>
             <option value="2">2 удаа</option>
             <option value="3">3 удаа</option>
             <option value="unlimited">Хязгааргүй</option>
@@ -372,7 +408,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
     </div>
     <button class="btn-main" onclick="startPayment()">🏦 Банкаар төлж карт авах</button>
   </div>
-</div>
+
 
 <!-- ============ VERIFY ============ -->
 <div id="page-verify" class="page">
@@ -410,15 +446,15 @@ tr:hover td{background:rgba(90,122,85,.04);}
     </div>
     <div id="pinErr" class="pin-err">Буруу PIN код байна</div>
     <button class="btn-main" onclick="checkPin()">Нэвтрэх</button>
-    <p style="color:var(--text);font-size:11px;margin-top:14px;font-family:'Space Mono',monospace;letter-spacing:1px">Анхны PIN: 1234</p>
+    <p style="color:var(--text);font-size:11px;margin-top:14px;font-family:&#39;Space Mono&#39;,monospace;letter-spacing:1px">Анхны PIN: 1234</p>
   </div>
 
   <div id="adminContent" style="display:none">
     <div class="admin-wrap">
       <div class="admin-hdr">
         <div>
-          <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--moss);margin-bottom:6px">Удирдлага</div>
-          <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:300;color:var(--cream)">Бэлгийн Карт</div>
+          <div style="font-family:&#39;Space Mono&#39;,monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--moss);margin-bottom:6px">Удирдлага</div>
+          <div style="font-family:&#39;Playfair Display&#39;,serif;font-size:30px;font-weight:300;color:var(--cream)">Бэлгийн Карт</div>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn-outline" onclick="toggleSett()">⚙ Тохиргоо</button>
@@ -436,9 +472,9 @@ tr:hover td{background:rgba(90,122,85,.04);}
 
       <!-- ADMIN TABS -->
       <div class="admin-tabs">
-        <button class="at active" onclick="switchAdminTab('pending',this)">⏳ Хүлээгдэж байгаа <span class="cnt" id="pendingCnt">0</span></button>
-        <button class="at" onclick="switchAdminTab('all',this)">📋 Бүх карт</button>
-        <button class="at" onclick="switchAdminTab('create',this)">+ Гараар үүсгэх</button>
+        <button class="at active" onclick="switchAdminTab(&#39;pending&#39;,this)">⏳ Хүлээгдэж байгаа <span class="cnt" id="pendingCnt">0</span></button>
+        <button class="at" onclick="switchAdminTab(&#39;all&#39;,this)">📋 Бүх карт</button>
+        <button class="at" onclick="switchAdminTab(&#39;create&#39;,this)">+ Гараар үүсгэх</button>
       </div>
 
       <div id="adminAlert" class="alert"></div>
@@ -529,17 +565,17 @@ tr:hover td{background:rgba(90,122,85,.04);}
         <div class="step-b"><strong>Гүйлгээний утганд заавал бичнэ үү</strong><span class="step-hl" id="pm-ref">GC-XXXXXXXX</span></div>
       </div>
     </div>
-    <button class="btn-khan" onclick="openBank('khanbank')">📱 Khan Bank апп нээх</button>
+    <button class="btn-khan" onclick="openBank(&#39;khanbank&#39;)">📱 Khan Bank апп нээх</button>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
-      <button class="btn-khan" onclick="openBank('tdb')" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#8B0000,#B22222)">TDB</button>
-      <button class="btn-khan" onclick="openBank('golomt')" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#1A5C1A,#2E8B2E)">Голомт</button>
-      <button class="btn-khan" onclick="openBank('state')" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#4A0080,#6A0DAD)">Төрийн</button>
-      <button class="btn-khan" onclick="openBank('mbank')" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#CC4400,#E85D00)">М Банк</button>
-      <button class="btn-khan" onclick="openBank('xacbank')" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#005580,#0077AA)">Хас Банк</button>
-      <button class="btn-khan" onclick="openBank('tdb')" style="margin:0;font-size:8px;padding:9px 4px;background:rgba(90,90,90,.5)">Бусад</button>
+      <button class="btn-khan" onclick="openBank(&#39;tdb&#39;)" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#8B0000,#B22222)">TDB</button>
+      <button class="btn-khan" onclick="openBank(&#39;golomt&#39;)" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#1A5C1A,#2E8B2E)">Голомт</button>
+      <button class="btn-khan" onclick="openBank(&#39;state&#39;)" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#4A0080,#6A0DAD)">Төрийн</button>
+      <button class="btn-khan" onclick="openBank(&#39;mbank&#39;)" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#CC4400,#E85D00)">М Банк</button>
+      <button class="btn-khan" onclick="openBank(&#39;xacbank&#39;)" style="margin:0;font-size:8px;padding:9px 4px;background:linear-gradient(135deg,#005580,#0077AA)">Хас Банк</button>
+      <button class="btn-khan" onclick="openBank(&#39;tdb&#39;)" style="margin:0;font-size:8px;padding:9px 4px;background:rgba(90,90,90,.5)">Бусад</button>
     </div>
     <button class="btn-confirm" onclick="confirmPay()">✓ Төлбөр хийсэн — Дараагийн алхам</button>
-    <button class="btn-cancel" onclick="closeModal('payModal')">Цуцлах</button>
+    <button class="btn-cancel" onclick="closeModal(&#39;payModal&#39;)">Цуцлах</button>
   </div>
 </div>
 
@@ -553,7 +589,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
     </p>
     <button class="btn-main" style="margin-bottom:10px" onclick="openInSafari()">🧭 Safari-д нээх</button>
     <div id="inAppMsg" style="background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.25);border-radius:10px;padding:14px;font-size:13px;color:var(--cream);line-height:1.8;margin-bottom:12px"></div>
-    <button class="btn-cancel" onclick="closeModal('inAppModal')">Хаах</button>
+    <button class="btn-cancel" onclick="closeModal(&#39;inAppModal&#39;)">Хаах</button>
   </div>
 </div>
 
@@ -587,8 +623,8 @@ tr:hover td{background:rgba(90,122,85,.04);}
         </div>
       </div>
     </div>
-    <p style="text-align:center;font-size:12px;color:var(--text);font-family:'Space Mono',monospace;letter-spacing:1px;margin-top:8px">Гүйлгээний утга: <span id="pcp-ref" style="color:var(--gold)"></span></p>
-    <button class="btn-cancel" style="margin-top:16px" onclick="closeModal('pendingModal')">Хаах</button>
+    <p style="text-align:center;font-size:12px;color:var(--text);font-family:&#39;Space Mono&#39;,monospace;letter-spacing:1px;margin-top:8px">Гүйлгээний утга: <span id="pcp-ref" style="color:var(--gold)"></span></p>
+    <button class="btn-cancel" style="margin-top:16px" onclick="closeModal(&#39;pendingModal&#39;)">Хаах</button>
   </div>
 </div>
 
@@ -620,7 +656,7 @@ tr:hover td{background:rgba(90,122,85,.04);}
       <button class="btn-outline" onclick="copyCode()">📋 Код хуулах</button>
       <button class="btn-gold" onclick="saveCardImage()">📷 Зураг хадгалах</button>
     </div>
-    <button class="btn-cancel" style="margin-top:10px" onclick="closeModal('cardModal')">Хаах</button>
+    <button class="btn-cancel" style="margin-top:10px" onclick="closeModal(&#39;cardModal&#39;)">Хаах</button>
   </div>
 </div>
 
@@ -630,6 +666,51 @@ const getCards = async () => window.fbGetCards ? await window.fbGetCards() : [];
 const setCards = async () => {}; // handled individually
 const getSett = async () => window.fbGetSettings ? await window.fbGetSettings() : {account:'9XXXXXXXX',name:'Гурван Тоорой',pin:'1234'};
 const setSett = async (d) => window.fbSaveSettings ? await window.fbSaveSettings(d) : null;
+
+let cardType='gift'; // 'gift' or 'voucher'
+let selDiscount_=10;
+
+function setCardType(type){
+  cardType=type;
+  const giftBtn=document.getElementById('typeGift');
+  const voucherBtn=document.getElementById('typeVoucher');
+  const giftSec=document.getElementById('giftSection');
+  const voucherSec=document.getElementById('voucherSection');
+  if(type==='gift'){
+    giftBtn.style.borderColor='var(--gold)';
+    giftBtn.style.background='rgba(200,168,75,.1)';
+    giftBtn.style.color='var(--gold)';
+    voucherBtn.style.borderColor='rgba(90,122,85,.3)';
+    voucherBtn.style.background='transparent';
+    voucherBtn.style.color='var(--text)';
+    giftSec.style.display='block';
+    voucherSec.style.display='none';
+    document.getElementById('prev-badge').textContent='Gift Voucher';
+    document.getElementById('prev-val-lbl').textContent='Дүн';
+    document.getElementById('prev-val').textContent=selAmt_?selAmt_.toLocaleString()+'₮':'—';
+  } else {
+    voucherBtn.style.borderColor='var(--gold)';
+    voucherBtn.style.background='rgba(200,168,75,.1)';
+    voucherBtn.style.color='var(--gold)';
+    giftBtn.style.borderColor='rgba(90,122,85,.3)';
+    giftBtn.style.background='transparent';
+    giftBtn.style.color='var(--text)';
+    giftSec.style.display='none';
+    voucherSec.style.display='block';
+    document.getElementById('prev-badge').textContent='Discount Voucher';
+    document.getElementById('prev-val-lbl').textContent='Хөнгөлөлт';
+    document.getElementById('prev-val').textContent=selDiscount_+'%';
+  }
+}
+
+function selDiscount(pct, tile){
+  selDiscount_=pct;
+  document.querySelectorAll('#voucherSection .amt-tile').forEach(t=>t.classList.remove('sel'));
+  tile.classList.add('sel');
+  document.getElementById('prev-val').textContent=pct+'%';
+  document.getElementById('prev-badge').textContent='Discount Voucher';
+  document.getElementById('prev-val-lbl').textContent='Хөнгөлөлт';
+}
 
 let selAmt_=400000, pendingCard=null, verifyCode_=null;
 
@@ -711,20 +792,45 @@ function genPayRef(){
 // PAYMENT
 async function startPayment(){
   if(!window.firebaseReady){alert('Түр хүлээнэ үү, систем ачаалж байна...');return;}
-  if(!selAmt_||selAmt_<1000){alert('Дүн сонгоно уу');return;}
   const s=await getSett();
   const days=parseInt(document.getElementById('f-valid').value);
   const exp=new Date(); exp.setDate(exp.getDate()+days);
+
+  if(cardType==='voucher'){
+    // Эрхийн бичиг — төлбөргүй, admin шууд үүсгэнэ
+    pendingCard={
+      code: await genCode(),
+      payRef: genPayRef(),
+      type: 'voucher',
+      discount: selDiscount_,
+      amount: 0,
+      recipient: document.getElementById('f-rec').value,
+      message: document.getElementById('f-msg').value,
+      expiryDate: exp.toISOString(),
+      useCount: document.getElementById('f-uses').value,
+      usedTimes: 0, status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+    document.getElementById('pm-amt').textContent=selDiscount_+'% Хөнгөлөлт';
+    document.getElementById('pm-desc').textContent='Гурван Тоорой эрхийн бичиг'+(pendingCard.recipient?' — '+pendingCard.recipient:'');
+    document.getElementById('pm-acc').textContent=s.account;
+    document.getElementById('pm-ref').textContent=pendingCard.payRef;
+    openModal('payModal');
+    return;
+  }
+
+  if(!selAmt_||selAmt_<1000){alert('Дүн сонгоно уу');return;}
   pendingCard={
-    code:await genCode(),       // Картын нууц код — баталгаажсаны дараа л харагдана
-    payRef:genPayRef(),   // Гүйлгээний утга — картын кодоос өөр
-    amount:selAmt_,
-    recipient:document.getElementById('f-rec').value,
-    message:document.getElementById('f-msg').value,
-    expiryDate:exp.toISOString(),
-    useCount:document.getElementById('f-uses').value,
-    usedTimes:0, status:'pending',
-    createdAt:new Date().toISOString()
+    code: await genCode(),
+    payRef: genPayRef(),
+    type: 'gift',
+    amount: selAmt_,
+    recipient: document.getElementById('f-rec').value,
+    message: document.getElementById('f-msg').value,
+    expiryDate: exp.toISOString(),
+    useCount: document.getElementById('f-uses').value,
+    usedTimes: 0, status: 'pending',
+    createdAt: new Date().toISOString()
   };
   document.getElementById('pm-amt').textContent=selAmt_.toLocaleString()+'₮';
   document.getElementById('pm-desc').textContent='Гурван Тоорой бэлгийн карт'+(pendingCard.recipient?' — '+pendingCard.recipient:'');
@@ -814,10 +920,17 @@ async function confirmPay(){
 
 // SHOW APPROVED CARD
 function showApprovedCard(card){
-  document.getElementById('fc-val').textContent=card.amount.toLocaleString()+'₮';
+  const isVoucher = card.type==='voucher';
+  document.getElementById('fc-val').textContent = isVoucher ? card.discount+'%' : card.amount.toLocaleString()+'₮';
   document.getElementById('fc-code').textContent=card.code;
   document.getElementById('fc-rec').textContent=card.recipient||'';
   document.getElementById('fc-exp').textContent='Хүчинтэй: '+new Date(card.expiryDate).toLocaleDateString('mn-MN');
+  // Update badge
+  const badge = document.querySelector('#finalCard .gc-badge');
+  if(badge) badge.textContent = isVoucher ? 'Discount Voucher' : 'Gift Voucher';
+  const valLbl = document.querySelector('#finalCard .gc-val-lbl');
+  if(valLbl) valLbl.textContent = isVoucher ? 'Хөнгөлөлт' : 'Дүн';
+
   const msgInner=document.getElementById('fc-msg-inner');
   const msg=document.getElementById('fc-msg');
   const valEl=document.getElementById('fc-val');
@@ -826,7 +939,7 @@ function showApprovedCard(card){
     msgInner.textContent='"'+card.message+'"';
     msg.style.display='block';
     msg.textContent='"'+card.message+'"';
-    valEl.style.fontSize='32px'; // мессеж байхад дүн жижгэрнэ
+    valEl.style.fontSize='32px';
   } else {
     msgInner.style.display='none';
     msg.style.display='none';
@@ -901,7 +1014,8 @@ async function doVerify(){
 function drows(c){
   const exp=new Date(c.expiryDate).toLocaleDateString('mn-MN');
   const ml=c.useCount==='unlimited'?'∞':c.useCount;
-  return `<tr><td>Дүн</td><td>${c.amount.toLocaleString()}₮</td></tr>
+  const isVoucher=c.type==='voucher';
+  return `<tr><td>${isVoucher?'Хөнгөлөлт':'Дүн'}</td><td>${isVoucher?c.discount+'%':c.amount.toLocaleString()+'₮'}</td></tr>
   <tr><td>Хүлээн авагч</td><td>${c.recipient||'—'}</td></tr>
   <tr><td>Дуусах огноо</td><td>${exp}</td></tr>
   <tr><td>Ашигласан / Нийт</td><td>${c.usedTimes} / ${ml}</td></tr>`;
@@ -1147,5 +1261,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   window.addEventListener('hashchange', checkHash);
 });
 </script>
-</body>
-</html>
+
+
+</body></html>
