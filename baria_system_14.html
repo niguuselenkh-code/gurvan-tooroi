@@ -491,10 +491,16 @@ function connectFb(){const cfgStr=document.getElementById('fbCfg').value.trim();
   if(!cfg.databaseURL){alert('databaseURL байх ёстой.');return;}
   try{localStorage.setItem('gt_baria_fbcfg',cfgStr);localStorage.setItem('gt_baria_fbch',ch);
     if(!firebase.apps.length)firebase.initializeApp(cfg);const db=firebase.database();fbRef=db.ref('gt_baria2/'+ch);
-    fbRef.on('value',snap=>{const v=snap.val();if(v&&Array.isArray(v.arrivals)){fbApplying=true;S.arrivals=v.arrivals;if(v.menu)S.menu=v.menu;save();renderToday();renderArr();renderRooms();renderReport();fbApplying=false;}});
+    fbRef.on('value',snap=>{const v=snap.val();if(!v)return;fbApplying=true;
+      if(Array.isArray(v.arrivals))S.arrivals=v.arrivals;
+      if(Array.isArray(v.menu))S.menu=v.menu;
+      if(typeof v.pinT==='string')S.pinT=v.pinT;
+      if(typeof v.pinM==='string')S.pinM=v.pinM;
+      if(Array.isArray(v.blocked))S.blocked=v.blocked;
+      save();renderToday();renderArr();renderRooms();renderReport();renderRole();renderPin();fbApplying=false;});
     fbConnected=true;renderSync('Холбогдсон ✓ (сувг: '+ch+')',true);pushFb();
   }catch(e){fbConnected=false;renderSync('Алдаа: '+e.message,false);}}
-function pushFb(){try{if(fbRef&&!fbApplying)fbRef.set({arrivals:S.arrivals,menu:S.menu,ts:Date.now()});}catch(e){}}
+function pushFb(){try{if(fbRef&&!fbApplying)fbRef.set({arrivals:S.arrivals,menu:S.menu,pinT:S.pinT||'',pinM:S.pinM||'',blocked:S.blocked||[],ts:Date.now()});}catch(e){}}
 function disconnectFb(){localStorage.removeItem('gt_baria_fbcfg');if(fbRef){try{fbRef.off();}catch(e){}fbRef=null;}fbConnected=false;renderSync('Салгасан',false);}
 function autoConnectFb(){const c=localStorage.getItem('gt_baria_fbcfg');const ch=localStorage.getItem('gt_baria_fbch')||'shared';
   const cf=document.getElementById('fbCfg'),chf=document.getElementById('fbChannel');if(cf&&c)cf.value=c;if(chf)chf.value=ch;if(c)connectFb();else renderSync();}
