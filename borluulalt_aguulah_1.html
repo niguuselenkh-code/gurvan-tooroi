@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="mn">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0058)file:///C:/Users/Gegee/Downloads/borluulalt_aguulah_1.html -->
+<html lang="mn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Гурван Тоорой — Бараа борлуулалт ба агуулах</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="./Гурван Тоорой — Бараа борлуулалт ба агуулах_files/css2" rel="stylesheet">
 <style>
   :root{
     --navy:#1e3a5f;
@@ -188,17 +188,17 @@
     </div>
   </div>
   <nav class="tabs">
-    <button data-tab="pos" class="active">🛒 Борлуулалт</button>
-    <button data-tab="inv">📦 Агуулах</button>
-    <button data-tab="guests">👤 Зочид</button>
-    <button data-tab="report">📊 Тайлан</button>
+    <button data-tab="pos" class="">🛒 Борлуулалт</button>
+    <button data-tab="inv" class="active">📦 Агуулах</button>
+    <button data-tab="guests" class="">👤 Зочид</button>
+    <button data-tab="report" class="">📊 Тайлан</button>
   </nav>
 </header>
 
 <main>
 
   <!-- ===================== POS ===================== -->
-  <section class="panel active" id="pos">
+  <section class="panel" id="pos">
     <div class="section-head">
       <div>
         <h2>Борлуулалт</h2>
@@ -209,13 +209,48 @@
       <div>
         <div style="margin-bottom:14px">
           <label class="field" for="posGuest">Зочин (буудаллаж буй)</label>
-          <select id="posGuest"></select>
-          <div class="hint" id="bkStatus"></div>
+          <select id="posGuest"><optgroup label="Захиалгаас (буудаллаж буй)"><option value="bk_b_wvs19">93097779 · №1</option><option value="bk_b_e0l5b">88668998 · №9</option></optgroup></select>
+          <div class="hint" id="bkStatus"><span style="color:var(--green);font-weight:600">✓ Захиалгатай холбогдсон</span> · өнөөдөр 2 зочин буудаллаж байна</div>
         </div>
         <div class="search">
           <input id="posSearch" placeholder="🔍 Бараа хайх...">
         </div>
-        <div class="prod-grid" id="posProducts"></div>
+        <div class="prod-grid" id="posProducts"><button class="prod-btn" onclick="addToCart(&#39;mqtl7gy59a2f&#39;)">
+      
+      <div class="pn">Экос</div>
+      <div class="pp">3,000₮</div>
+      <div class="ps">Үлдэгдэл: 24 1.0л</div>
+    </button><button class="prod-btn" onclick="addToCart(&#39;mqtl90ci1k4o&#39;)">
+      
+      <div class="pn">Кола</div>
+      <div class="pp">4,500₮</div>
+      <div class="ps">Үлдэгдэл: 12 1.25л</div>
+    </button><button class="prod-btn" onclick="addToCart(&#39;mqtlb1h5x47q&#39;)">
+      
+      <div class="pn">Фанта</div>
+      <div class="pp">3,900₮</div>
+      <div class="ps">Үлдэгдэл: 9 330мл</div>
+    </button><button class="prod-btn" onclick="addToCart(&#39;mqtlbtn1ddjk&#39;)">
+      
+      <div class="pn">Спрайт</div>
+      <div class="pp">3,900₮</div>
+      <div class="ps">Үлдэгдэл: 11 330мл</div>
+    </button><button class="prod-btn" onclick="addToCart(&#39;mqtlfdjyhd2k&#39;)">
+      
+      <div class="pn">Фюз теа</div>
+      <div class="pp">4,900₮</div>
+      <div class="ps">Үлдэгдэл: 6 1.2л</div>
+    </button><button class="prod-btn" onclick="addToCart(&#39;mqtljaxxd3ff&#39;)">
+      
+      <div class="pn">Тимбарк ундаа</div>
+      <div class="pp">3,000₮</div>
+      <div class="ps">Үлдэгдэл: 11 330мл</div>
+    </button><button class="prod-btn" onclick="addToCart(&#39;mqtlmszhu5ba&#39;)">
+      
+      <div class="pn">Мюс нухаш</div>
+      <div class="pp">3,000₮</div>
+      <div class="ps">Үлдэгдэл: 8 100гр</div>
+    </button></div>
       </div>
 
       <div class="card cart">
@@ -223,19 +258,17 @@
           <span>Сагс</span>
           <button class="btn-icon" id="clearCart" title="Сагс цэвэрлэх">🗑</button>
         </div>
-        <div class="cart-body" id="cartBody">
-          <div class="empty">Сагс хоосон байна</div>
-        </div>
+        <div class="cart-body" id="cartBody"><div class="empty">Сагс хоосон байна</div></div>
         <div class="cart-foot">
           <div class="cart-total"><span>Нийт</span><span id="cartTotal">0₮</span></div>
-          <button class="btn btn-berry" id="confirmSale" style="width:100%;justify-content:center" disabled>Борлуулалт баталгаажуулах</button>
+          <button class="btn btn-berry" id="confirmSale" style="width:100%;justify-content:center" disabled="">Борлуулалт баталгаажуулах</button>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ===================== INVENTORY ===================== -->
-  <section class="panel" id="inv">
+  <section class="panel active" id="inv">
     <div class="section-head">
       <div>
         <h2>Агуулахын бүртгэл</h2>
@@ -248,8 +281,8 @@
       </div>
     </div>
     <div class="seg" id="invFilter">
-      <button data-f="all" class="active">Бүгд</button>
-      <button data-f="sale">Зарах бараа</button>
+      <button data-f="all" class="">Бүгд</button>
+      <button data-f="sale" class="active">Зарах бараа</button>
       <button data-f="use">Ашиглах материал</button>
     </div>
     <div class="search"><input id="invSearch" placeholder="🔍 Бараа хайх..."></div>
@@ -259,7 +292,105 @@
           <th>Бараа</th><th>Төрөл</th><th>Ангилал</th><th class="num">Өртөг</th><th class="num">Зарах үнэ</th>
           <th class="num">Үлдэгдэл</th><th>Төлөв</th><th></th>
         </tr></thead>
-        <tbody id="invBody"></tbody>
+        <tbody id="invBody"><tr>
+      <td><b>Экос</b><div style="font-size:12px;color:var(--muted)">1.0л</div></td>
+      <td><span class="pill sale">Зарах</span></td>
+      <td>Ус</td>
+      <td class="num">2,000₮</td>
+      <td class="num">3,000₮</td>
+      <td class="num"><b>24</b></td>
+      <td><span class="pill ok">Хангалттай</span></td>
+      <td><div class="row-actions">
+        <button class="btn-icon" title="Нөхөн дүүргэх" onclick="restock(&#39;mqtl7gy59a2f&#39;)">➕</button>
+        
+        <button class="btn-icon" title="Засах" onclick="openProductModal(&#39;mqtl7gy59a2f&#39;)">✎</button>
+        <button class="btn-icon" title="Устгах" onclick="deleteProduct(&#39;mqtl7gy59a2f&#39;)">🗑</button>
+      </div></td>
+    </tr><tr>
+      <td><b>Кола</b><div style="font-size:12px;color:var(--muted)">1.25л</div></td>
+      <td><span class="pill sale">Зарах</span></td>
+      <td>Ундаа</td>
+      <td class="num">3,360₮</td>
+      <td class="num">4,500₮</td>
+      <td class="num"><b>12</b></td>
+      <td><span class="pill ok">Хангалттай</span></td>
+      <td><div class="row-actions">
+        <button class="btn-icon" title="Нөхөн дүүргэх" onclick="restock(&#39;mqtl90ci1k4o&#39;)">➕</button>
+        
+        <button class="btn-icon" title="Засах" onclick="openProductModal(&#39;mqtl90ci1k4o&#39;)">✎</button>
+        <button class="btn-icon" title="Устгах" onclick="deleteProduct(&#39;mqtl90ci1k4o&#39;)">🗑</button>
+      </div></td>
+    </tr><tr>
+      <td><b>Фанта</b><div style="font-size:12px;color:var(--muted)">330мл</div></td>
+      <td><span class="pill sale">Зарах</span></td>
+      <td>Ундаа</td>
+      <td class="num">3,000₮</td>
+      <td class="num">3,900₮</td>
+      <td class="num"><b>9</b></td>
+      <td><span class="pill ok">Хангалттай</span></td>
+      <td><div class="row-actions">
+        <button class="btn-icon" title="Нөхөн дүүргэх" onclick="restock(&#39;mqtlb1h5x47q&#39;)">➕</button>
+        
+        <button class="btn-icon" title="Засах" onclick="openProductModal(&#39;mqtlb1h5x47q&#39;)">✎</button>
+        <button class="btn-icon" title="Устгах" onclick="deleteProduct(&#39;mqtlb1h5x47q&#39;)">🗑</button>
+      </div></td>
+    </tr><tr>
+      <td><b>Спрайт</b><div style="font-size:12px;color:var(--muted)">330мл</div></td>
+      <td><span class="pill sale">Зарах</span></td>
+      <td>Ундаа</td>
+      <td class="num">3,000₮</td>
+      <td class="num">3,900₮</td>
+      <td class="num"><b>11</b></td>
+      <td><span class="pill ok">Хангалттай</span></td>
+      <td><div class="row-actions">
+        <button class="btn-icon" title="Нөхөн дүүргэх" onclick="restock(&#39;mqtlbtn1ddjk&#39;)">➕</button>
+        
+        <button class="btn-icon" title="Засах" onclick="openProductModal(&#39;mqtlbtn1ddjk&#39;)">✎</button>
+        <button class="btn-icon" title="Устгах" onclick="deleteProduct(&#39;mqtlbtn1ddjk&#39;)">🗑</button>
+      </div></td>
+    </tr><tr>
+      <td><b>Фюз теа</b><div style="font-size:12px;color:var(--muted)">1.2л</div></td>
+      <td><span class="pill sale">Зарах</span></td>
+      <td>Ундаа</td>
+      <td class="num">3,750₮</td>
+      <td class="num">4,900₮</td>
+      <td class="num"><b>6</b></td>
+      <td><span class="pill ok">Хангалттай</span></td>
+      <td><div class="row-actions">
+        <button class="btn-icon" title="Нөхөн дүүргэх" onclick="restock(&#39;mqtlfdjyhd2k&#39;)">➕</button>
+        
+        <button class="btn-icon" title="Засах" onclick="openProductModal(&#39;mqtlfdjyhd2k&#39;)">✎</button>
+        <button class="btn-icon" title="Устгах" onclick="deleteProduct(&#39;mqtlfdjyhd2k&#39;)">🗑</button>
+      </div></td>
+    </tr><tr>
+      <td><b>Тимбарк ундаа</b><div style="font-size:12px;color:var(--muted)">330мл</div></td>
+      <td><span class="pill sale">Зарах</span></td>
+      <td>Ундаа</td>
+      <td class="num">2,000₮</td>
+      <td class="num">3,000₮</td>
+      <td class="num"><b>11</b></td>
+      <td><span class="pill ok">Хангалттай</span></td>
+      <td><div class="row-actions">
+        <button class="btn-icon" title="Нөхөн дүүргэх" onclick="restock(&#39;mqtljaxxd3ff&#39;)">➕</button>
+        
+        <button class="btn-icon" title="Засах" onclick="openProductModal(&#39;mqtljaxxd3ff&#39;)">✎</button>
+        <button class="btn-icon" title="Устгах" onclick="deleteProduct(&#39;mqtljaxxd3ff&#39;)">🗑</button>
+      </div></td>
+    </tr><tr>
+      <td><b>Мюс нухаш</b><div style="font-size:12px;color:var(--muted)">100гр</div></td>
+      <td><span class="pill sale">Зарах</span></td>
+      <td>Нухаш</td>
+      <td class="num">2,000₮</td>
+      <td class="num">3,000₮</td>
+      <td class="num"><b>8</b></td>
+      <td><span class="pill ok">Хангалттай</span></td>
+      <td><div class="row-actions">
+        <button class="btn-icon" title="Нөхөн дүүргэх" onclick="restock(&#39;mqtlmszhu5ba&#39;)">➕</button>
+        
+        <button class="btn-icon" title="Засах" onclick="openProductModal(&#39;mqtlmszhu5ba&#39;)">✎</button>
+        <button class="btn-icon" title="Устгах" onclick="deleteProduct(&#39;mqtlmszhu5ba&#39;)">🗑</button>
+      </div></td>
+    </tr></tbody>
       </table>
     </div>
   </section>
@@ -273,7 +404,39 @@
       </div>
       <button class="btn btn-primary" id="addGuestBtn">+ Гар зочин нэмэх</button>
     </div>
-    <div id="guestList"></div>
+    <div id="guestList"><div class="card guest-card">
+      <div class="guest-top">
+        <div>
+          <div class="gn">93097779 <span class="pill use">Захиалга</span></div>
+          <div class="gm">№1 · Ирсэн: 2026-06-24 · 93097779</div>
+        </div>
+        <div style="text-align:right">
+          <div class="guest-bill">0₮</div>
+          <div style="font-size:12px;color:var(--muted)">0 удаагийн авалт</div>
+        </div>
+      </div>
+      <div class="toolbar" style="margin-top:12px">
+        <button class="btn btn-ghost btn-sm" onclick="toggleGuestItems(&#39;bk_b_wvs19&#39;)">Дэлгэрэнгүй</button>
+        
+      </div>
+      <div class="guest-items" id="gi_bk_b_wvs19"><div class="gi-row">Худалдан авалт алга</div></div>
+    </div><div class="card guest-card">
+      <div class="guest-top">
+        <div>
+          <div class="gn">88668998 <span class="pill use">Захиалга</span></div>
+          <div class="gm">№9 · Ирсэн: 2026-06-22 · 88668998</div>
+        </div>
+        <div style="text-align:right">
+          <div class="guest-bill">0₮</div>
+          <div style="font-size:12px;color:var(--muted)">0 удаагийн авалт</div>
+        </div>
+      </div>
+      <div class="toolbar" style="margin-top:12px">
+        <button class="btn btn-ghost btn-sm" onclick="toggleGuestItems(&#39;bk_b_e0l5b&#39;)">Дэлгэрэнгүй</button>
+        
+      </div>
+      <div class="guest-items" id="gi_bk_b_e0l5b"><div class="gi-row">Худалдан авалт алга</div></div>
+    </div></div>
   </section>
 
   <!-- ===================== REPORT ===================== -->
@@ -286,17 +449,17 @@
       <div class="card stat"><div class="label">Өнөөдрийн орлого</div><div class="value berry" id="stRevToday">0₮</div></div>
       <div class="card stat"><div class="label">Өнөөдрийн ашиг</div><div class="value green" id="stProfitToday">0₮</div></div>
       <div class="card stat"><div class="label">Нийт орлого</div><div class="value" id="stRevAll">0₮</div></div>
-      <div class="card stat"><div class="label">Агуулахын үнэлгээ</div><div class="value" id="stStockVal">0₮</div></div>
+      <div class="card stat"><div class="label">Агуулахын үнэлгээ</div><div class="value" id="stStockVal">208,820₮</div></div>
     </div>
 
     <div class="grid" style="grid-template-columns:1fr 1fr;gap:16px" id="reportCols">
       <div class="card" style="padding:16px">
         <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">⚠ Дуусч буй бараа</h3>
-        <div id="lowStockList"></div>
+        <div id="lowStockList"><div class="hint">Бүх бараа хангалттай байна 👍</div></div>
       </div>
       <div class="card" style="padding:16px">
         <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">🏆 Шилдэг борлуулалт</h3>
-        <div id="topList"></div>
+        <div id="topList"><div class="hint">Борлуулалт хараахан алга.</div></div>
       </div>
     </div>
 
@@ -304,7 +467,7 @@
     <div class="card tbl-wrap">
       <table>
         <thead><tr><th>Огноо</th><th>Зочин</th><th>Бараа</th><th class="num">Дүн</th></tr></thead>
-        <tbody id="salesBody"></tbody>
+        <tbody id="salesBody"><tr><td colspan="4" class="empty">Борлуулалт бүртгэгдээгүй байна.</td></tr></tbody>
       </table>
     </div>
   </section>
@@ -314,13 +477,36 @@
 <!-- Modal -->
 <div class="modal-bg" id="modalBg">
   <div class="modal">
-    <div class="modal-head"><h3 id="modalTitle"></h3><button class="x" id="modalClose">&times;</button></div>
-    <div class="modal-body" id="modalBody"></div>
-    <div class="modal-foot" id="modalFoot"></div>
+    <div class="modal-head"><h3 id="modalTitle">Шинэ бараа</h3><button class="x" id="modalClose">×</button></div>
+    <div class="modal-body" id="modalBody">
+    <div class="form-grid">
+      <div style="grid-column:1/-1"><label class="field">Барааны төрөл *</label>
+        <select id="f_type">
+          <option value="sale" selected="">Зарах бараа (зочинд зарна)</option>
+          <option value="use">Ашиглах материал (дотоод хэрэглээ)</option>
+        </select></div>
+      <div style="grid-column:1/-1"><label class="field">Барааны нэр *</label>
+        <input id="f_name" value="" placeholder="ж: Ус 0.5л / Гар савангаар"></div>
+      <div><label class="field">Ангилал</label>
+        <input id="f_cat" value="" placeholder="ж: Ундаа / Цэвэрлэгээ"></div>
+      <div><label class="field">Хэмжих нэгж</label>
+        <input id="f_unit" value="ш" placeholder="ш / кг / л"></div>
+      <div><label class="field">Өртөг (₮)</label>
+        <input id="f_cost" type="number" min="0" value="" placeholder="0"></div>
+      <div><label class="field">Зарах үнэ (₮)</label>
+        <input id="f_price" type="number" min="0" value="" placeholder="0"></div>
+      <div><label class="field">Үлдэгдэл *</label>
+        <input id="f_stock" type="number" min="0" value="" placeholder="0"></div>
+      <div><label class="field">Доод хязгаар</label>
+        <input id="f_min" type="number" min="0" value="5"></div>
+    </div>
+    <div class="hint">«Ашиглах материал» нь борлуулалтад харагдахгүй — зөвхөн агуулахын үлдэгдэл, хэрэглээг хянана. Зарах үнэ шаардлагагүй.</div></div>
+    <div class="modal-foot" id="modalFoot"><button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="saveProduct(&#39;&#39;)">Хадгалах</button></div>
   </div>
 </div>
 
-<div id="toast"></div>
+<div id="toast" class="ok">Бараа нэмэгдлээ</div>
 
 <script>
 /* ============================================================
@@ -897,5 +1083,6 @@ function renderAll(){
 }
 renderAll();
 </script>
-</body>
-</html>
+
+
+</body></html>
