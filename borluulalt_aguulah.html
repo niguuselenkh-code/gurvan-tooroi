@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Гурван Тоорой — Бараа борлуулалт ба агуулах</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1e3a5f;
+    --navy-dark:#152a45;
+    --berry:#b23a5d;
+    --green:#2e7d5b;
+    --amber:#c77d1a;
+    --red:#c0392b;
+    --bg:#f4f2ed;
+    --card:#ffffff;
+    --line:#e4e0d8;
+    --ink:#1f2937;
+    --muted:#6b7280;
+    --soft:#f8f6f2;
+    --radius:14px;
+    --shadow:0 1px 3px rgba(21,42,69,.08),0 6px 18px rgba(21,42,69,.05);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.45;
+  }
+  /* ---------- Header ---------- */
+  header.app{
+    background:linear-gradient(135deg,var(--navy),var(--navy-dark));
+    color:#fff;
+    padding:18px 20px 0;
+    position:sticky;top:0;z-index:50;
+    box-shadow:0 2px 12px rgba(21,42,69,.18);
+  }
+  .brand{display:flex;align-items:center;gap:12px;max-width:1100px;margin:0 auto;padding-bottom:14px}
+  .berries{display:flex;gap:3px}
+  .berries span{width:11px;height:11px;border-radius:50%;background:var(--berry);display:block}
+  .berries span:nth-child(2){background:#cf5a7c;margin-top:5px}
+  .berries span:nth-child(3){background:#8f2b49}
+  .brand h1{font-size:15px;font-weight:800;letter-spacing:.2px;line-height:1.1}
+  .brand .sub{font-size:12px;color:#aebfd6;font-weight:500}
+  nav.tabs{display:flex;gap:2px;max-width:1100px;margin:0 auto;overflow-x:auto}
+  nav.tabs button{
+    background:none;border:none;color:#aebfd6;font-family:inherit;
+    font-size:14px;font-weight:600;padding:11px 16px;cursor:pointer;
+    border-bottom:3px solid transparent;white-space:nowrap;transition:.15s;
+  }
+  nav.tabs button:hover{color:#dce6f2}
+  nav.tabs button.active{color:#fff;border-bottom-color:var(--berry)}
+  /* ---------- Layout ---------- */
+  main{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+  .panel{display:none}
+  .panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .section-head h2{font-size:19px;font-weight:700;color:var(--navy)}
+  .section-head .desc{font-size:13px;color:var(--muted)}
+  /* ---------- Cards & grid ---------- */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .grid{display:grid;gap:14px}
+  .stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .stat{padding:16px 18px}
+  .stat .label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+  .stat .value{font-size:26px;font-weight:800;color:var(--navy);margin-top:4px}
+  .stat .value.green{color:var(--green)}
+  .stat .value.berry{color:var(--berry)}
+  /* ---------- Buttons ---------- */
+  .btn{
+    font-family:inherit;font-size:14px;font-weight:600;border:none;border-radius:10px;
+    padding:10px 16px;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:7px;
+  }
+  .btn-primary{background:var(--navy);color:#fff}
+  .btn-primary:hover{background:var(--navy-dark)}
+  .btn-berry{background:var(--berry);color:#fff}
+  .btn-berry:hover{filter:brightness(.93)}
+  .btn-green{background:var(--green);color:#fff}
+  .btn-green:hover{filter:brightness(.93)}
+  .btn-ghost{background:var(--soft);color:var(--navy);border:1px solid var(--line)}
+  .btn-ghost:hover{background:#eee9e1}
+  .btn-sm{padding:6px 11px;font-size:13px;border-radius:8px}
+  .btn-icon{padding:7px 9px;border-radius:8px;background:var(--soft);border:1px solid var(--line);color:var(--ink);cursor:pointer;font-size:14px;font-weight:600}
+  .btn-icon:hover{background:#eee9e1}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  /* ---------- Tables ---------- */
+  .tbl-wrap{overflow-x:auto;border-radius:var(--radius)}
+  table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card)}
+  thead th{
+    background:var(--soft);text-align:left;padding:11px 14px;font-size:12px;
+    font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;
+    border-bottom:1px solid var(--line);white-space:nowrap;
+  }
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:var(--soft)}
+  .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:600}
+  .pill.ok{background:#e3f3eb;color:var(--green)}
+  .pill.low{background:#fbf0dd;color:var(--amber)}
+  .pill.out{background:#fbe4e1;color:var(--red)}
+  /* ---------- Forms / inputs ---------- */
+  label.field{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:5px}
+  input,select{
+    width:100%;font-family:inherit;font-size:14px;padding:10px 12px;
+    border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);
+  }
+  input:focus,select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,58,95,.1)}
+  .form-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+  /* ---------- POS ---------- */
+  .pos{display:grid;gap:16px;grid-template-columns:1fr 360px}
+  @media(max-width:820px){.pos{grid-template-columns:1fr}}
+  .prod-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+  .prod-btn{
+    text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:12px;cursor:pointer;transition:.12s;box-shadow:var(--shadow);position:relative;
+  }
+  .prod-btn:hover{border-color:var(--navy);transform:translateY(-1px)}
+  .prod-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+  .prod-btn .pn{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px}
+  .prod-btn .pp{font-size:15px;font-weight:700;color:var(--berry)}
+  .prod-btn .ps{font-size:12px;color:var(--muted);margin-top:3px}
+  .cart{position:sticky;top:130px;align-self:start}
+  .cart-head{padding:14px 16px;border-bottom:1px solid var(--line);font-weight:700;color:var(--navy);display:flex;justify-content:space-between;align-items:center}
+  .cart-body{max-height:340px;overflow-y:auto}
+  .cart-line{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
+  .cart-line .ci{flex:1;min-width:0}
+  .cart-line .ci .n{font-size:13px;font-weight:600}
+  .cart-line .ci .s{font-size:12px;color:var(--muted)}
+  .qty{display:flex;align-items:center;gap:6px}
+  .qty button{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--soft);font-weight:700;cursor:pointer;font-size:15px;line-height:1}
+  .qty button:hover{background:#eee9e1}
+  .qty span{min-width:22px;text-align:center;font-weight:600;font-size:14px}
+  .cart-foot{padding:14px 16px;border-top:1px solid var(--line)}
+  .cart-total{display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:var(--navy);margin-bottom:12px}
+  .empty{padding:30px 16px;text-align:center;color:var(--muted);font-size:14px}
+  /* ---------- Guests ---------- */
+  .guest-card{padding:16px;margin-bottom:12px}
+  .guest-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+  .guest-top .gn{font-size:16px;font-weight:700;color:var(--navy)}
+  .guest-top .gm{font-size:13px;color:var(--muted)}
+  .guest-bill{font-size:20px;font-weight:800;color:var(--berry)}
+  .guest-items{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px;display:none}
+  .guest-items.open{display:block}
+  .gi-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;color:var(--muted)}
+  /* ---------- Modal ---------- */
+  .modal-bg{position:fixed;inset:0;background:rgba(21,42,69,.45);display:none;align-items:flex-start;justify-content:center;padding:30px 16px;z-index:100;overflow-y:auto}
+  .modal-bg.open{display:flex}
+  .modal{background:#fff;border-radius:16px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:pop .2s ease}
+  @keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+  .modal-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .modal-head h3{font-size:17px;color:var(--navy);font-weight:700}
+  .modal-body{padding:20px}
+  .modal-foot{padding:16px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
+  .x{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1}
+  /* ---------- Toast ---------- */
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:13px 22px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;transition:.3s;z-index:200;max-width:90vw;text-align:center}
+  #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+  #toast.err{background:var(--red)}
+  #toast.ok{background:var(--green)}
+  .row-actions{display:flex;gap:6px;justify-content:flex-end}
+  .search{margin-bottom:14px;position:relative}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .seg{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;margin-bottom:14px}
+  .seg button{background:none;border:none;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:6px 13px;border-radius:7px;cursor:pointer;white-space:nowrap}
+  .seg button.active{background:#fff;color:var(--navy);box-shadow:0 1px 2px rgba(0,0,0,.07)}
+  .pill.use{background:#e7ecf3;color:var(--navy)}
+  .pill.sale{background:#f3e6ec;color:var(--berry)}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  .badge-low{position:absolute;top:8px;right:8px;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <div class="brand">
+    <div class="berries"><span></span><span></span><span></span></div>
+    <div>
+      <h1>Гурван Тоорой</h1>
+      <div class="sub">Бараа борлуулалт ба агуулахын бүртгэл</div>
+    </div>
+  </div>
+  <nav class="tabs">
+    <button data-tab="pos" class="active">🛒 Борлуулалт</button>
+    <button data-tab="inv">📦 Агуулах</button>
+    <button data-tab="guests">👤 Зочид</button>
+    <button data-tab="report">📊 Тайлан</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ===================== POS ===================== -->
+  <section class="panel active" id="pos">
+    <div class="section-head">
+      <div>
+        <h2>Борлуулалт</h2>
+        <div class="desc">Зочин сонгоод бараа нэмнэ. Баталгаажуулахад агуулахаас автоматаар хасагдана.</div>
+      </div>
+    </div>
+    <div class="pos">
+      <div>
+        <div style="margin-bottom:14px">
+          <label class="field" for="posGuest">Зочин (буудаллаж буй)</label>
+          <select id="posGuest"></select>
+          <div class="hint" id="bkStatus"></div>
+        </div>
+        <div class="search">
+          <input id="posSearch" placeholder="🔍 Бараа хайх...">
+        </div>
+        <div class="prod-grid" id="posProducts"></div>
+      </div>
+
+      <div class="card cart">
+        <div class="cart-head">
+          <span>Сагс</span>
+          <button class="btn-icon" id="clearCart" title="Сагс цэвэрлэх">🗑</button>
+        </div>
+        <div class="cart-body" id="cartBody">
+          <div class="empty">Сагс хоосон байна</div>
+        </div>
+        <div class="cart-foot">
+          <div class="cart-total"><span>Нийт</span><span id="cartTotal">0₮</span></div>
+          <button class="btn btn-berry" id="confirmSale" style="width:100%;justify-content:center" disabled>Борлуулалт баталгаажуулах</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== INVENTORY ===================== -->
+  <section class="panel" id="inv">
+    <div class="section-head">
+      <div>
+        <h2>Агуулахын бүртгэл</h2>
+        <div class="desc">Зарах бараа ба ашиглах материалын үлдэгдэл, өртөг. Доод хязгаараас бага бол сэрэмжлүүлнэ.</div>
+      </div>
+      <div class="toolbar">
+        <button class="btn btn-ghost btn-sm" id="seedBtn">Жишээ оруулах</button>
+        <button class="btn btn-ghost btn-sm" id="exportInv">⬇ CSV</button>
+        <button class="btn btn-primary" id="addProductBtn">+ Шинэ бараа</button>
+      </div>
+    </div>
+    <div class="seg" id="invFilter">
+      <button data-f="all" class="active">Бүгд</button>
+      <button data-f="sale">Зарах бараа</button>
+      <button data-f="use">Ашиглах материал</button>
+    </div>
+    <div class="search"><input id="invSearch" placeholder="🔍 Бараа хайх..."></div>
+    <div class="card tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Бараа</th><th>Төрөл</th><th>Ангилал</th><th class="num">Өртөг</th><th class="num">Зарах үнэ</th>
+          <th class="num">Үлдэгдэл</th><th>Төлөв</th><th></th>
+        </tr></thead>
+        <tbody id="invBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== GUESTS ===================== -->
+  <section class="panel" id="guests">
+    <div class="section-head">
+      <div>
+        <h2>Зочид</h2>
+        <div class="desc">Захиалгаас буудаллаж буй зочид автоматаар орж ирнэ. Walk-in бол гараар нэмнэ.</div>
+      </div>
+      <button class="btn btn-primary" id="addGuestBtn">+ Гар зочин нэмэх</button>
+    </div>
+    <div id="guestList"></div>
+  </section>
+
+  <!-- ===================== REPORT ===================== -->
+  <section class="panel" id="report">
+    <div class="section-head">
+      <div><h2>Тайлан</h2><div class="desc">Орлого, ашиг, борлуулалтын түүх.</div></div>
+      <button class="btn btn-ghost btn-sm" id="exportSales">⬇ Борлуулалт CSV</button>
+    </div>
+    <div class="grid stats" style="margin-bottom:18px">
+      <div class="card stat"><div class="label">Өнөөдрийн орлого</div><div class="value berry" id="stRevToday">0₮</div></div>
+      <div class="card stat"><div class="label">Өнөөдрийн ашиг</div><div class="value green" id="stProfitToday">0₮</div></div>
+      <div class="card stat"><div class="label">Нийт орлого</div><div class="value" id="stRevAll">0₮</div></div>
+      <div class="card stat"><div class="label">Агуулахын үнэлгээ</div><div class="value" id="stStockVal">0₮</div></div>
+    </div>
+
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:16px" id="reportCols">
+      <div class="card" style="padding:16px">
+        <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">⚠ Дуусч буй бараа</h3>
+        <div id="lowStockList"></div>
+      </div>
+      <div class="card" style="padding:16px">
+        <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">🏆 Шилдэг борлуулалт</h3>
+        <div id="topList"></div>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px;color:var(--navy);margin:22px 0 10px">Сүүлийн борлуулалт</h3>
+    <div class="card tbl-wrap">
+      <table>
+        <thead><tr><th>Огноо</th><th>Зочин</th><th>Бараа</th><th class="num">Дүн</th></tr></thead>
+        <tbody id="salesBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<!-- Modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-head"><h3 id="modalTitle"></h3><button class="x" id="modalClose">&times;</button></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   Гурван Тоорой — Бараа борлуулалт ба агуулах
+   Нэг файлын систем. Өгөгдөл localStorage-д хадгалагдана.
+   ============================================================ */
+
+const DB_KEY = 'gt_inventory_v1';
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const money = n => (Math.round(n)||0).toLocaleString('mn-MN') + '₮';
+const todayStr = () => new Date().toISOString().slice(0,10);
+
+/* ===== Захиалгын системтэй холболт (gt_booking_only_v1-ийг уншина) ===== */
+const BOOKING_KEY = 'gt_booking_only_v1';
+const pad2 = n => String(n).padStart(2,'0');
+function addDays(s,n){
+  const [y,m,d] = s.split('-').map(Number);
+  const dt = new Date(y, m-1, d); dt.setDate(dt.getDate()+n);
+  return dt.getFullYear()+'-'+pad2(dt.getMonth()+1)+'-'+pad2(dt.getDate());
+}
+function readBookingState(){
+  try{ const r = localStorage.getItem(BOOKING_KEY); return r?JSON.parse(r):null; }
+  catch(e){ return null; }
+}
+function bookingConnected(){ return !!readBookingState(); }
+function mapBooking(b){
+  return {
+    id:'bk_'+b.id, bookingId:b.id,
+    name: b.name || b.phone,
+    room: (b.rooms||[]).map(r=>'№'+r.num).join(', '),
+    phone: b.phone, checkIn: b.checkIn, nights: b.nights,
+    status: b.status, source:'booking'
+  };
+}
+function bookingGuestsStaying(){
+  const st = readBookingState();
+  if(!st || !st.bookings) return [];
+  const today = todayStr();
+  return st.bookings
+    .filter(b => { const out = addDays(b.checkIn, b.nights); return b.checkIn<=today && today<out; })
+    .map(mapBooking);
+}
+function bookingGuestsAll(){
+  const st = readBookingState();
+  if(!st || !st.bookings) return [];
+  return st.bookings.map(mapBooking);
+}
+function allActiveGuests(){
+  const manual = db.guests.filter(g=>g.active).map(g=>({...g, source:'manual'}));
+  return [...bookingGuestsStaying(), ...manual];
+}
+function resolveGuestName(id){
+  const g = allActiveGuests().find(x=>x.id===id)
+         || bookingGuestsAll().find(x=>x.id===id)
+         || db.guests.find(x=>x.id===id);
+  return g ? (g.name || g.phone || '—') : '—';
+}
+
+let db = load();
+let cart = []; // {productId, qty}
+let invFilter = 'all'; // all | sale | use
+
+function load(){
+  try{
+    const raw = localStorage.getItem(DB_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { products:[], guests:[], sales:[] };
+}
+function save(){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+/* ---------- Toast ---------- */
+let toastT;
+function toast(msg, type=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show ' + type;
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>{ t.className = type; }, 2600);
+}
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll('nav.tabs button').forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById(b.dataset.tab).classList.add('active');
+    renderAll();
+  };
+});
+
+/* ---------- Modal ---------- */
+const modalBg = document.getElementById('modalBg');
+function openModal(title, bodyHTML, footHTML){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = bodyHTML;
+  document.getElementById('modalFoot').innerHTML = footHTML;
+  modalBg.classList.add('open');
+}
+function closeModal(){ modalBg.classList.remove('open'); }
+document.getElementById('modalClose').onclick = closeModal;
+modalBg.onclick = e=>{ if(e.target===modalBg) closeModal(); };
+
+/* ---------- Stock status ---------- */
+function stockStatus(p){
+  if(p.stock<=0) return {cls:'out', txt:'Дууссан'};
+  if(p.stock<=(p.minStock||5)) return {cls:'low', txt:'Бага'};
+  return {cls:'ok', txt:'Хангалттай'};
+}
+
+/* ============================================================
+   PRODUCTS / INVENTORY
+   ============================================================ */
+function productForm(p){
+  const type = p?(p.type||'sale'):'sale';
+  return `
+    <div class="form-grid">
+      <div style="grid-column:1/-1"><label class="field">Барааны төрөл *</label>
+        <select id="f_type">
+          <option value="sale" ${type==='sale'?'selected':''}>Зарах бараа (зочинд зарна)</option>
+          <option value="use" ${type==='use'?'selected':''}>Ашиглах материал (дотоод хэрэглээ)</option>
+        </select></div>
+      <div style="grid-column:1/-1"><label class="field">Барааны нэр *</label>
+        <input id="f_name" value="${p?p.name:''}" placeholder="ж: Ус 0.5л / Гар савангаар"></div>
+      <div><label class="field">Ангилал</label>
+        <input id="f_cat" value="${p?p.category:''}" placeholder="ж: Ундаа / Цэвэрлэгээ"></div>
+      <div><label class="field">Хэмжих нэгж</label>
+        <input id="f_unit" value="${p?p.unit:'ш'}" placeholder="ш / кг / л"></div>
+      <div><label class="field">Өртөг (₮)</label>
+        <input id="f_cost" type="number" min="0" value="${p?p.cost:''}" placeholder="0"></div>
+      <div><label class="field">Зарах үнэ (₮)</label>
+        <input id="f_price" type="number" min="0" value="${p?p.price:''}" placeholder="0"></div>
+      <div><label class="field">Үлдэгдэл *</label>
+        <input id="f_stock" type="number" min="0" value="${p?p.stock:''}" placeholder="0"></div>
+      <div><label class="field">Доод хязгаар</label>
+        <input id="f_min" type="number" min="0" value="${p?(p.minStock??5):5}"></div>
+    </div>
+    <div class="hint">«Ашиглах материал» нь борлуулалтад харагдахгүй — зөвхөн агуулахын үлдэгдэл, хэрэглээг хянана. Зарах үнэ шаардлагагүй.</div>`;
+}
+function openProductModal(id){
+  const p = id ? db.products.find(x=>x.id===id) : null;
+  openModal(p?'Бараа засах':'Шинэ бараа',
+    productForm(p),
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="saveProduct('${id||''}')">Хадгалах</button>`);
+}
+function saveProduct(id){
+  const type = document.getElementById('f_type').value;
+  const name = document.getElementById('f_name').value.trim();
+  const price = +document.getElementById('f_price').value;
+  const stock = +document.getElementById('f_stock').value;
+  if(!name){ toast('Барааны нэр оруулна уу','err'); return; }
+  if(type==='sale' && (!price || price<0)){ toast('Зарах үнэ оруулна уу','err'); return; }
+  const data = {
+    type,
+    name,
+    category: document.getElementById('f_cat').value.trim() || 'Бусад',
+    unit: document.getElementById('f_unit').value.trim() || 'ш',
+    cost: +document.getElementById('f_cost').value || 0,
+    price: price||0,
+    stock: stock||0,
+    minStock: +document.getElementById('f_min').value || 0
+  };
+  if(id){ Object.assign(db.products.find(x=>x.id===id), data); toast('Бараа шинэчлэгдлээ','ok'); }
+  else { db.products.push({id:uid(), ...data}); toast('Бараа нэмэгдлээ','ok'); }
+  save(); closeModal(); renderAll();
+}
+function deleteProduct(id){
+  const p = db.products.find(x=>x.id===id);
+  openModal('Устгах уу?', `<p style="font-size:14px"><b>${p.name}</b> барааг устгах гэж байна. Энэ үйлдлийг буцаах боломжгүй.</p>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-berry" onclick="confirmDeleteProduct('${id}')">Устгах</button>`);
+}
+function confirmDeleteProduct(id){
+  db.products = db.products.filter(x=>x.id!==id);
+  cart = cart.filter(c=>c.productId!==id);
+  save(); closeModal(); renderAll(); toast('Устгагдлаа');
+}
+function restock(id){
+  const p = db.products.find(x=>x.id===id);
+  openModal('Нөхөн дүүргэх — '+p.name,
+    `<label class="field">Нэмэх тоо хэмжээ</label>
+     <input id="f_add" type="number" min="1" placeholder="0" autofocus>
+     <div class="hint">Одоогийн үлдэгдэл: ${p.stock} ${p.unit}</div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-green" onclick="confirmRestock('${id}')">Нэмэх</button>`);
+}
+function confirmRestock(id){
+  const add = +document.getElementById('f_add').value;
+  if(!add || add<=0){ toast('Тоо хэмжээ оруулна уу','err'); return; }
+  db.products.find(x=>x.id===id).stock += add;
+  save(); closeModal(); renderAll(); toast('Үлдэгдэл нэмэгдлээ','ok');
+}
+function consume(id){
+  const p = db.products.find(x=>x.id===id);
+  openModal('Хэрэглээ бүртгэх — '+p.name,
+    `<label class="field">Зарцуулсан тоо хэмжээ</label>
+     <input id="f_use" type="number" min="1" max="${p.stock}" placeholder="0" autofocus>
+     <div class="hint">Одоогийн үлдэгдэл: ${p.stock} ${p.unit}</div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-berry" onclick="confirmConsume('${id}')">Хасах</button>`);
+}
+function confirmConsume(id){
+  const use = +document.getElementById('f_use').value;
+  const p = db.products.find(x=>x.id===id);
+  if(!use || use<=0){ toast('Тоо хэмжээ оруулна уу','err'); return; }
+  if(use>p.stock){ toast('Үлдэгдлээс их байна','err'); return; }
+  p.stock -= use;
+  save(); closeModal(); renderAll(); toast('Хэрэглээ бүртгэгдлээ','ok');
+}
+
+function renderInventory(){
+  const q = document.getElementById('invSearch').value.toLowerCase();
+  const list = db.products.filter(p=>{
+    const tp = p.type||'sale';
+    if(invFilter!=='all' && tp!==invFilter) return false;
+    return p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q);
+  });
+  const body = document.getElementById('invBody');
+  if(!list.length){
+    body.innerHTML = `<tr><td colspan="8" class="empty">Бараа бүртгэгдээгүй байна. «Шинэ бараа» дарж эхлүүлнэ үү.</td></tr>`;
+    return;
+  }
+  body.innerHTML = list.map(p=>{
+    const s = stockStatus(p);
+    const isUse = (p.type||'sale')==='use';
+    const typePill = isUse
+      ? `<span class="pill use">Ашиглах</span>`
+      : `<span class="pill sale">Зарах</span>`;
+    return `<tr>
+      <td><b>${p.name}</b><div style="font-size:12px;color:var(--muted)">${p.unit}</div></td>
+      <td>${typePill}</td>
+      <td>${p.category}</td>
+      <td class="num">${money(p.cost)}</td>
+      <td class="num">${isUse?'<span style="color:var(--muted)">—</span>':money(p.price)}</td>
+      <td class="num"><b>${p.stock}</b></td>
+      <td><span class="pill ${s.cls}">${s.txt}</span></td>
+      <td><div class="row-actions">
+        <button class="btn-icon" title="Нөхөн дүүргэх" onclick="restock('${p.id}')">➕</button>
+        ${isUse?`<button class="btn-icon" title="Хэрэглээ бүртгэх" onclick="consume('${p.id}')">➖</button>`:''}
+        <button class="btn-icon" title="Засах" onclick="openProductModal('${p.id}')">✎</button>
+        <button class="btn-icon" title="Устгах" onclick="deleteProduct('${p.id}')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ============================================================
+   GUESTS
+   ============================================================ */
+function openGuestModal(){
+  openModal('Гар зочин нэмэх (walk-in)',
+    `<div class="form-grid">
+      <div style="grid-column:1/-1"><label class="field">Зочны нэр *</label><input id="g_name" placeholder="ж: Б.Болд"></div>
+      <div><label class="field">Өрөө / Байр</label><input id="g_room" placeholder="ж: 101"></div>
+      <div><label class="field">Утас</label><input id="g_phone" placeholder=""></div>
+     </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="saveGuest()">Хадгалах</button>`);
+}
+function saveGuest(){
+  const name = document.getElementById('g_name').value.trim();
+  if(!name){ toast('Зочны нэр оруулна уу','err'); return; }
+  db.guests.push({
+    id:uid(), name,
+    room: document.getElementById('g_room').value.trim(),
+    phone: document.getElementById('g_phone').value.trim(),
+    checkIn: todayStr(), active:true
+  });
+  save(); closeModal(); renderAll(); toast('Зочин нэмэгдлээ','ok');
+}
+function guestBill(gid){
+  return db.sales.filter(s=>s.guestId===gid)
+    .reduce((sum,s)=>sum+s.total,0);
+}
+function guestSales(gid){ return db.sales.filter(s=>s.guestId===gid); }
+function toggleGuestItems(gid){ document.getElementById('gi_'+gid).classList.toggle('open'); }
+function checkoutGuest(gid){
+  const g = db.guests.find(x=>x.id===gid);
+  const bill = guestBill(gid);
+  openModal('Гаргах — '+g.name,
+    `<p style="font-size:14px">Нийт төлбөр: <b style="color:var(--berry);font-size:18px">${money(bill)}</b></p>
+     <div class="hint">Зочныг гаргахад идэвхтэй жагсаалтаас хасагдана. Борлуулалтын түүх хадгалагдана.</div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-green" onclick="confirmCheckout('${gid}')">Төлбөр хаах & гаргах</button>`);
+}
+function confirmCheckout(gid){
+  db.guests.find(x=>x.id===gid).active = false;
+  save(); closeModal(); renderAll(); toast('Зочин гарлаа','ok');
+}
+function renderGuests(){
+  const list = allActiveGuests();
+  const wrap = document.getElementById('guestList');
+  if(!list.length){
+    wrap.innerHTML = `<div class="card empty">Буудаллаж буй зочин алга. Захиалгын системд захиалга оруулах эсвэл «Гар зочин нэмэх» дарна уу.</div>`;
+    return;
+  }
+  wrap.innerHTML = list.map(g=>{
+    const sales = guestSales(g.id);
+    const bill = sales.reduce((s,x)=>s+x.total,0);
+    const items = sales.flatMap(s=>s.items.map(i=>`<div class="gi-row"><span>${i.name} × ${i.qty}</span><span>${money(i.price*i.qty)}</span></div>`)).join('') || '<div class="gi-row">Худалдан авалт алга</div>';
+    const srcBadge = g.source==='booking'
+      ? `<span class="pill use">Захиалга</span>`
+      : `<span class="pill sale">Гар</span>`;
+    const checkoutBtn = g.source==='manual'
+      ? `<button class="btn btn-green btn-sm" onclick="checkoutGuest('${g.id}')">Гаргах</button>` : '';
+    return `<div class="card guest-card">
+      <div class="guest-top">
+        <div>
+          <div class="gn">${g.name} ${srcBadge}</div>
+          <div class="gm">${g.room?(g.source==='booking'?g.room:'Өрөө '+g.room)+' · ':''}Ирсэн: ${g.checkIn||'—'}${g.phone?' · '+g.phone:''}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="guest-bill">${money(bill)}</div>
+          <div style="font-size:12px;color:var(--muted)">${sales.length} удаагийн авалт</div>
+        </div>
+      </div>
+      <div class="toolbar" style="margin-top:12px">
+        <button class="btn btn-ghost btn-sm" onclick="toggleGuestItems('${g.id}')">Дэлгэрэнгүй</button>
+        ${checkoutBtn}
+      </div>
+      <div class="guest-items" id="gi_${g.id}">${items}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   POS / SALE
+   ============================================================ */
+function renderPosGuests(){
+  const sel = document.getElementById('posGuest');
+  const cur = sel.value;
+  const booking = bookingGuestsStaying();
+  const manual = db.guests.filter(g=>g.active);
+  let html = '';
+  if(booking.length){
+    html += `<optgroup label="Захиалгаас (буудаллаж буй)">`
+      + booking.map(g=>`<option value="${g.id}">${g.name}${g.room?' · '+g.room:''}</option>`).join('')
+      + `</optgroup>`;
+  }
+  if(manual.length){
+    html += `<optgroup label="Гар бүртгэл">`
+      + manual.map(g=>`<option value="${g.id}">${g.name}${g.room?' · Өрөө '+g.room:''}</option>`).join('')
+      + `</optgroup>`;
+  }
+  sel.innerHTML = html || `<option value="">— Буудаллаж буй зочин алга —</option>`;
+  if([...sel.options].some(o=>o.value===cur)) sel.value = cur;
+
+  // холболтын төлөв
+  const st = document.getElementById('bkStatus');
+  if(bookingConnected()){
+    st.innerHTML = `<span style="color:var(--green);font-weight:600">✓ Захиалгатай холбогдсон</span> · өнөөдөр ${booking.length} зочин буудаллаж байна`;
+  } else {
+    st.innerHTML = `<span style="color:var(--amber);font-weight:600">Захиалгын систем олдсонгүй.</span> Хоёр файлыг нэг домэйн дээр (GitHub Pages) байршуулна уу. Эсвэл «Зочид»-оос гараар нэмнэ.`;
+  }
+}
+function renderPosProducts(){
+  const q = document.getElementById('posSearch').value.toLowerCase();
+  const sellable = db.products.filter(p=>(p.type||'sale')==='sale');
+  const list = sellable.filter(p=>p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q));
+  const wrap = document.getElementById('posProducts');
+  if(!sellable.length){
+    wrap.innerHTML = `<div class="empty" style="grid-column:1/-1">Зарах бараа бүртгэгдээгүй байна. «Агуулах» хэсэгт «Зарах бараа» нэмнэ үү.</div>`;
+    return;
+  }
+  if(!list.length){ wrap.innerHTML = `<div class="empty" style="grid-column:1/-1">Хайлтад тохирох бараа алга.</div>`; return; }
+  wrap.innerHTML = list.map(p=>{
+    const inCart = cart.find(c=>c.productId===p.id)?.qty || 0;
+    const avail = p.stock - inCart;
+    const s = stockStatus(p);
+    return `<button class="prod-btn" ${avail<=0?'disabled':''} onclick="addToCart('${p.id}')">
+      ${s.cls!=='ok'?`<span class="badge-low pill ${s.cls}">${p.stock}</span>`:''}
+      <div class="pn">${p.name}</div>
+      <div class="pp">${money(p.price)}</div>
+      <div class="ps">Үлдэгдэл: ${p.stock} ${p.unit}</div>
+    </button>`;
+  }).join('');
+}
+function addToCart(pid){
+  const p = db.products.find(x=>x.id===pid);
+  const line = cart.find(c=>c.productId===pid);
+  const inCart = line?line.qty:0;
+  if(inCart >= p.stock){ toast('Үлдэгдэл хүрэлцэхгүй','err'); return; }
+  if(line) line.qty++; else cart.push({productId:pid, qty:1});
+  renderCart(); renderPosProducts();
+}
+function changeQty(pid, d){
+  const line = cart.find(c=>c.productId===pid);
+  if(!line) return;
+  const p = db.products.find(x=>x.id===pid);
+  if(d>0 && line.qty>=p.stock){ toast('Үлдэгдэл хүрэлцэхгүй','err'); return; }
+  line.qty += d;
+  if(line.qty<=0) cart = cart.filter(c=>c.productId!==pid);
+  renderCart(); renderPosProducts();
+}
+function cartTotal(){
+  return cart.reduce((s,c)=>{
+    const p = db.products.find(x=>x.id===c.productId);
+    return s + (p?p.price*c.qty:0);
+  },0);
+}
+function renderCart(){
+  const body = document.getElementById('cartBody');
+  if(!cart.length){
+    body.innerHTML = `<div class="empty">Сагс хоосон байна</div>`;
+  } else {
+    body.innerHTML = cart.map(c=>{
+      const p = db.products.find(x=>x.id===c.productId);
+      return `<div class="cart-line">
+        <div class="ci"><div class="n">${p.name}</div><div class="s">${money(p.price)} × ${c.qty}</div></div>
+        <div class="qty">
+          <button onclick="changeQty('${p.id}',-1)">−</button>
+          <span>${c.qty}</span>
+          <button onclick="changeQty('${p.id}',1)">+</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('cartTotal').textContent = money(cartTotal());
+  const guestOk = !!document.getElementById('posGuest').value;
+  document.getElementById('confirmSale').disabled = !cart.length || !guestOk;
+}
+function confirmSale(){
+  const gid = document.getElementById('posGuest').value;
+  if(!gid){ toast('Зочин сонгоно уу','err'); return; }
+  if(!cart.length) return;
+  // validate stock once more
+  for(const c of cart){
+    const p = db.products.find(x=>x.id===c.productId);
+    if(!p || c.qty>p.stock){ toast(`${p?p.name:'Бараа'} үлдэгдэл хүрэлцэхгүй`,'err'); return; }
+  }
+  const items = cart.map(c=>{
+    const p = db.products.find(x=>x.id===c.productId);
+    return {productId:p.id, name:p.name, qty:c.qty, price:p.price, cost:p.cost};
+  });
+  const total = items.reduce((s,i)=>s+i.price*i.qty,0);
+  // decrement stock
+  cart.forEach(c=>{ db.products.find(x=>x.id===c.productId).stock -= c.qty; });
+  db.sales.push({ id:uid(), guestId:gid, items, total, ts:new Date().toISOString() });
+  cart = [];
+  save(); renderAll();
+  toast('Борлуулалт амжилттай · '+money(total),'ok');
+}
+document.getElementById('confirmSale').onclick = confirmSale;
+document.getElementById('clearCart').onclick = ()=>{ cart=[]; renderCart(); renderPosProducts(); };
+document.getElementById('posGuest').onchange = renderCart;
+document.getElementById('posSearch').oninput = renderPosProducts;
+document.getElementById('invSearch').oninput = renderInventory;
+document.querySelectorAll('#invFilter button').forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll('#invFilter button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    invFilter = b.dataset.f;
+    renderInventory();
+  };
+});
+
+/* ============================================================
+   REPORTS
+   ============================================================ */
+function renderReport(){
+  const today = todayStr();
+  let revToday=0, profitToday=0, revAll=0;
+  db.sales.forEach(s=>{
+    revAll += s.total;
+    const isToday = s.ts.slice(0,10)===today;
+    s.items.forEach(i=>{
+      if(isToday){ revToday += i.price*i.qty; profitToday += (i.price-(i.cost||0))*i.qty; }
+    });
+  });
+  const stockVal = db.products.reduce((s,p)=>s+p.cost*p.stock,0);
+  document.getElementById('stRevToday').textContent = money(revToday);
+  document.getElementById('stProfitToday').textContent = money(profitToday);
+  document.getElementById('stRevAll').textContent = money(revAll);
+  document.getElementById('stStockVal').textContent = money(stockVal);
+
+  // low stock
+  const low = db.products.filter(p=>p.stock<=(p.minStock||5)).sort((a,b)=>a.stock-b.stock);
+  document.getElementById('lowStockList').innerHTML = low.length
+    ? low.map(p=>{const s=stockStatus(p);return `<div class="gi-row" style="font-size:14px;color:var(--ink)"><span>${p.name}</span><span class="pill ${s.cls}">${p.stock} ${p.unit}</span></div>`;}).join('')
+    : `<div class="hint">Бүх бараа хангалттай байна 👍</div>`;
+
+  // top products
+  const tally = {};
+  db.sales.forEach(s=>s.items.forEach(i=>{
+    tally[i.name] = tally[i.name] || {qty:0, rev:0};
+    tally[i.name].qty += i.qty; tally[i.name].rev += i.price*i.qty;
+  }));
+  const top = Object.entries(tally).sort((a,b)=>b[1].rev-a[1].rev).slice(0,6);
+  document.getElementById('topList').innerHTML = top.length
+    ? top.map(([n,d])=>`<div class="gi-row" style="font-size:14px;color:var(--ink)"><span>${n} <span style="color:var(--muted)">×${d.qty}</span></span><span><b>${money(d.rev)}</b></span></div>`).join('')
+    : `<div class="hint">Борлуулалт хараахан алга.</div>`;
+
+  // recent sales
+  const guestName = id => resolveGuestName(id);
+  const recent = [...db.sales].reverse().slice(0,30);
+  document.getElementById('salesBody').innerHTML = recent.length
+    ? recent.map(s=>{
+        const d = new Date(s.ts);
+        const dt = d.toLocaleDateString('mn-MN')+' '+d.toLocaleTimeString('mn-MN',{hour:'2-digit',minute:'2-digit'});
+        const itemsTxt = s.items.map(i=>`${i.name}×${i.qty}`).join(', ');
+        return `<tr><td style="white-space:nowrap">${dt}</td><td>${guestName(s.guestId)}</td><td style="font-size:13px">${itemsTxt}</td><td class="num"><b>${money(s.total)}</b></td></tr>`;
+      }).join('')
+    : `<tr><td colspan="4" class="empty">Борлуулалт бүртгэгдээгүй байна.</td></tr>`;
+}
+
+/* ============================================================
+   CSV EXPORT
+   ============================================================ */
+function downloadCSV(filename, rows){
+  const csv = rows.map(r=>r.map(c=>{
+    const v = (c==null?'':String(c)).replace(/"/g,'""');
+    return /[",\n]/.test(v) ? `"${v}"` : v;
+  }).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+}
+document.getElementById('exportInv').onclick = ()=>{
+  const rows = [['Нэр','Төрөл','Ангилал','Нэгж','Өртөг','Зарах үнэ','Үлдэгдэл','Доод хязгаар']];
+  db.products.forEach(p=>rows.push([p.name,(p.type||'sale')==='use'?'Ашиглах':'Зарах',p.category,p.unit,p.cost,p.price,p.stock,p.minStock]));
+  downloadCSV('aguulah_'+todayStr()+'.csv', rows);
+};
+document.getElementById('exportSales').onclick = ()=>{
+  const gname = id=>resolveGuestName(id);
+  const rows = [['Огноо','Зочин','Бараа','Тоо','Нэгж үнэ','Дүн']];
+  db.sales.forEach(s=>s.items.forEach(i=>{
+    rows.push([new Date(s.ts).toLocaleString('mn-MN'), gname(s.guestId), i.name, i.qty, i.price, i.price*i.qty]);
+  }));
+  downloadCSV('borluulalt_'+todayStr()+'.csv', rows);
+};
+
+/* ---------- Buttons ---------- */
+document.getElementById('addProductBtn').onclick = ()=>openProductModal();
+document.getElementById('addGuestBtn').onclick = openGuestModal;
+document.getElementById('seedBtn').onclick = seedData;
+
+function seedData(){
+  if(db.products.length){
+    openModal('Жишээ бараа', '<p style="font-size:14px">Аль хэдийн бараа бүртгэлтэй байна. Жишээ бараа нэмэх үү?</p>',
+      `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+       <button class="btn btn-primary" onclick="doSeed()">Нэмэх</button>`);
+  } else doSeed();
+}
+function doSeed(){
+  const samples = [
+    // [нэр, ангилал, нэгж, өртөг, зарах үнэ, үлдэгдэл, доод хязгаар, төрөл]
+    ['Ус 0.5л','Ундаа','ш',500,1500,40,10,'sale'],
+    ['Кока кола 0.5л','Ундаа','ш',1500,3000,24,8,'sale'],
+    ['Жүүс','Ундаа','ш',1200,2500,18,6,'sale'],
+    ['Чипс','Идээ','ш',1800,3500,15,5,'sale'],
+    ['Шоколад','Идээ','ш',2000,4000,20,6,'sale'],
+    ['Сэшүүр','Дурсгал','ш',8000,15000,6,3,'sale'],
+    ['Малгай','Дурсгал','ш',12000,22000,4,2,'sale'],
+    // Ашиглах материал (дотоод хэрэглээ)
+    ['Гар савангаар','Цэвэрлэгээ','ш',2500,0,12,4,'use'],
+    ['Аяга угаагч','Цэвэрлэгээ','л',6000,0,5,2,'use'],
+    ['Шампунь','Ариун цэвэр','ш',3500,0,20,6,'use'],
+    ['Жорлонгийн цаас','Ариун цэвэр','боодол',1200,0,30,10,'use'],
+    ['Угаалгын нунтаг','Цэвэрлэгээ','кг',4500,0,8,3,'use']
+  ];
+  samples.forEach(s=>db.products.push({id:uid(),name:s[0],category:s[1],unit:s[2],cost:s[3],price:s[4],stock:s[5],minStock:s[6],type:s[7]}));
+  save(); closeModal(); renderAll(); toast('Жишээ бараа нэмэгдлээ','ok');
+}
+
+/* ---------- Render all ---------- */
+function renderAll(){
+  renderPosGuests();
+  renderPosProducts();
+  renderCart();
+  renderInventory();
+  renderGuests();
+  renderReport();
+}
+renderAll();
+</script>
+</body>
+</html>
