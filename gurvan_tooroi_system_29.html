@@ -1,0 +1,2275 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Гурван Тоорой — Удирдлагын систем</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1e3a5f;--navy-dark:#152a45;--berry:#b23a5d;--green:#2e7d5b;
+    --amber:#c77d1a;--red:#c0392b;--bg:#f4f2ed;--card:#fff;--line:#e4e0d8;
+    --ink:#1f2937;--muted:#6b7280;--soft:#f8f6f2;--radius:14px;
+    --shadow:0 1px 3px rgba(21,42,69,.08),0 6px 18px rgba(21,42,69,.05);
+    --oo:#eaf1f7;--nooo:#f3ece8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.45}
+  header.app{background:linear-gradient(135deg,var(--navy),var(--navy-dark));color:#fff;padding:16px 20px 0;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(21,42,69,.18)}
+  .brand{display:flex;align-items:center;gap:12px;max-width:1240px;margin:0 auto;padding-bottom:12px}
+  .berries{display:flex;gap:3px}
+  .berries span{width:11px;height:11px;border-radius:50%;background:var(--berry);display:block}
+  .berries span:nth-child(2){background:#cf5a7c;margin-top:5px}
+  .berries span:nth-child(3){background:#8f2b49}
+  .brand h1{font-size:15px;font-weight:800;line-height:1.1}
+  .brand .sub{font-size:12px;color:#aebfd6;font-weight:500}
+  nav.tabs{display:flex;gap:2px;max-width:1240px;margin:0 auto;overflow-x:auto}
+  nav.tabs button{background:none;border:none;color:#aebfd6;font-family:inherit;font-size:14px;font-weight:600;padding:11px 16px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:.15s}
+  nav.tabs button:hover{color:#dce6f2}
+  nav.tabs button.active{color:#fff;border-bottom-color:var(--berry)}
+  main{max-width:1240px;margin:0 auto;padding:18px 16px 60px}
+  .panel{display:none}.panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .section-head h2{font-size:19px;font-weight:700;color:var(--navy)}
+  .desc{font-size:13px;color:var(--muted)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .btn{font-family:inherit;font-size:14px;font-weight:600;border:none;border-radius:10px;padding:10px 16px;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:7px}
+  .btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:var(--navy-dark)}
+  .btn-berry{background:var(--berry);color:#fff}.btn-berry:hover{filter:brightness(.93)}
+  .btn-green{background:var(--green);color:#fff}.btn-green:hover{filter:brightness(.93)}
+  .btn-ghost{background:var(--soft);color:var(--navy);border:1px solid var(--line)}.btn-ghost:hover{background:#eee9e1}
+  .btn-sm{padding:6px 11px;font-size:13px;border-radius:8px}
+  .btn-icon{padding:7px 9px;border-radius:8px;background:var(--soft);border:1px solid var(--line);color:var(--ink);cursor:pointer;font-size:14px;font-weight:600}
+  .btn-icon:hover{background:#eee9e1}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  label.field{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:5px}
+  input,select,textarea{width:100%;font-family:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+  textarea{resize:vertical;min-height:80px;line-height:1.5}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,58,95,.1)}
+  .form-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:600}
+  .pill.conf{background:#e3f3eb;color:var(--green)}
+  .pill.pend{background:#fbf0dd;color:var(--amber)}
+  .pill.canc{background:#fbe4e1;color:var(--red)}
+  .pill.paid{background:#e3f3eb;color:var(--green)}
+  .pill.unpaid{background:#eef0f3;color:var(--muted)}
+  .pill.full{background:#e1edfa;color:#1c6ea4}
+  /* ---- Reminders ---- */
+  .rem{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .rem .rcard{flex:1;min-width:180px;padding:13px 15px;border-radius:12px;border:1px solid var(--line);background:var(--card)}
+  .rem .rcard .rt{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+  .rem .rcard .rv{font-size:15px;font-weight:600;margin-top:5px}
+  .rem .rcard.warn{border-color:#f0d9a8;background:#fdf7ec}
+  .rem .rcard.warn .rt{color:var(--amber)}
+  /* ---- Calendar ---- */
+  .calbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  .calbar .mnav{display:flex;align-items:center;gap:8px}
+  .calbar h3{font-size:17px;font-weight:700;color:var(--navy);min-width:130px;text-align:center}
+  .cal-wrap{overflow:auto;max-height:72vh;border:1px solid var(--line);border-radius:var(--radius);background:#fff}
+  table.cal{border-collapse:collapse;font-size:12px;width:max-content;min-width:100%}
+  table.cal th,table.cal td{border:1px solid var(--line);text-align:center}
+  table.cal thead th{position:sticky;top:0;background:var(--soft);z-index:3;padding:5px 3px;font-weight:700;color:var(--navy);min-width:40px;height:40px}
+  table.cal thead th.we{background:#efe9e4;color:var(--berry)}
+  table.cal .rlabel{position:sticky;left:0;background:#fff;z-index:2;text-align:left;padding:6px 10px;min-width:118px;font-weight:600;white-space:nowrap}
+  table.cal thead th.corner{position:sticky;left:0;top:0;z-index:4;background:var(--soft);text-align:left;padding-left:10px}
+  table.cal tbody td.cell{height:38px;min-width:40px;cursor:pointer;padding:0;position:relative}
+  table.cal tbody td.cell:hover{background:#f0f4f8}
+  table.cal td.oo-lab{background:var(--oo)}
+  table.cal td.nooo-lab{background:var(--nooo)}
+  .grp{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:var(--soft);padding:4px 10px;text-align:left;position:sticky;left:0}
+  .occ{position:absolute;inset:2px;border-radius:5px;display:flex;align-items:center;padding:0 5px;font-size:11px;font-weight:600;overflow:hidden;white-space:nowrap;color:#fff}
+  .occ.conf{background:var(--green)}
+  .occ.pend{background:var(--amber)}
+  .occ.full{background:#1c6ea4}
+  .occ.start{border-top-left-radius:5px;border-bottom-left-radius:5px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px;align-items:center}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+  /* ---- Booking list ---- */
+  .item{padding:14px 16px;border-bottom:1px solid var(--line)}
+  .item:last-child{border-bottom:none}
+  .item .top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .item .ttl{font-size:15px;font-weight:700;color:var(--navy)}
+  .item .meta{font-size:13px;color:var(--muted);margin-top:3px}
+  .item .price{font-size:16px;font-weight:800;color:var(--navy)}
+  .item .btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .filt{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .empty{padding:30px 16px;text-align:center;color:var(--muted);font-size:14px}
+  /* ---- Modal ---- */
+  .modal-bg{position:fixed;inset:0;background:rgba(21,42,69,.45);display:none;align-items:flex-start;justify-content:center;padding:24px 14px;z-index:100;overflow-y:auto}
+  .modal-bg.open{display:flex}
+  .modal{background:#fff;border-radius:16px;max-width:640px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:pop .2s ease}
+  @keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1}}
+  .modal-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .modal-head h3{font-size:17px;color:var(--navy);font-weight:700}
+  .modal-body{padding:18px 20px;max-height:68vh;overflow-y:auto}
+  .modal-foot{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+  .x{background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1}
+  .roombox{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--soft)}
+  .kid{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+  .chip{display:inline-block;background:#fbe4e1;color:var(--red);font-size:12px;font-weight:600;padding:3px 9px;border-radius:8px}
+  .sumline{display:flex;justify-content:space-between;font-size:13px;padding:2px 0;color:var(--muted)}
+  .sumtot{display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:var(--navy);border-top:1px solid var(--line);margin-top:8px;padding-top:8px}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:13px 22px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;transition:.3s;z-index:200;max-width:90vw;text-align:center}
+  #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+  #toast.err{background:var(--red)}#toast.ok{background:var(--green)}
+  .set-sec{padding:16px;margin-bottom:14px}
+  .set-sec h3{font-size:15px;color:var(--navy);margin-bottom:10px}
+  .mini-tbl{width:100%;border-collapse:collapse;font-size:13px}
+  .stats{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:16px}
+  .stat{padding:14px 16px}
+  .stat .label{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .stat .value{font-size:22px;font-weight:800;color:var(--navy);margin-top:4px}
+  .stat .value.berry{color:var(--berry)}.stat .value.green{color:var(--green)}.stat .value.blue{color:#1c6ea4}
+  .rangebar{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
+  .rangebar .rf{display:flex;flex-direction:column;gap:4px}
+  .rangebar .rf label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase}
+  .rangebar input{width:150px}
+  .ptbl{width:100%;border-collapse:collapse;font-size:13px}
+  .ptbl th{background:var(--soft);text-align:left;padding:8px 10px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .ptbl td{padding:8px 10px;border-bottom:1px solid var(--line)}
+  .ptbl tr:last-child td{border-bottom:none}
+  .seg{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;margin-bottom:12px}
+  .seg button{background:none;border:none;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:6px 13px;border-radius:7px;cursor:pointer;white-space:nowrap}
+  .seg button.active{background:#fff;color:var(--navy);box-shadow:0 1px 2px rgba(0,0,0,.07)}
+  .pill.goods{background:#e7ecf3;color:var(--navy)}
+  .pill.service{background:#f3e6ec;color:var(--berry)}
+  /* ---- Massage plan ---- */
+  .msum{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));margin-bottom:12px}
+  .msum .card{padding:12px 14px;text-align:center}
+  .msum .v{font-size:22px;font-weight:800;color:var(--navy)}
+  .msum .l{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px}
+  .msum .card.time .v{color:var(--berry)}
+  .gplan{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px;background:var(--card);box-shadow:var(--shadow)}
+  .gplan .gh{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .gplan .gh .nm{font-weight:700;font-size:15px;color:var(--navy)}
+  .gplan .gh .sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .ptbl2{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px;min-width:560px}
+  .ptbl2 th{background:var(--soft);padding:7px 8px;font-size:11px;font-weight:700;color:var(--navy);text-align:left;border:1px solid var(--line)}
+  .ptbl2 th.adult{background:#eef2f7}.ptbl2 th.child{background:#f3ecec}.ptbl2 th.water{background:#e9f2f4}
+  .ptbl2 td{padding:5px 7px;border:1px solid var(--line);vertical-align:middle}
+  .ptbl2 td.dayc{white-space:nowrap;color:var(--muted);font-weight:600;font-size:11.5px}
+  .ptbl2 select{width:100%;min-width:100px;padding:5px 6px;font-size:12px}
+  .ptbl2 .cellwrap{display:flex;align-items:center;gap:5px}
+  .ptbl2 .cellwrap.na{opacity:.4}
+  .ptbl2 .cnt{flex:0 0 auto;min-width:18px;font-weight:700;color:var(--navy);font-size:12px}
+  .ptbl2 .dchk{width:16px;height:16px;flex:0 0 auto;cursor:pointer;accent-color:var(--green)}
+  .ptbl2 .dchk.is-done{transform:scale(1.15)}
+  .ptbl2 td.cell-done{background:#eaf5ee}
+  .ptbl2 td.cell-done select{border-color:#bfe0cb}
+  .ptbl2 .cst{width:74px;padding:3px 5px;font-size:11px;flex:0 0 auto}
+  .ptbl2 .cdur{font-size:10px;color:var(--muted);margin-top:2px;text-align:right;padding-right:26px}
+  .ptbl2 tr.offday td{background:#fbeceb}
+  /* mini calendar */
+  .mc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+  .mc-w{text-align:center;font-size:10.5px;font-weight:700;color:var(--muted);padding:2px 0}
+  .mc-empty{}
+  .mc-day{position:relative;border:1px solid var(--line);border-radius:7px;min-height:42px;padding:3px 4px;cursor:pointer;transition:.1s;display:flex;flex-direction:column;align-items:center;gap:2px}
+  .mc-day:hover{border-color:var(--navy);background:var(--soft)}
+  .mc-day.sel{border-color:var(--berry);background:#fbeef3;box-shadow:0 0 0 1px var(--berry) inset}
+  .mc-day.today .mc-n{color:#1c6ea4;font-weight:800}
+  .mc-day.mc-off{background:#fbeceb}
+  .mc-n{font-size:11.5px;font-weight:600}
+  .mc-b{font-size:9.5px;font-weight:700;color:#fff;border-radius:8px;padding:0 5px;line-height:1.5}
+  .mc-b.mc-done{background:var(--green)}
+  .mc-b.mc-part{background:var(--amber)}
+  .mc-b.mc-undone{background:var(--red)}
+  .mini-tbl td,.mini-tbl th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <div class="brand">
+    <div class="berries"><span></span><span></span><span></span></div>
+    <div><h1>Гурван Тоорой</h1><div class="sub">Амралтын газрын удирдлагын систем</div></div>
+  </div>
+  <nav class="tabs">
+    <button data-tab="cal" class="active">📅 Календарь</button>
+    <button data-tab="list">📋 Захиалгууд</button>
+    <button data-tab="massage">💆 Бариа</button>
+    <button data-tab="inv">🛒 Худалдан авалт</button>
+    <button data-tab="report">📊 Тайлан</button>
+    <button data-tab="settings">⚙️ Тохиргоо</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ============ CALENDAR ============ -->
+  <section class="panel active" id="cal">
+    <div class="section-head">
+      <div><h2>Захиалгын календарь</h2><div class="desc">Өрөө × өдөр. Хоосон нүд дарж захиалга үүсгэнэ, дүүрсэн нүд дарж дэлгэрэнгүйг нээнэ.</div></div>
+      <button class="btn btn-primary" id="newBkBtn">+ Шинэ захиалга</button>
+    </div>
+    <div class="rem" id="reminders"></div>
+    <div class="calbar">
+      <div class="mnav">
+        <button class="btn-icon" id="prevM">‹</button>
+        <h3 id="calMonth"></h3>
+        <button class="btn-icon" id="nextM">›</button>
+        <button class="btn btn-ghost btn-sm" id="todayM">Өнөөдөр</button>
+      </div>
+    </div>
+    <div class="cal-wrap"><table class="cal" id="calTable"></table></div>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--green)"></i> Баталгаажсан</span>
+      <span><i class="dot" style="background:#1c6ea4"></i> Бүрэн төлсөн</span>
+      <span><i class="dot" style="background:var(--amber)"></i> Баталгаажаагүй</span>
+      <span><i class="dot" style="background:var(--oo)"></i> 00-той өрөө</span>
+      <span><i class="dot" style="background:var(--nooo)"></i> 00-гүй өрөө</span>
+    </div>
+  </section>
+
+  <!-- ============ LIST ============ -->
+  <section class="panel" id="list">
+    <div class="section-head">
+      <div><h2>Захиалгын жагсаалт</h2><div class="desc">Бүх захиалга, шүүлтүүр, төлбөр тооцоо.</div></div>
+      <button class="btn btn-primary" id="newBkBtn2">+ Шинэ захиалга</button>
+    </div>
+    <div class="filt" id="listFilt"></div>
+    <div class="card"><div id="bookingList"></div></div>
+  </section>
+
+  <!-- ============ MASSAGE ============ -->
+  <section class="panel" id="massage">
+    <div class="section-head">
+      <div><h2>Барианы төлөвлөгөө</h2><div class="desc">Зочин бүрийн өдрийн төлөвлөгөө. «✓ Хийсэн» тэмдэглэхэд төлбөр нэхэмжлэлд нэмэгдэнэ.</div></div>
+      <button class="btn btn-berry btn-sm" onclick="confirmAutoPlan()">🎯 Автомат төлөвлөгөө</button>
+    </div>
+    <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">📅 Календарь — өдөр дарж төлөвлөгөө, хийгдсэн/дутууг харна</h3>
+    <div class="card" style="padding:14px;max-width:420px;margin-bottom:20px"><div id="msgMiniCal"></div></div>
+    <div class="calbar">
+      <div class="mnav">
+        <button class="btn-icon" id="prevD">‹</button>
+        <h3 id="msgDayLbl"></h3>
+        <button class="btn-icon" id="nextD">›</button>
+        <button class="btn btn-ghost btn-sm" id="todayD">Өнөөдөр</button>
+      </div>
+    </div>
+    <div id="msgDaySummary" style="margin-bottom:18px"></div>
+    <div id="msgRoomGrid" style="margin-bottom:22px"></div>
+  </section>
+
+  <!-- ============ FRIDGE PRODUCTS (Хөргөгчний бараа) ============ -->
+  <section class="panel" id="inv">
+    <div class="section-head">
+      <div><h2>Худалдан авалт</h2><div class="desc">Хүнс/ахуйн бараа, нэмэлт үйлчилгээний нэр, үнэ, үлдэгдлийн бүртгэл. Захиалгын дэлгэрэнгүй дэх «Нэмэлт үйлчилгээ» хэсгээр сонгож нэмнэ.</div></div>
+      <div class="row">
+        <button class="btn btn-ghost btn-sm" onclick="seedProducts()">Жишээ бараа оруулах</button>
+        <button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="openInternalUse()">🏠 Дотоод хэрэглээ</button>
+        <button class="btn btn-berry btn-sm" onclick="openStockTake()">🧾 Тулгалт хийх</button>
+        <button class="btn btn-primary btn-sm" onclick="openProductModal()">+ Шинэ бараа</button>
+      </div>
+    </div>
+    <div class="card" style="padding:14px;margin-bottom:14px">
+      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <h3 style="font-size:15px;color:var(--navy);margin:0">📅 Өдрийн хяналт</h3>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn-icon" onclick="stockDay=addDays(stockDay,-1);renderInventory()">‹</button>
+          <b id="stockDayLbl" style="min-width:130px;text-align:center;font-size:14px"></b>
+          <button class="btn-icon" onclick="stockDay=addDays(stockDay,1);renderInventory()">›</button>
+          <button class="btn btn-ghost btn-sm" onclick="stockDay=todayStr();renderInventory()">Өнөөдөр</button>
+        </div>
+      </div>
+      <div id="stockTakeInfo" style="margin-top:10px"></div>
+      <div id="dailyStockBox" style="overflow-x:auto;margin-top:10px"></div>
+    </div>
+    <div class="seg" id="invGroupFilt">
+      <button data-g="all" class="active">Бүгд</button>
+      <button data-g="goods">Зарах бараа</button>
+      <button data-g="food">Хоолны материал</button>
+      <button data-g="house">Ахуйн хэрэглээ</button>
+      <button data-g="build">Барилгын материал</button>
+      <button data-g="massage">Барианы бараа</button>
+      <button data-g="service">Нэмэлт үйлчилгээ</button>
+    </div>
+    <div class="search" style="margin-bottom:12px"><input id="invSearch" placeholder="🔍 Бараа хайх..." oninput="renderInventory()"></div>
+    <div class="card" style="overflow-x:auto">
+      <table class="ptbl"><thead><tr><th>Бараа</th><th>Бүлэг</th><th>Ангилал</th><th>Өртөг</th><th>Зарах үнэ</th><th>Үлдэгдэл</th><th>Төлөв</th><th></th></tr></thead>
+      <tbody id="invBody"></tbody></table>
+    </div>
+  </section>
+
+  <!-- ============ REPORT ============ -->
+  <section class="panel" id="report">
+    <div class="section-head">
+      <div><h2>Тайлан</h2><div class="desc">Орлого, төлбөр тооцоо, өрөө ба хүүхдийн ангиллаар задаргаа.</div></div>
+    </div>
+    <div class="rangebar">
+      <div class="rf"><label>Эхлэх (ирэх өдөр)</label><input type="date" id="rp_from"></div>
+      <div class="rf"><label>Дуустал</label><input type="date" id="rp_to"></div>
+      <button class="btn btn-ghost btn-sm" onclick="setReportRange('month')">Энэ сар</button>
+      <button class="btn btn-ghost btn-sm" onclick="setReportRange('lastmonth')">Өнгөрсөн сар</button>
+      <button class="btn btn-ghost btn-sm" onclick="setReportRange('all')">Бүх цаг</button>
+      <button class="btn btn-primary btn-sm" onclick="renderReport()">Шүүх</button>
+    </div>
+    <div class="stats" id="rpStats"></div>
+    <div class="grid" style="display:grid;gap:16px;grid-template-columns:1fr 1fr" id="rpCols">
+      <div class="card" style="padding:16px">
+        <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">🚪 Өрөөгөөр</h3>
+        <div style="overflow-x:auto"><table class="mini-tbl" id="rpRoomTbl"></table></div>
+      </div>
+      <div class="card" style="padding:16px">
+        <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">🧒 Хүүхдийн ангиллаар</h3>
+        <div style="overflow-x:auto"><table class="mini-tbl" id="rpKidTbl"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section class="panel" id="settings">
+    <div class="section-head"><div><h2>Тохиргоо</h2><div class="desc">Өрөө, үнэ, ангилал, данс, торгууль, мессежийн загвар.</div></div></div>
+    <div id="setBody"></div>
+  </section>
+</main>
+
+<div class="modal-bg" id="modalBg"><div class="modal">
+  <div class="modal-head"><h3 id="modalTitle"></h3><button class="x" id="modalClose">&times;</button></div>
+  <div class="modal-body" id="modalBody"></div>
+  <div class="modal-foot" id="modalFoot"></div>
+</div></div>
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+/* ============================================================
+   Гурван Тоорой — Удирдлагын систем · Модуль 1: Захиалга
+   Нэг localStorage хадгаламж (gt_system_v1). Дараагийн модулиуд
+   энэ бүтэц дээр нэмэгдэнэ (assets, kitchen г.м).
+   ============================================================ */
+const KEY='gt_system_v1';
+const DEFAULT_TPL=`урьдчилгаа 50% {урьдчилгаа} шилжүүлээд баталгаажуулна.
+Данс: {данс}
+Утга: Утасны дугаар, ирэх он сар
+
+Авч ирэх зүйлс:
+1. Ор хөнжлийн даавуу /авч ирэх боломжгүй бол манайхаас авч хэрэглэх боломжтой. Үнэ: 10к/
+2. Өөрсдийн хувийн бэлтгэлийн зүйлс (саван, оо, сойзны цаас, нүүр гарын алчуур)
+3. Массаж хийлгэх бол тос / baby oil. Авч ирэх боломжгүй бол манайд үүлэн брэндийн цэвэршүүлсэн тос 15–28к/
+4. Өөрсдийн тавчик, угаалгын зүйлс
+
+Ирэх цаг: {ирэхцаг}
+Гарах цаг: {гарахцаг}
+Өглөөний цай: 8:30–9:30
+Өдрийн хоол: 13:00
+Өдрийн цай: 16:30
+Оройн хоол: 18:30
+
+Хаяг: Тэрэлжийн мэлхий хаднаас баруун хойш 1.2км. Жавхлант (Томужин) зуслангийн хашаанд. Google map-аас "гурван тоорой" гэж хайж ирэх боломжтой.
+
+Цуцлах болон хойшлуулах тохиолдолд {мэдэгдэх} хоногийн өмнө мэдэгдэнэ үү. Мэдэгдээгүй тохиолдолд {цуцлалт} суутгахыг анхаарна уу!
+
+Зөвшөөрч байвал захиалгаа баталгаажуулаад эргээд хариу илгээнэ үү.
+
+Баярлалаа. Гурван Тоорой 🌿`;
+
+function defaults(){return{
+  rooms:[{num:1,oo:true,beds:2,price:145000},{num:2,oo:true,beds:1,price:155000},{num:3,oo:true,beds:2,price:145000},{num:4,oo:true,beds:1,price:155000},
+         {num:5,oo:true,beds:2,price:145000},{num:7,oo:false,beds:1,price:125000},{num:8,oo:false,beds:2,price:125000},{num:9,oo:false,beds:2,price:125000},{num:10,oo:false,beds:2,price:125000}],
+  pricing:{baseOO:145000,baseNoOO:125000,singleAdd:20000,extraAdult:20000},
+  tiers:[{id:'t_inf',name:'0-6 сар (хоолгүй)',price:20000},{id:'t_bor',name:'Бор хоол (зутан/бантан)',price:40000},
+    {id:'t_norm',name:'Энгийн хоол',price:50000},{id:'t_68',name:'4-8 нас',price:60000},{id:'t_913',name:'9-13 нас',price:80000}],
+  fees:{cancel:50000, noticeDays:2, deductFrom:'prepay'},
+  prepay:{percent:50},
+  accounts:[{id:'a1',name:'Хаан банк (Нигүүсэл Эрхэм Энх)',num:'IBAN 39000500 5779672039'}],
+  template:DEFAULT_TPL,
+  bookings:[],
+  massageServices:[
+    {id:'ms_baria',name:'Бариа',price:0,mins:0,therapist:true,ageBased:true,billable:false},
+    {id:'ms_water',name:'Усанд оруулах',price:0,mins:15,therapist:true,billable:false},
+    {id:'ms_soup',name:'Шөл',price:0,mins:15,therapist:true,billable:false},
+    {id:'ms_whey',name:'Шар сүү',price:15000,mins:15,therapist:true,billable:true},
+    {id:'ms_bann',name:'Жижиг банн спа',price:0,mins:15,therapist:true,billable:false},
+    {id:'ms_hair',name:'Үсний спа',price:0,mins:20,therapist:true,billable:false},
+    {id:'ms_durleg',name:'Дүрлэг',price:0,mins:15,therapist:false,billable:false},
+    {id:'ms_foot',name:'Хөлний дүрлэг',price:0,mins:15,therapist:false,billable:false},
+    {id:'ms_eye',name:'Нүдний спа',price:0,mins:20,therapist:false,billable:false}
+  ],
+  therapists:[{id:'th1',name:'Массажч 1',weight:1},{id:'th2',name:'Массажч 2 (бага оролцдог)',weight:0.5}],
+  msgDefaults:{
+    adult:{baria:'ms_baria',bonus:'ms_hair'},
+    child:{baria:'ms_baria',rotate:['ms_foot','ms_eye']},
+    water:{baria:'ms_baria',rotate:['ms_water']}
+  },
+  massages:[],
+  products:[],
+  productSales:[],
+  stockMoves:[],
+  stockTakes:[]
+};}
+
+let S=null, draft=null, editId=null, listFilter='all', calYM=null;
+let msgDate=null, msgDraft=null, msgEditId=null;
+
+function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):defaults();}catch(e){S=defaults();}
+  // migration guards
+  S.fees=S.fees||{cancel:50000,noticeDays:2,deductFrom:'prepay'};
+  S.prepay=S.prepay||{percent:50};
+  S.pricing=Object.assign({baseOO:145000,baseNoOO:125000,singleAdd:20000,extraAdult:20000},S.pricing||{});
+  (S.rooms||[]).forEach(r=>{ if(r.price==null) r.price=defaultRoomPrice(r.oo,r.beds); });
+  S.bookings=S.bookings||[];
+  S.bookings.forEach(b=>{
+    if(!b.payments){
+      b.payments = (b.finalPay&&b.finalPay.received) ? [{amount:b.finalPay.amount||0,accountId:b.finalPay.accountId||'',date:b.finalPay.date||todayStr(),at:b.finalPay.paidAt||new Date().toISOString()}] : [];
+    }
+  });
+  S.massageServices=S.massageServices||[];
+  // Зааврын үйлчилгээнүүд байхыг баталгаажуулна (байхгүйг нэмнэ)
+  const GUIDE_SVC=[
+    {id:'ms_baria',name:'Бариа',price:0,mins:0,therapist:true,ageBased:true,billable:false},
+    {id:'ms_water',name:'Усанд оруулах',price:0,mins:15,therapist:true,billable:false},
+    {id:'ms_soup',name:'Шөл',price:0,mins:15,therapist:true,billable:false},
+    {id:'ms_whey',name:'Шар сүү',price:15000,mins:15,therapist:true,billable:true},
+    {id:'ms_bann',name:'Жижиг банн спа',price:0,mins:15,therapist:true,billable:false},
+    {id:'ms_hair',name:'Үсний спа',price:0,mins:20,therapist:true,billable:false},
+    {id:'ms_durleg',name:'Дүрлэг',price:0,mins:15,therapist:false,billable:false},
+    {id:'ms_foot',name:'Хөлний дүрлэг',price:0,mins:15,therapist:false,billable:false},
+    {id:'ms_eye',name:'Нүдний спа',price:0,mins:20,therapist:false,billable:false}
+  ];
+  GUIDE_SVC.forEach(g=>{ if(!S.massageServices.find(s=>s.id===g.id)) S.massageServices.push({...g}); });
+  // therapist талбар дутуу бол нөхнө (Дүрлэг/Хөлний дүрлэг/Нүдний спа → үгүй, бусад → тийм)
+  S.massageServices.forEach(s=>{ if(s.therapist==null) s.therapist=!['ms_durleg','ms_foot','ms_eye'].includes(s.id); });
+  // billable (нэмэлт төлбөртэй эсэх) дутуу бол: Шар сүү → тийм, бусад → үгүй
+  S.massageServices.forEach(s=>{ if(s.billable==null) s.billable=(s.id==='ms_whey'); });
+  (S.tiers||[]).forEach(t=>{ if(t.id==='t_68' && t.name==='6-8 нас') t.name='4-8 нас'; });
+  S.therapists=S.therapists||[{id:'th1',name:'Массажч 1',weight:1}];
+  S.therapists.forEach(t=>{ if(t.weight==null) t.weight=1; });
+  // msgDefaults — ротаци бүтэц рүү шилжүүлэх
+  const DEF_MD={
+    adult:{baria:'ms_baria',bonus:'ms_hair'},
+    child:{baria:'ms_baria',rotate:['ms_foot','ms_eye']},
+    water:{baria:'ms_baria',rotate:['ms_water']}
+  };
+  if(!S.msgDefaults) S.msgDefaults=JSON.parse(JSON.stringify(DEF_MD));
+  ['adult','child','water'].forEach(c=>{
+    if(typeof S.msgDefaults[c]==='string' || S.msgDefaults[c]==null){ S.msgDefaults[c]=JSON.parse(JSON.stringify(DEF_MD[c])); }
+    if(!S.msgDefaults[c].baria) S.msgDefaults[c].baria='ms_baria';
+  });
+  delete S.serviceRules;
+  S.massages=S.massages||[];
+  S.msgDayStatus=S.msgDayStatus||{};
+  S.products=S.products||[];
+  S.products.forEach(p=>{ if(!p.group) p.group='goods'; });
+  S.productSales=S.productSales||[];
+  S.stockMoves=S.stockMoves||[];
+  S.stockTakes=S.stockTakes||[];
+}
+function defaultRoomPrice(oo,beds){
+  if(oo && beds>=2) return 145000;
+  if(oo && beds===1) return 155000;
+  return 125000; // 00-гүй бүх өрөө
+}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+  try{ if(typeof syncPush==='function') syncPush(); }catch(e){}
+}
+
+/* ---- helpers ---- */
+const uid=p=>p+'_'+Math.random().toString(36).slice(2,7);
+const pad=n=>String(n).padStart(2,'0');
+const money=n=>(Math.round(n)||0).toLocaleString('en-US')+'₮';
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function parseD(s){const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);}
+function addDays(s,n){const d=parseD(s);d.setDate(d.getDate()+n);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function daysBetween(a,b){return Math.round((parseD(b)-parseD(a))/86400000);}
+const WK=['Ням','Дав','Мяг','Лха','Пүр','Баа','Бям'];
+function fmtD(s){const d=parseD(s);return d.getMonth()+1+'/'+d.getDate()+' ('+WK[d.getDay()]+')';}
+function roomByNum(n){return S.rooms.find(r=>r.num==n);}
+function tierById(id){return S.tiers.find(t=>t.id===id);}
+function accById(id){return S.accounts.find(a=>a.id===id);}
+
+/* ---- toast & modal ---- */
+let toastT;
+function toast(m,t=''){const el=document.getElementById('toast');el.textContent=m;el.className='show '+t;clearTimeout(toastT);toastT=setTimeout(()=>el.className=t,2600);}
+const modalBg=document.getElementById('modalBg');
+function openModal(title,body,foot){document.getElementById('modalTitle').textContent=title;document.getElementById('modalBody').innerHTML=body;document.getElementById('modalFoot').innerHTML=foot;modalBg.classList.add('open');}
+function closeModal(){modalBg.classList.remove('open');}
+document.getElementById('modalClose').onclick=closeModal;
+modalBg.onclick=e=>{if(e.target===modalBg)closeModal();};
+
+/* ---- tabs ---- */
+document.querySelectorAll('nav.tabs button').forEach(b=>{b.onclick=()=>{
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active');
+  renderAll();
+};});
+
+/* ============================================================ PRICING */
+function normOv(v){
+  if(v==null) return {price:null,roomNum:null};
+  if(typeof v!=='object') return {price:v,roomNum:null}; // хуучин формат (зөвхөн тоо)
+  return {price:(v.price!=null?v.price:null),roomNum:(v.roomNum!=null?v.roomNum:null)};
+}
+function rCheckIn(bk,r){ return r.checkIn || bk.checkIn; }
+function rNights(bk,r){ return (r.nights!=null && +r.nights>0) ? +r.nights : bk.nights; }
+function effectiveRoomsForNight(bk,i){
+  if(bk.rooms.length!==1) return bk.rooms.map(r=>+r.num);
+  const ov=normOv((bk.nightOverrides||[])[i]);
+  return [ +(ov.roomNum!=null?ov.roomNum:bk.rooms[0].num) ];
+}
+function effectiveRoomsForDate(bk,date){
+  if(bk.rooms.length===1){
+    const idx=daysBetween(bk.checkIn,date);
+    if(idx<0||idx>=bk.nights) return [];
+    return effectiveRoomsForNight(bk,idx);
+  }
+  // Олон өрөө: өрөө бүр өөрийн огноо/хоногтой
+  const out=[];
+  bk.rooms.forEach(r=>{
+    const ci=rCheckIn(bk,r), n=rNights(bk,r);
+    const idx=daysBetween(ci,date);
+    if(idx>=0 && idx<n) out.push(+r.num);
+  });
+  return out;
+}
+function roomPriceOnDate(room,date){
+  const hist=(room.priceHistory&&room.priceHistory.length)?room.priceHistory:[{from:'0000-01-01',price:room.price}];
+  let best=hist[0];
+  hist.forEach(h=>{ if(h.from<=date && h.from>=best.from) best=h; });
+  return best.price;
+}
+function roomOccupancyOn(r,date){
+  let adults=r.adults||0;
+  let children=(r.children||[]).slice();
+  (r.joiners||[]).forEach(j=>{
+    if(date && j.fromDate && date>=j.fromDate){
+      if(j.kind==='adult') adults++;
+      else children.push({age:j.age,tierId:j.tierId,adultPriced:!!j.adultPriced,_joiner:true});
+    }
+  });
+  return {adults,children};
+}
+function roomPricing(r,date){
+  const room=roomByNum(r.num);if(!room)return{lines:[],total:0};
+  const occ=roomOccupancyOn(r,date);
+  const adults=occ.adults;
+  const kids=occ.children;
+  const adultKids=kids.filter(k=>k.adultPriced).length;
+  const adultEquiv=adults+adultKids; // том хүн + том үнээр тооцох хүүхэд
+  const perPerson=date?roomPriceOnDate(room,date):(room.price!=null?room.price:(room.oo?S.pricing.baseOO:S.pricing.baseNoOO));
+  const lines=[];
+  if(r.custom>0){
+    if(adultEquiv>0) lines.push({label:adultEquiv+' том хүн (тусгай нийт үнэ)', each:r.custom, qty:1});
+  } else if(adultEquiv===1){
+    lines.push({label:'1 том хүн (ганц хүн +'+Math.round(S.pricing.singleAdd/1000)+'к)', each:perPerson+S.pricing.singleAdd, qty:1});
+  } else if(adultEquiv>=2){
+    lines.push({label:adultEquiv+' том хүн (тус бүр '+money(perPerson)+')', each:perPerson, qty:adultEquiv});
+  }
+  kids.forEach(k=>{
+    if(k.adultPriced) return;
+    const t=tierById(k.tierId);
+    lines.push({label:'Хүүхэд '+k.age+'н'+(t?' ('+t.name+')':''), each:t?t.price:0, qty:1});
+  });
+  lines.forEach(l=>l.sum=l.each*l.qty);
+  return{lines,total:lines.reduce((a,b)=>a+b.sum,0)};
+}
+function perNight(bk){return bk.rooms.reduce((s,r)=>s+roomPricing(r,bk.checkIn).total,0);}
+function nightlyPrices(rooms,nights,overrides,checkIn){
+  const arr=[];
+  const singleRoomMode=rooms.length===1;
+  let refPn=rooms.reduce((s,r)=>s+roomPricing(r,checkIn).total,0); // эхний хоногийн жишиг үнэ (харуулахад)
+  for(let i=0;i<nights;i++){
+    const date=checkIn?addDays(checkIn,i):null;
+    const ov=normOv(overrides?overrides[i]:null);
+    let effRoomNum=null, stdPrice;
+    if(singleRoomMode){
+      effRoomNum=ov.roomNum!=null?ov.roomNum:rooms[0].num;
+      const rForCalc = effRoomNum===rooms[0].num ? rooms[0] : Object.assign({},rooms[0],{num:effRoomNum});
+      stdPrice=roomPricing(rForCalc,date).total;
+    } else {
+      stdPrice=rooms.reduce((s,r)=>s+roomPricing(r,date).total,0);
+    }
+    const price=ov.price!=null?ov.price:stdPrice;
+    arr.push({night:i,date,price,std:stdPrice,custom:ov.price!=null,roomNum:effRoomNum,roomChanged:singleRoomMode&&effRoomNum!==rooms[0].num});
+  }
+  return{pn:refPn,nightly:arr,total:arr.reduce((s,x)=>s+x.price,0)};
+}
+// Байрны төлбөрийг тооцоолно. Ганц өрөө → хоног тус бүр (өрөө сэлгэх/тусгай үнэ дэмждэг).
+// Олон өрөө → өрөө бүр өөрийн огноо/хоногоор.
+function stayBreakdown(bk){
+  if(bk.rooms.length===1){
+    const np=nightlyPrices(bk.rooms,bk.nights,bk.nightOverrides,bk.checkIn);
+    return {single:true, total:np.total, pn:np.pn, nightly:np.nightly, perRoom:null};
+  }
+  let total=0; const perRoom=[];
+  bk.rooms.forEach(r=>{
+    const ci=rCheckIn(bk,r), n=rNights(bk,r);
+    const nights=[];
+    for(let i=0;i<n;i++){ const d=addDays(ci,i); const price=roomPricing(r,d).total; nights.push({date:d,price}); total+=price; }
+    perRoom.push({room:r, roomNum:+r.num, checkIn:ci, nights:n, nightly:nights, subtotal:nights.reduce((s,x)=>s+x.price,0)});
+  });
+  const pn=bk.rooms.reduce((s,r)=>s+roomPricing(r,rCheckIn(bk,r)).total,0);
+  return {single:false, total, pn, nightly:[], perRoom};
+}
+function bookingTotals(bk){
+  const sb=stayBreakdown(bk);
+  const pn=sb.pn;
+  const stay=sb.total;
+  const extras=(bk.extras||[]).reduce((s,e)=>s+(e.price||0)*(e.qty||1),0);
+  const fee=bk.cancelInfo?bk.cancelInfo.fee:0;
+  const prepaid=(bk.prepay&&bk.prepay.received)?(bk.prepay.amount||0):0;
+  const payments=bk.payments||[];
+  const legacyFinal=(bk.finalPay&&bk.finalPay.received&&!payments.length)?(bk.finalPay.amount||0):0;
+  const finalPaid=payments.reduce((s,p)=>s+(p.amount||0),0)+legacyFinal;
+  const paid=prepaid+finalPaid;
+  const grand=stay+extras+fee;
+  const balance=grand-paid;
+  const fullyPaid = bk.status!=='cancelled' && paid>0 && balance<=0;
+  return{pn,nightly:sb.nightly,breakdown:sb,stay,extras,fee,grand,prepaid,finalPaid,paid,balance,fullyPaid};
+}
+function prepaySuggest(bk){const sb=stayBreakdown(bk);return Math.round(sb.total*(S.prepay.percent/100));}
+
+/* ============================================================ CONFLICT */
+function roomConflictOnDate(num,date,exclId){
+  return S.bookings.some(b=>{
+    if(b.id===exclId||b.status==='cancelled')return false;
+    return effectiveRoomsForDate(b,date).includes(+num);
+  });
+}
+function roomConflict(num,inD,nights,exclId){
+  for(let i=0;i<nights;i++){
+    if(roomConflictOnDate(num,addDays(inD,i),exclId)) return true;
+  }
+  return false;
+}
+function bookingAt(num,day){
+  return S.bookings.find(b=>{
+    if(b.status==='cancelled')return false;
+    return effectiveRoomsForDate(b,day).includes(+num);
+  });
+}
+
+/* ============================================================ DRAFT / FORM */
+function blankRoom(){return{num:S.rooms[0].num,adults:1,children:[],custom:0};}
+function newDraft(){return{rooms:[blankRoom()],checkIn:todayStr(),nights:2,arrive:'12:00',leave:'11:00',phone:'',name:'',note:'',nightOverrides:[]};}
+function autoTier(ri,ki){const k=draft.rooms[ri].children[ki];const a=k.age;
+  if(a<1)k.tierId='t_inf';else if(a<=3)k.tierId='t_norm';else if(a<=8)k.tierId='t_68';else if(a<=13)k.tierId='t_913';else{k.adultPriced=true;}}
+function syncNightOverrides(){
+  const arr=draft.nightOverrides||[];
+  const n=draft.nights||0;
+  while(arr.length<n)arr.push(null);
+  arr.length=n;
+  draft.nightOverrides=arr;
+}
+
+function openBookingModal(pref){
+  draft = pref ? Object.assign(newDraft(), pref) : newDraft();
+  syncNightOverrides();
+  renderBookingModal();
+}
+function editBooking(id){
+  const bk=S.bookings.find(b=>b.id===id);if(!bk)return;
+  editId=id;
+  draft={rooms:JSON.parse(JSON.stringify(bk.rooms)),checkIn:bk.checkIn,nights:bk.nights,
+    arrive:bk.arriveTime||'12:00',leave:bk.leaveTime||'11:00',phone:bk.phone,name:bk.name||'',note:bk.note||'',
+    nightOverrides:JSON.parse(JSON.stringify(bk.nightOverrides||[]))};
+  syncNightOverrides();
+  renderBookingModal();
+}
+function roomOpts(sel){return S.rooms.map(r=>`<option value="${r.num}" ${r.num==sel?'selected':''}>№${r.num} · ${r.oo?'00-той':'00-гүй'} · ${r.beds} ор · хүн тус бүр ${money(r.price!=null?r.price:0)}</option>`).join('');}
+function tierOpts(sel){return S.tiers.map(t=>`<option value="${t.id}" ${t.id===sel?'selected':''}>${t.name} · ${money(t.price)}</option>`).join('');}
+
+function renderBookingModal(){
+  syncNightOverrides();
+  const totals=bookingTotalsFromDraft();
+  const singleRoomDraft = draft.rooms.length===1;
+  let roomsH='';
+  draft.rooms.forEach((r,ri)=>{
+    const pr=roomPricing(r,draft.checkIn);
+    let busy=false;
+    if(draft.checkIn){
+      if(singleRoomDraft){
+        for(let i=0;i<draft.nights;i++){
+          const ov=normOv(draft.nightOverrides[i]);
+          const usedNum=ov.roomNum!=null?ov.roomNum:r.num;
+          if(usedNum===r.num && roomConflictOnDate(r.num,addDays(draft.checkIn,i),editId)){busy=true;break;}
+        }
+      } else {
+        const ci=rCheckIn(draft,r), n=rNights(draft,r);
+        busy=roomConflict(r.num,ci,n,editId);
+      }
+    }
+    roomsH+=`<div class="roombox">
+      <div class="row" style="align-items:flex-end">
+        <div style="flex:1;min-width:120px"><label class="field">Өрөө</label><select onchange="draft.rooms[${ri}].num=this.value;renderBookingModal()">${roomOpts(r.num)}</select></div>
+        <div style="flex:0 0 90px"><label class="field">Том хүн</label><input type="number" min="0" value="${r.adults}" onchange="draft.rooms[${ri}].adults=parseInt(this.value)||0;renderBookingModal()"></div>
+        <div style="flex:0 0 110px"><label class="field">Тусгай үнэ/хон</label><input type="number" min="0" placeholder="—" value="${r.custom||''}" onchange="draft.rooms[${ri}].custom=parseInt(this.value)||0;renderBookingModal()"></div>
+        <button class="btn btn-ghost btn-sm" onclick="delRoom(${ri})">✕</button>
+      </div>
+      ${busy?`<div class="chip" style="margin-top:8px">⚠️ №${r.num} энэ хугацаанд давхцаж байна</div>`:''}
+      ${!singleRoomDraft?`<div class="row" style="align-items:flex-end;gap:8px;margin-top:8px;background:var(--soft);padding:8px 10px;border-radius:8px">
+        <div style="flex:1;min-width:130px"><label class="field" style="font-size:11px">Энэ өрөөний ирэх өдөр</label><input type="date" value="${rCheckIn(draft,r)}" onchange="draft.rooms[${ri}].checkIn=this.value;renderBookingModal()"></div>
+        <div style="flex:0 0 90px"><label class="field" style="font-size:11px">Хоног</label><input type="number" min="1" value="${rNights(draft,r)}" onchange="draft.rooms[${ri}].nights=parseInt(this.value)||1;renderBookingModal()"></div>
+        <div class="hint" style="flex:0 0 auto">→ ${fmtD(addDays(rCheckIn(draft,r),rNights(draft,r)))}</div>
+        ${(r.checkIn||r.nights)?`<button class="btn-icon" title="Үндсэн огноо руу буцаах" onclick="delete draft.rooms[${ri}].checkIn;delete draft.rooms[${ri}].nights;renderBookingModal()">↺</button>`:''}
+      </div>`:''}
+      <div style="margin-top:8px">`;
+    (r.children||[]).forEach((k,ki)=>{
+      roomsH+=`<div class="kid">
+        <span style="font-size:12px;color:var(--muted);font-weight:600">Хүүхэд</span>
+        <input type="number" min="0" max="17" value="${k.age}" style="width:56px" onchange="draft.rooms[${ri}].children[${ki}].age=parseInt(this.value)||0;autoTier(${ri},${ki});renderBookingModal()">
+        <span style="font-size:12px;color:var(--muted)">нас</span>
+        <select style="flex:1;min-width:120px" ${k.adultPriced?'disabled':''} onchange="draft.rooms[${ri}].children[${ki}].tierId=this.value;renderBookingModal()">${tierOpts(k.tierId)}</select>
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px"><input type="checkbox" style="width:auto" ${k.adultPriced?'checked':''} onchange="draft.rooms[${ri}].children[${ki}].adultPriced=this.checked;renderBookingModal()">том үнэ</label>
+        <button class="btn-icon" onclick="delKid(${ri},${ki})">✕</button>
+      </div>`;
+    });
+    roomsH+=`</div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="addKid(${ri})">+ Хүүхэд</button>`;
+    // Дундаас нэмэгдэх хүн
+    (r.joiners||[]).forEach((j,ji)=>{
+      roomsH+=`<div class="kid" style="background:#eef4fb;border-color:#cfe0f2">
+        <span style="font-size:12px;color:#1c6ea4;font-weight:700">Нэмэгдэх</span>
+        <select style="width:90px" onchange="draft.rooms[${ri}].joiners[${ji}].kind=this.value;renderBookingModal()"><option value="adult" ${j.kind==='adult'?'selected':''}>Том хүн</option><option value="child" ${j.kind==='child'?'selected':''}>Хүүхэд</option></select>
+        ${j.kind==='child'?`<input type="number" min="0" max="17" value="${j.age||0}" style="width:52px" title="нас" onchange="draft.rooms[${ri}].joiners[${ji}].age=parseInt(this.value)||0;autoJoinerTier(${ri},${ji});renderBookingModal()"><span style="font-size:11px;color:var(--muted)">нас</span>`:''}
+        <span style="font-size:11px;color:var(--muted)">ирэх</span>
+        <input type="date" value="${j.fromDate||rCheckIn(draft,r)}" style="width:140px" onchange="draft.rooms[${ri}].joiners[${ji}].fromDate=this.value;renderBookingModal()">
+        <button class="btn-icon" onclick="delJoiner(${ri},${ji})">✕</button>
+      </div>`;
+    });
+    roomsH+=`
+      <button class="btn btn-ghost btn-sm" style="margin-top:6px;color:#1c6ea4" onclick="addJoiner(${ri})">+ Дундаас нэмэгдэх хүн</button>
+      <div style="text-align:right;font-weight:700;color:var(--navy);margin-top:6px">${money(pr.total)}/эхний хон</div>
+    </div>`;
+  });
+
+  const nightRows = draft.checkIn ? totals.nightly.map((n,i)=>{
+    const date=addDays(draft.checkIn,i);
+    const conflict = singleRoomDraft && n.roomNum!=null && roomConflictOnDate(n.roomNum,date,editId);
+    return `<div class="row" style="align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+      <span style="flex:1;min-width:90px;font-size:13px;color:var(--muted)">${fmtD(date)}</span>
+      ${singleRoomDraft?`<select style="width:150px" onchange="draft.nightOverrides[${i}]=Object.assign(normOv(draft.nightOverrides[${i}]),{roomNum:this.value==draft.rooms[0].num?null:parseInt(this.value)});renderBookingModal()">${roomOpts(n.roomNum)}</select>`:''}
+      <input type="number" min="0" style="width:120px" value="${n.price}" onchange="draft.nightOverrides[${i}]=Object.assign(normOv(draft.nightOverrides[${i}]),{price:this.value===''?null:(parseInt(this.value)||0)});renderBookingModal()">
+      ${n.custom?`<button class="btn-icon" title="Стандарт үнэ рүү буцаах" onclick="draft.nightOverrides[${i}]=Object.assign(normOv(draft.nightOverrides[${i}]),{price:null});renderBookingModal()">↺</button>`:''}
+      ${n.custom?'<span class="chip" style="font-size:11px">тусгай үнэ</span>':''}
+      ${n.roomChanged?'<span class="chip" style="font-size:11px;background:#e1edfa;color:#1c6ea4">өрөө сольсон</span>':''}
+      ${conflict?'<span class="chip" style="font-size:11px">⚠️ давхцаж байна</span>':''}
+    </div>`;
+  }).join('') : '';
+
+  const perRoomRows = (!singleRoomDraft && totals.perRoom) ? totals.perRoom.map(pr=>`
+      <div class="sumline"><span>№${pr.roomNum} · ${fmtD(pr.checkIn)}-с ${pr.nights} хон</span><span>${money(pr.subtotal)}</span></div>
+    `).join('') : '';
+
+  const body=`
+    <div class="form-grid" style="margin-bottom:12px">
+      <div><label class="field">Утас *</label><input id="d_phone" value="${draft.phone||''}" onchange="draft.phone=this.value"></div>
+      <div><label class="field">Нэр</label><input id="d_name" value="${draft.name||''}" onchange="draft.name=this.value"></div>
+      <div><label class="field">Ирэх өдөр *</label><input type="date" value="${draft.checkIn}" onchange="draft.checkIn=this.value;renderBookingModal()"></div>
+      <div><label class="field">Хоног *</label><input type="number" min="1" value="${draft.nights}" onchange="draft.nights=parseInt(this.value)||1;renderBookingModal()"></div>
+      <div><label class="field">Ирэх цаг</label><input value="${draft.arrive}" onchange="draft.arrive=this.value"></div>
+      <div><label class="field">Гарах цаг</label><input value="${draft.leave}" onchange="draft.leave=this.value"></div>
+    </div>
+    <div class="hint" style="margin:-4px 0 12px">${draft.checkIn?('Үндсэн гарах өдөр: '+fmtD(addDays(draft.checkIn,draft.nights))+(singleRoomDraft?'':' · Өрөө бүр өөрийн огноотой байж болно')):''}</div>
+    <label class="field">Өрөөнүүд</label>
+    ${roomsH}
+    <button class="btn btn-ghost btn-sm" onclick="addRoom()">+ Өрөө нэмэх</button>
+    ${singleRoomDraft?`<div style="margin-top:14px"><label class="field">Хоног тус бүрийн үнэ ба өрөө<div style="font-weight:400;font-size:11px;color:var(--muted)">Жишиг үнэ: ${money(totals.pn)}/эхний хон. Хоног бүрийн өрөө, үнийг тусад нь өөрчилж болно (жиш: эхлээд 00-гүй өрөөнд, дараа нь 00-той өрөөрүү шилжих).</div></label>
+      <div class="card" style="padding:10px 12px">${nightRows||'<div class="hint">Эхлээд ирэх өдөр сонгоно уу.</div>'}</div>
+    </div>`:`<div style="margin-top:14px"><label class="field">Өрөө тус бүрийн задаргаа</label>
+      <div class="card" style="padding:10px 12px">${perRoomRows}</div>
+    </div>`}
+    <div style="margin-top:12px"><label class="field">Тэмдэглэл</label><input id="d_note" value="${draft.note||''}" onchange="draft.note=this.value"></div>
+    <div class="card" style="padding:14px;margin-top:14px">
+      <div class="sumtot"><span>Нийт төлбөр</span><span>${money(totals.total)}</span></div>
+      <div class="sumline" style="margin-top:6px;color:var(--berry);font-weight:700"><span>Урьдчилгаа санал (${S.prepay.percent}%)</span><span>${money(Math.round(totals.total*S.prepay.percent/100))}</span></div>
+    </div>`;
+  openModal(editId?'Захиалга засах':'Шинэ захиалга',body,
+    `<button class="btn btn-ghost" onclick="cancelDraft()">Болих</button>
+     <button class="btn btn-primary" onclick="saveBooking()">${editId?'Хадгалах':'Захиалга үүсгэх'}</button>`);
+}
+function bookingTotalsFromDraft(){return stayBreakdown(draft);}
+function addRoom(){draft.rooms.push(blankRoom());renderBookingModal();}
+function delRoom(i){draft.rooms.splice(i,1);if(!draft.rooms.length)draft.rooms.push(blankRoom());renderBookingModal();}
+function addKid(ri){draft.rooms[ri].children.push({age:2,tierId:'t_norm',adultPriced:false});renderBookingModal();}
+function delKid(ri,ki){draft.rooms[ri].children.splice(ki,1);renderBookingModal();}
+function addJoiner(ri){
+  const r=draft.rooms[ri];
+  r.joiners=r.joiners||[];
+  // анхдагч: ирэх огноо = ирснээс 1 хоногийн дараа (эсвэл ирэх өдөр)
+  const from=rCheckIn(draft,r);
+  r.joiners.push({kind:'adult',age:2,tierId:'t_norm',adultPriced:false,fromDate:addDays(from,1)});
+  renderBookingModal();
+}
+function delJoiner(ri,ji){draft.rooms[ri].joiners.splice(ji,1);renderBookingModal();}
+function autoJoinerTier(ri,ji){const j=draft.rooms[ri].joiners[ji];const a=j.age;
+  if(a<1)j.tierId='t_inf';else if(a<=3)j.tierId='t_norm';else if(a<=8)j.tierId='t_68';else if(a<=13)j.tierId='t_913';else{j.adultPriced=true;}}
+function cancelDraft(){editId=null;draft=null;closeModal();}
+function saveBooking(){
+  if(!draft.phone||!draft.phone.trim()){toast('Утасны дугаар оруулна уу','err');return;}
+  if(!draft.checkIn||draft.nights<1){toast('Ирэх өдөр/хоног оруулна уу','err');return;}
+  syncNightOverrides();
+  const ex=editId?S.bookings.find(b=>b.id===editId):null;
+  const rooms=JSON.parse(JSON.stringify(draft.rooms));
+  rooms.forEach(r=>{
+    r.num=parseInt(r.num)||r.num;
+    if(r.checkIn===''||r.checkIn==null) delete r.checkIn;
+    if(r.nights===''||r.nights==null||+r.nights<=0) delete r.nights; else r.nights=+r.nights;
+  });
+  const bk={
+    id:editId||uid('b'),phone:draft.phone.trim(),name:(draft.name||'').trim(),
+    checkIn:draft.checkIn,nights:draft.nights,arriveTime:draft.arrive||'12:00',leaveTime:draft.leave||'11:00',
+    note:(draft.note||'').trim(),rooms,
+    nightOverrides:JSON.parse(JSON.stringify(draft.nightOverrides||[])),
+    status:ex?ex.status:'pending',
+    prepay:ex?ex.prepay:{amount:0,accountId:S.accounts[0]?.id||'',date:'',received:false},
+    payments:ex?(ex.payments||[]):[],
+    extras:ex?ex.extras:[],
+    createdAt:ex?ex.createdAt:new Date().toISOString(),
+    msgSentAt:ex?ex.msgSentAt:null,confirmedAt:ex?ex.confirmedAt:null,
+    cancelInfo:ex?ex.cancelInfo:null
+  };
+  if(editId){const i=S.bookings.findIndex(b=>b.id===editId);S.bookings[i]=bk;}else S.bookings.push(bk);
+  if(typeof autoPlanBooking==='function'){ try{ autoPlanBooking(bk); }catch(e){} }
+  save();editId=null;draft=null;closeModal();renderAll();toast('Хадгаллаа ✓','ok');
+}
+
+/* ============================================================ DETAIL / ACTIONS */
+function openDetail(id){
+  const bk=S.bookings.find(b=>b.id===id);if(!bk)return;
+  const t=bookingTotals(bk);const out=addDays(bk.checkIn,bk.nights);
+  const acc=accById(bk.prepay?.accountId);
+  const facc=accById(bk.finalPay?.accountId);
+  const conf=bk.status==='confirmed',canc=bk.status==='cancelled';
+  const statusPill = canc?'<span class="pill canc">Цуцлагдсан</span>'
+    : t.fullyPaid?'<span class="pill full">💎 Бүрэн төлсөн</span>'
+    : conf?'<span class="pill conf">✓ Баталгаажсан</span>'
+    : '<span class="pill pend">⏳ Хүлээгдэж буй</span>';
+  const extrasH=(bk.extras||[]).map((e,i)=>`<div class="kid">
+      <input value="${e.name}" placeholder="Үйлчилгээ" style="flex:1;min-width:120px" onchange="setExtra('${id}',${i},'name',this.value)">
+      <input type="number" value="${e.price||0}" style="width:100px" onchange="setExtra('${id}',${i},'price',parseInt(this.value)||0)"><span style="font-size:12px">₮</span>
+      <input type="number" min="1" value="${e.qty||1}" style="width:60px" onchange="setExtra('${id}',${i},'qty',parseInt(this.value)||1)"><span style="font-size:12px">ш</span>
+      <button class="btn-icon" onclick="delExtra('${id}',${i})">✕</button>
+    </div>`).join('');
+  const body=`
+    <div class="row" style="justify-content:space-between;margin-bottom:10px">
+      <div><b style="font-size:16px">${bk.phone}${bk.name?' · '+bk.name:''}</b>
+        <div class="desc">Ирэх ${fmtD(bk.checkIn)} ${bk.arriveTime} → Гарах ${fmtD(out)} ${bk.leaveTime} (${bk.nights} хон)</div></div>
+      <div>${statusPill}</div>
+    </div>
+    <div class="card" style="padding:12px;margin-bottom:12px">
+      ${bk.rooms.map((r,ri)=>{const pr=roomPricing(r,bk.checkIn);const room=roomByNum(r.num);const kids=r.children||[];
+        const ages=kids.map(k=>k.age+'н'+(k.adultPriced?' (том үнэ)':'')).join(', ');
+        return `<div class="sumline"><span>№${r.num} (${room?.oo?'00-той':'00-гүй'}) · ${r.adults} том${kids.length?', '+kids.length+' хүүхэд: '+ages:''}</span><span>${money(pr.total)}/эхний хон</span></div>
+        <input placeholder="Нэмэлт тайлбар (жиш: харшилтай, тусгай хүсэлт...)" value="${r.note||''}" style="margin:4px 0 8px;font-size:12.5px;padding:6px 9px" onchange="setRoomNote('${id}',${ri},this.value)">`;}).join('')}
+      <div style="margin:4px 0">
+        <div class="sumline" style="font-weight:600;color:var(--navy)"><span>Байрны төлбөр (${bk.rooms.length>1?bk.rooms.length+' өрөө':bk.nights+' хон'})</span><span>${money(t.stay)}</span></div>
+        ${bk.rooms.length===1 ? t.nightly.map((n,i)=>{
+          const date=addDays(bk.checkIn,i);
+          const singleRoomBk = true;
+          const conflict = n.roomNum!=null && roomConflictOnDate(n.roomNum,date,id);
+          return `<div class="row" style="align-items:center;gap:6px;margin:3px 0 3px 10px;flex-wrap:wrap">
+            <span style="flex:1;min-width:80px;font-size:12px;color:var(--muted)">${fmtD(date)}</span>
+            <select style="width:140px;padding:5px 8px;font-size:12.5px" onchange="setNightRoom('${id}',${i},this.value)">${roomOpts(n.roomNum)}</select>
+            <input type="number" min="0" style="width:100px;padding:5px 8px;font-size:12.5px" value="${n.price}" onchange="setNightPrice('${id}',${i},this.value)">
+            ${n.custom?`<button class="btn-icon" style="padding:4px 6px" title="Стандарт руу буцаах" onclick="setNightPrice('${id}',${i},'')">↺</button>`:''}
+            ${n.custom?'<span class="chip" style="font-size:10px;padding:1px 6px">тусгай үнэ</span>':''}
+            ${n.roomChanged?'<span class="chip" style="font-size:10px;padding:1px 6px;background:#e1edfa;color:#1c6ea4">өрөө сольсон</span>':''}
+            ${conflict?'<span class="chip" style="font-size:10px;padding:1px 6px">⚠️ давхцаж байна</span>':''}
+          </div>`;
+        }).join('') : (t.breakdown.perRoom||[]).map(pr=>`
+          <div class="sumline" style="margin-left:10px"><span style="font-size:12.5px">№${pr.roomNum} · ${fmtD(pr.checkIn)}-с ${pr.nights} хон (${fmtD(pr.checkIn)} → ${fmtD(addDays(pr.checkIn,pr.nights))})</span><span>${money(pr.subtotal)}</span></div>
+        `).join('')}
+      </div>
+      ${t.extras?`<div class="sumline"><span>Нэмэлт үйлчилгээ</span><span>${money(t.extras)}</span></div>`:''}
+      ${t.fee?`<div class="sumline" style="color:var(--red)"><span>Торгууль (${bk.cancelInfo.type==='late'?'хожуу хойшлол':'цуцлалт'})</span><span>${money(t.fee)}</span></div>`:''}
+      <div class="sumtot"><span>Нийт төлбөр</span><span>${money(t.grand)}</span></div>
+      ${t.prepaid?`<div class="sumline" style="margin-top:6px"><span>Урьдчилгаа${acc?' ('+acc.name.split(' ')[0]+')':''}</span><span>${money(t.prepaid)}</span></div>`:''}
+      ${(bk.payments||[]).map((p,pi)=>{const pa=accById(p.accountId);return `<div class="sumline"><span>Төлбөр ${pi+1}${pa?' ('+pa.name.split(' ')[0]+')':''} · ${p.date||''} <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Устгах" onclick="delPayment('${id}',${pi})">✕</button></span><span>${money(p.amount||0)}</span></div>`;}).join('')}
+      <div class="sumline" style="font-weight:700;color:${t.balance>0?'var(--berry)':'var(--green)'}"><span>${t.balance>0?'Үлдэгдэл төлбөр':t.balance<0?'Илүү төлөлт':'Бүрэн төлөгдсөн ✓'}</span><span>${money(Math.abs(t.balance))}</span></div>
+    </div>
+    <label class="field">Нэмэлт үйлчилгээ / худалдан авалт</label>
+    <div id="extraBox">${extrasH||'<div class="hint">Одоогоор алга</div>'}</div>
+    <div class="row" style="margin-top:8px;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="addExtra('${id}')">+ Нэмэлт мөр (гараар)</button>
+      <button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="openAddPurchase('${id}')">🥤 Хөргөгчний бараа нэмэх</button>
+    </div>
+    <div class="hint" style="margin-top:10px">
+      ${bk.msgSentAt?'📤 Мессеж явуулсан: '+new Date(bk.msgSentAt).toLocaleString('mn-MN'):'Мессеж хараахан явуулаагүй'}<br>
+      ${bk.confirmedAt?'✓ Баталгаажсан: '+new Date(bk.confirmedAt).toLocaleString('mn-MN'):''}
+      ${t.fullyPaid&&(bk.payments||[]).length?'<br>💎 Бүрэн төлсөн: '+new Date(bk.payments[bk.payments.length-1].at||bk.payments[bk.payments.length-1].date).toLocaleString('mn-MN'):''}
+    </div>`;
+  const foot=`
+    <button class="btn btn-ghost btn-sm" onclick="closeModal();editBooking('${id}')">✎ Засах</button>
+    <button class="btn btn-ghost btn-sm" onclick="showMessage('${id}')">📤 Мессеж</button>
+    ${!canc?`<button class="btn btn-green btn-sm" onclick="openConfirm('${id}')">${conf?'Урьдчилгаа засах':'Баталгаажуулах'}</button>`:''}
+    ${!canc&&conf&&t.balance>0?`<button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="openFinalPay('${id}')">💎 Үлдэгдэл төлбөр хийх</button>`:''}
+    ${!canc?`<button class="btn btn-berry btn-sm" onclick="openCancel('${id}')">Цуцлах/хойшлол</button>`:`<button class="btn btn-ghost btn-sm" onclick="uncancel('${id}')">Сэргээх</button>`}
+    <button class="btn-icon" onclick="delBooking('${id}')" title="Устгах">🗑</button>`;
+  openModal('Захиалгын дэлгэрэнгүй',body,foot);
+}
+function addExtra(id){const bk=S.bookings.find(b=>b.id===id);bk.extras=bk.extras||[];bk.extras.push({name:'',price:0,qty:1});save();openDetail(id);}
+function setExtra(id,i,k,v){const bk=S.bookings.find(b=>b.id===id);bk.extras[i][k]=v;save();openDetail(id);}
+function delExtra(id,i){const bk=S.bookings.find(b=>b.id===id);bk.extras.splice(i,1);save();openDetail(id);}
+
+/* ---- Add fridge purchase directly from booking detail ---- */
+let purchDraft=null;
+function openAddPurchase(id){
+  if(!S.products.length){toast('Эхлээд «Хөргөгчний бараа» табаас бараа бүртгэнэ үү','err');return;}
+  const bk=S.bookings.find(b=>b.id===id);if(!bk)return;
+  purchDraft={bookingId:id,roomNum:bk.rooms[0]?.num,productId:S.products[0].id,qty:1};
+  renderAddPurchase();
+}
+function renderAddPurchase(){
+  const bk=S.bookings.find(b=>b.id===purchDraft.bookingId);
+  const p=S.products.find(x=>x.id===purchDraft.productId);
+  const roomOptsH=bk.rooms.map(r=>`<option value="${r.num}" ${r.num==purchDraft.roomNum?'selected':''}>№${r.num}</option>`).join('');
+  const goods=S.products.filter(x=>(x.group||'goods')==='goods');
+  const services=S.products.filter(x=>x.group==='service');
+  const optHtml=x=>`<option value="${x.id}" ${x.id===purchDraft.productId?'selected':''}>${x.name} · ${money(x.price)} · үлдэгдэл ${x.stock}</option>`;
+  const prodOptsH=(goods.length?`<optgroup label="Хүнс, ахуй бараа">${goods.map(optHtml).join('')}</optgroup>`:'')
+    + (services.length?`<optgroup label="Нэмэлт үйлчилгээ">${services.map(optHtml).join('')}</optgroup>`:'');
+  const maxQty=p?p.stock:0;
+  if(purchDraft.qty>maxQty)purchDraft.qty=Math.max(1,maxQty);
+  const total=p?p.price*purchDraft.qty:0;
+  const body=`
+    <div class="form-grid">
+      ${bk.rooms.length>1?`<div><label class="field">Өрөө</label><select onchange="purchDraft.roomNum=this.value;renderAddPurchase()">${roomOptsH}</select></div>`:''}
+      <div style="grid-column:${bk.rooms.length>1?'auto':'1/-1'}"><label class="field">Бараа</label><select onchange="purchDraft.productId=this.value;purchDraft.qty=1;renderAddPurchase()">${prodOptsH}</select></div>
+    </div>
+    <div style="margin-top:12px;display:flex;align-items:center;gap:10px">
+      <label class="field" style="margin-bottom:0">Тоо ширхэг</label>
+      <div class="qty" style="gap:8px">
+        <button class="btn-icon" onclick="changePurchQty(-1)">−</button>
+        <span style="min-width:26px;text-align:center;font-weight:700">${purchDraft.qty}</span>
+        <button class="btn-icon" onclick="changePurchQty(1)">+</button>
+      </div>
+      ${maxQty<=0?'<span style="color:var(--red);font-size:12.5px">Үлдэгдэл дууссан</span>':''}
+    </div>
+    <div class="sumtot" style="margin-top:14px"><span>Нийт дүн (№${purchDraft.roomNum})</span><span>${money(total)}</span></div>`;
+  openModal('🥤 Хөргөгчний бараа нэмэх', body,
+    `<button class="btn btn-ghost" onclick="openDetail('${purchDraft.bookingId}')">Болих</button>
+     <button class="btn btn-primary" ${maxQty<=0?'disabled':''} onclick="confirmAddPurchase()">Нэмэх</button>`);
+}
+function changePurchQty(d){
+  const p=S.products.find(x=>x.id===purchDraft.productId);
+  const max=p?p.stock:0;
+  const nv=purchDraft.qty+d;
+  if(nv<1||nv>max)return;
+  purchDraft.qty=nv;
+  renderAddPurchase();
+}
+function confirmAddPurchase(){
+  const bk=S.bookings.find(b=>b.id===purchDraft.bookingId);
+  const p=S.products.find(x=>x.id===purchDraft.productId);
+  if(!bk||!p)return;
+  if(purchDraft.qty<1||purchDraft.qty>p.stock){toast('Үлдэгдэл хүрэлцэхгүй','err');return;}
+  p.stock-=purchDraft.qty;
+  logMove(p.id,-purchDraft.qty,'guest',{who:(bk.name||bk.phone)+' (№'+purchDraft.roomNum+')',note:'Зочны худалдан авалт'});
+  bk.extras=bk.extras||[];
+  bk.extras.push({name:p.name+' (№'+purchDraft.roomNum+', хөргөгч)', price:p.price, qty:purchDraft.qty});
+  S.productSales.push({id:uid('ps'),bookingId:bk.id,date:todayStr(),items:[{productId:p.id,name:p.name,qty:purchDraft.qty,price:p.price,cost:p.cost}],total:p.price*purchDraft.qty,ts:new Date().toISOString()});
+  const bid=purchDraft.bookingId;
+  purchDraft=null;
+  save();renderAll();openDetail(bid);
+  toast('Худалдан авалт нэмэгдлээ ✓','ok');
+}
+function setRoomNote(id,ri,val){const bk=S.bookings.find(b=>b.id===id);bk.rooms[ri].note=val;save();renderAll();toast('Тайлбар хадгаллаа','ok');}
+function ensureNightOverridesLen(bk){
+  const arr=bk.nightOverrides||[];
+  while(arr.length<bk.nights)arr.push(null);
+  arr.length=bk.nights;
+  bk.nightOverrides=arr;
+  return arr;
+}
+function setNightPrice(id,i,val){
+  const bk=S.bookings.find(b=>b.id===id);if(!bk)return;
+  const arr=ensureNightOverridesLen(bk);
+  const cur=normOv(arr[i]);
+  cur.price=(val===''||val==null)?null:(parseInt(val)||0);
+  arr[i]=cur;
+  save();renderAll();openDetail(id);toast('Үнэ шинэчлэгдлээ','ok');
+}
+function setNightRoom(id,i,val){
+  const bk=S.bookings.find(b=>b.id===id);if(!bk)return;
+  const arr=ensureNightOverridesLen(bk);
+  const cur=normOv(arr[i]);
+  const newNum=parseInt(val);
+  cur.roomNum=(newNum===bk.rooms[0].num)?null:newNum;
+  arr[i]=cur;
+  save();renderAll();openDetail(id);toast('Өрөө шинэчлэгдлээ ✓','ok');
+}
+
+function openConfirm(id){
+  const bk=S.bookings.find(b=>b.id===id);
+  const t=bookingTotals(bk);
+  const suggest=bk.prepay?.amount||prepaySuggest(bk);
+  openModal('Баталгаажуулах',
+    `<div class="form-grid">
+      <div><label class="field">Урьдчилгаа дүн (₮)</label><input id="c_amt" type="number" value="${suggest}"><div class="hint">Санал: ${money(prepaySuggest(bk))} (нийтийн ${S.prepay.percent}%)</div></div>
+      <div><label class="field">Данс</label><select id="c_acc">${S.accounts.map(a=>`<option value="${a.id}" ${a.id===bk.prepay?.accountId?'selected':''}>${a.name}</option>`).join('')}</select></div>
+      <div><label class="field">Огноо</label><input id="c_date" type="date" value="${bk.prepay?.date||todayStr()}"></div>
+    </div>
+    <label style="font-size:13px;display:flex;align-items:center;gap:6px;margin-top:10px"><input id="c_recv" type="checkbox" style="width:auto" checked>Урьдчилгаа орж ирсэн (баталгаажсан)</label>`,
+    `<button class="btn btn-ghost" onclick="openDetail('${id}')">Буцах</button>
+     <button class="btn btn-green" onclick="doConfirm('${id}')">Хадгалах</button>`);
+}
+function doConfirm(id){
+  const bk=S.bookings.find(b=>b.id===id);
+  const recv=document.getElementById('c_recv').checked;
+  bk.prepay={amount:parseInt(document.getElementById('c_amt').value)||0,accountId:document.getElementById('c_acc').value,
+    date:document.getElementById('c_date').value,received:recv};
+  if(recv){bk.status='confirmed';bk.confirmedAt=bk.confirmedAt||new Date().toISOString();}
+  else{bk.status='pending';}
+  save();closeModal();renderAll();toast(recv?'Баталгаажлаа ✓':'Хадгаллаа','ok');
+}
+function openFinalPay(id){
+  const bk=S.bookings.find(b=>b.id===id);
+  const t=bookingTotals(bk);
+  openModal('Үлдэгдэл төлбөр хийх',
+    `<p class="hint" style="margin-bottom:10px">Нийт: <b>${money(t.grand)}</b> · Төлсөн: <b style="color:var(--green)">${money(t.paid)}</b> · Үлдэгдэл: <b style="color:var(--berry)">${money(t.balance)}</b></p>
+     <div class="form-grid">
+      <div><label class="field">Одоо төлж буй дүн (₮)</label><input id="f_amt" type="number" value="${t.balance>0?t.balance:0}"></div>
+      <div><label class="field">Данс</label><select id="f_acc">${S.accounts.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')}</select></div>
+      <div><label class="field">Огноо</label><input id="f_date" type="date" value="${todayStr()}"></div>
+    </div>
+    <div class="hint" style="margin-top:8px">Дүнг өөрчилж хэсэгчлэн төлж болно. Үлдэгдэл дүнг бүтнээр нь оруулбал захиалга «Бүрэн төлсөн» болж хаагдана.</div>`,
+    `<button class="btn btn-ghost" onclick="openDetail('${id}')">Буцах</button>
+     <button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="doFinalPay('${id}')">Төлбөр нэмэх</button>`);
+}
+function doFinalPay(id){
+  const bk=S.bookings.find(b=>b.id===id);
+  const amt=parseInt(document.getElementById('f_amt').value)||0;
+  if(amt<=0){toast('Дүн оруулна уу','err');return;}
+  bk.payments=bk.payments||[];
+  bk.payments.push({amount:amt,accountId:document.getElementById('f_acc').value,date:document.getElementById('f_date').value,at:new Date().toISOString()});
+  bk.finalPay=null; // хуучин формат цэвэрлэнэ
+  save();closeModal();renderAll();openDetail(id);
+  const t=bookingTotals(bk);
+  toast(t.balance<=0?'Бүрэн төлөгдлөө 💎':'Төлбөр нэмэгдлээ · үлдэгдэл '+money(t.balance),'ok');
+}
+function delPayment(id,idx){
+  const bk=S.bookings.find(b=>b.id===id);
+  bk.payments.splice(idx,1);save();renderAll();openDetail(id);toast('Төлбөр устгагдлаа');
+}
+function openCancel(id){
+  const bk=S.bookings.find(b=>b.id===id);
+  openModal('Цуцлах / хойшлол',
+    `<label class="field">Төрөл</label>
+     <select id="cn_type">
+       <option value="cancel">Цуцлалт</option>
+       <option value="late">Хожуу хойшлол (${S.fees.noticeDays} хоногийн өмнө мэдэгдээгүй)</option>
+     </select>
+     <div style="margin-top:10px"><label class="field">Торгууль (₮)</label><input id="cn_fee" type="number" value="${S.fees.cancel}"></div>
+     <div class="hint" style="margin-top:8px">Торгуулийг ${S.fees.deductFrom==='prepay'?'урьдчилгаанаас':'үлдэгдэл төлбөрөөс'} хасна (Тохиргооноос өөрчилж болно).</div>`,
+    `<button class="btn btn-ghost" onclick="openDetail('${id}')">Буцах</button>
+     <button class="btn btn-berry" onclick="doCancel('${id}')">Баталгаажуулах</button>`);
+}
+function doCancel(id){
+  const bk=S.bookings.find(b=>b.id===id);
+  bk.cancelInfo={type:document.getElementById('cn_type').value,fee:parseInt(document.getElementById('cn_fee').value)||0,at:new Date().toISOString()};
+  bk.status='cancelled';
+  save();closeModal();renderAll();toast('Цуцлагдлаа','ok');
+}
+function uncancel(id){const bk=S.bookings.find(b=>b.id===id);bk.cancelInfo=null;bk.status=bk.prepay?.received?'confirmed':'pending';save();closeModal();renderAll();toast('Сэргээлээ','ok');}
+function delBooking(id){
+  openModal('Устгах уу?',`<p style="font-size:14px">Энэ захиалгыг бүрмөсөн устгах уу?</p>`,
+    `<button class="btn btn-ghost" onclick="openDetail('${id}')">Болих</button>
+     <button class="btn btn-berry" onclick="confirmDel('${id}')">Устгах</button>`);
+}
+function confirmDel(id){S.bookings=S.bookings.filter(b=>b.id!==id);save();closeModal();renderAll();toast('Устгагдлаа');}
+
+/* ---- message ---- */
+function buildMessage(bk){
+  const acc=accById(bk.prepay?.accountId)||S.accounts[0]||{name:'',num:''};
+  const prep=bk.prepay?.amount||prepaySuggest(bk);
+  return S.template
+    .replace('{урьдчилгаа}',money(prep))
+    .replace('{данс}',(acc.name?acc.name+' ':'')+(acc.num||''))
+    .replace('{ирэхцаг}',bk.arriveTime||'12:00')
+    .replace('{гарахцаг}',bk.leaveTime||'11:00')
+    .replace('{мэдэгдэх}',S.fees.noticeDays)
+    .replace('{цуцлалт}',money(S.fees.cancel));
+}
+function showMessage(id){
+  const bk=S.bookings.find(b=>b.id===id);
+  const msg=buildMessage(bk);
+  openModal('Баталгаажуулах мессеж',
+    `<textarea id="msgText" style="min-height:280px">${msg}</textarea>
+     <div class="hint">Хуулж аваад Viber/утсаар илгээнэ үү. «Явуулсан» дарвал 24 цагийн сануулга эхэлнэ.</div>`,
+    `<button class="btn btn-ghost" onclick="openDetail('${id}')">Буцах</button>
+     <button class="btn btn-ghost" onclick="copyMsg()">Хуулах</button>
+     <button class="btn btn-primary" onclick="markSent('${id}')">Явуулсан гэж тэмдэглэх</button>`);
+}
+function copyMsg(){const ta=document.getElementById('msgText');ta.select();try{navigator.clipboard.writeText(ta.value);}catch(e){document.execCommand('copy');}toast('Хуулагдлаа ✓','ok');}
+function markSent(id){const bk=S.bookings.find(b=>b.id===id);bk.msgSentAt=new Date().toISOString();save();closeModal();renderAll();toast('Тэмдэглэлээ','ok');}
+
+/* ============================================================ REMINDERS */
+function renderReminders(){
+  const now=Date.now();const today=todayStr();
+  const unpaid24=S.bookings.filter(b=>b.status!=='cancelled'&&b.msgSentAt&&!(b.prepay&&b.prepay.received)&&(now-new Date(b.msgSentAt))>864e5);
+  const arrivals=S.bookings.filter(b=>b.status!=='cancelled'&&b.checkIn===today);
+  const departures=S.bookings.filter(b=>b.status!=='cancelled'&&addDays(b.checkIn,b.nights)===today);
+  const pending=S.bookings.filter(b=>b.status==='pending'&&!b.msgSentAt);
+  const overdueUnpaid=S.bookings.filter(b=>b.status!=='cancelled'&&addDays(b.checkIn,b.nights)<today&&bookingTotals(b).balance>0);
+  let h='';
+  if(overdueUnpaid.length)h+=`<div class="rcard warn"><div class="rt">🔴 Гарсан ч төлбөр дутуу</div><div class="rv">${overdueUnpaid.map(b=>`<a href="#" onclick="openDetail('${b.id}');return false" style="color:inherit;text-decoration:underline">${b.phone} (${money(bookingTotals(b).balance)})</a>`).join(', ')}</div></div>`;
+  if(unpaid24.length)h+=`<div class="rcard warn"><div class="rt">⏰ 24 цаг өнгөрсөн — урьдчилгаа хүлээгдэж буй</div><div class="rv">${unpaid24.map(b=>b.phone).join(', ')}</div></div>`;
+  h+=`<div class="rcard"><div class="rt">📥 Өнөөдөр ирэх</div><div class="rv">${arrivals.length?arrivals.map(b=>b.phone+' (№'+b.rooms.map(r=>r.num).join(',')+')').join('; '):'—'}</div></div>`;
+  h+=`<div class="rcard"><div class="rt">📤 Өнөөдөр гарах</div><div class="rv">${departures.length?departures.map(b=>b.phone+' (№'+b.rooms.map(r=>r.num).join(',')+')').join('; '):'—'}</div></div>`;
+  if(pending.length)h+=`<div class="rcard"><div class="rt">✉️ Мессеж явуулаагүй</div><div class="rv">${pending.length} захиалга</div></div>`;
+  document.getElementById('reminders').innerHTML=h;
+}
+
+/* ============================================================ CALENDAR */
+function renderCalendar(){
+  if(!calYM){const d=new Date();calYM=d.getFullYear()+'-'+pad(d.getMonth()+1);}
+  const [y,m]=calYM.split('-').map(Number);
+  const first=new Date(y,m-1,1),dim=new Date(y,m,0).getDate();
+  document.getElementById('calMonth').textContent=y+' оны '+m+'-р сар';
+  const today=todayStr();
+  let head='<thead><tr><th class="corner">Өрөө</th>';
+  for(let d=1;d<=dim;d++){const dow=new Date(y,m-1,d).getDay();const we=dow===0||dow===6;
+    head+=`<th class="${we?'we':''}">${d}<div style="font-size:9px;font-weight:500">${WK[dow]}</div></th>`;}
+  head+='</tr></thead>';
+  let bodyH='<tbody>';
+  let lastGrp='';
+  S.rooms.forEach(room=>{
+    const grp=room.oo?'00-той':'00-гүй';
+    if(grp!==lastGrp){bodyH+=`<tr><td class="grp" colspan="${dim+1}">${grp} өрөө</td></tr>`;lastGrp=grp;}
+    bodyH+=`<tr><td class="rlabel ${room.oo?'oo-lab':'nooo-lab'}">№${room.num} <span style="color:var(--muted);font-weight:500">(${room.beds} ор)</span></td>`;
+    for(let d=1;d<=dim;d++){
+      const day=y+'-'+pad(m)+'-'+pad(d);
+      const bk=bookingAt(room.num,day);
+      if(bk){
+        const idx=daysBetween(bk.checkIn,day);
+        const isSegStart = idx===0 || !effectiveRoomsForNight(bk,idx-1).includes(+room.num);
+        const label=isSegStart?(bk.name||bk.phone):'';
+        bodyH+=`<td class="cell" data-bk="${bk.id}" title="${bk.phone}${bk.name?' · '+bk.name:''} · ${bk.nights}хон">
+          <div class="occ ${bookingTotals(bk).fullyPaid?'full':bk.status==='confirmed'?'conf':'pend'} ${isSegStart?'start':''}">${isSegStart?label:''}</div></td>`;
+      } else {
+        bodyH+=`<td class="cell" data-new="${room.num}|${day}"></td>`;
+      }
+    }
+    bodyH+='</tr>';
+  });
+  bodyH+='</tbody>';
+  const tbl=document.getElementById('calTable');
+  tbl.innerHTML=head+bodyH;
+  tbl.querySelectorAll('td.cell').forEach(td=>{
+    td.onclick=()=>{
+      if(td.dataset.bk){openDetail(td.dataset.bk);}
+      else if(td.dataset.new){const[num,day]=td.dataset.new.split('|');editId=null;openBookingModal({checkIn:day,rooms:[{num:+num,adults:1,children:[],custom:0}]});}
+    };
+  });
+}
+document.getElementById('prevM').onclick=()=>{const[y,m]=calYM.split('-').map(Number);const d=new Date(y,m-2,1);calYM=d.getFullYear()+'-'+pad(d.getMonth()+1);renderCalendar();};
+document.getElementById('nextM').onclick=()=>{const[y,m]=calYM.split('-').map(Number);const d=new Date(y,m,1);calYM=d.getFullYear()+'-'+pad(d.getMonth()+1);renderCalendar();};
+document.getElementById('todayM').onclick=()=>{const d=new Date();calYM=d.getFullYear()+'-'+pad(d.getMonth()+1);renderCalendar();};
+
+/* ============================================================ LIST */
+function renderList(){
+  const filters=[['all','Бүгд'],['pending','Хүлээгдэж буй'],['confirmed','Баталгаажсан'],['unpaid','Урьдчилгаа аваагүй'],['overdue','Гарсан ч төлбөр дутуу'],['full','Бүрэн төлсөн'],['cancelled','Цуцлагдсан']];
+  document.getElementById('listFilt').innerHTML=filters.map(([k,l])=>`<button class="btn ${listFilter===k?'btn-primary':'btn-ghost'} btn-sm" onclick="listFilter='${k}';renderList()">${l}</button>`).join('');
+  let list=[...S.bookings].sort((a,b)=>a.checkIn.localeCompare(b.checkIn));
+  if(listFilter==='pending')list=list.filter(b=>b.status==='pending');
+  if(listFilter==='confirmed')list=list.filter(b=>b.status==='confirmed');
+  if(listFilter==='cancelled')list=list.filter(b=>b.status==='cancelled');
+  if(listFilter==='unpaid')list=list.filter(b=>b.status!=='cancelled'&&!(b.prepay&&b.prepay.received));
+  if(listFilter==='full')list=list.filter(b=>bookingTotals(b).fullyPaid);
+  if(listFilter==='overdue')list=list.filter(b=>b.status!=='cancelled'&&addDays(b.checkIn,b.nights)<todayStr()&&bookingTotals(b).balance>0);
+  const wrap=document.getElementById('bookingList');
+  if(!list.length){wrap.innerHTML='<div class="empty">Захиалга алга.</div>';return;}
+  wrap.innerHTML=list.map(bk=>{
+    const t=bookingTotals(bk);const out=addDays(bk.checkIn,bk.nights);
+    const ad=bk.rooms.reduce((a,r)=>a+(r.adults||0),0),kd=bk.rooms.reduce((a,r)=>a+(r.children||[]).length,0);
+    const conf=bk.status==='confirmed',canc=bk.status==='cancelled',paid=bk.prepay&&bk.prepay.received;
+    const overdue=!canc&&out<todayStr()&&t.balance>0;
+    return `<div class="item" style="${overdue?'background:#fdf2f1':''}">
+      <div class="top">
+        <div><span class="ttl">${bk.phone}${bk.name?' · '+bk.name:''}</span>
+          <div class="meta">Ирэх ${fmtD(bk.checkIn)} → Гарах ${fmtD(out)} (${bk.nights} хон) · ${bk.rooms.map(r=>'№'+r.num).join(', ')} · ${ad} том ${kd} хүүхэд</div></div>
+        <div style="text-align:right"><div class="price">${money(t.grand)}</div>
+          <div class="desc">${t.balance>0?'Үлдэгдэл: '+money(t.balance):'Бүрэн төлсөн'}</div></div>
+      </div>
+      <div class="btns">
+        ${overdue?'<span class="pill canc">🔴 Хугацаа хэтэрсэн</span>':''}
+        ${canc?'<span class="pill canc">Цуцлагдсан</span>':t.fullyPaid?'<span class="pill full">💎 Бүрэн төлсөн</span>':conf?'<span class="pill conf">✓ Баталгаажсан</span>':'<span class="pill pend">⏳ Хүлээгдэж буй</span>'}
+        <span class="pill ${paid?'paid':'unpaid'}">${paid?'💰 Урьдчилгаа авсан':'Урьдчилгаа аваагүй'}</span>
+        ${!canc&&conf&&t.balance>0?`<button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="openFinalPay('${bk.id}')">💎 Үлдэгдэл хаах</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="openDetail('${bk.id}')">Дэлгэрэнгүй</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================ SETTINGS */
+function renderSettings(){
+  const p=S.pricing;
+  const body=`
+    <div class="card set-sec">
+      <h3>💰 Ерөнхий үнэ</h3>
+      <div class="form-grid">
+        <div><label class="field">Ганц хүн нэмэгдэл (₮)<div style="font-weight:400;font-size:11px;color:var(--muted)">ганцаараа орвол нэг удаа нэмнэ</div></label><input type="number" id="s_single" value="${p.singleAdd}"></div>
+        <div><label class="field">Урьдчилгаа (%)</label><input type="number" id="s_prep" value="${S.prepay.percent}"></div>
+      </div>
+      <input type="hidden" id="s_oo" value="${p.baseOO}"><input type="hidden" id="s_nooo" value="${p.baseNoOO}">
+      <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="savePricing()">Хадгалах</button>
+    </div>
+
+    <div class="card set-sec">
+      <h3>🚪 Өрөө ба хүний үнэ</h3>
+      <div class="hint" style="margin-bottom:8px">«Хүн тус бүрийн үнэ» баганад 2+ хүн хамт байх үеийн НЭГ хүний ногдох үнийг бичнэ. Нийт төлбөр = энэ үнэ × хүний тоо. Ганцаараа орвол доор харуулсан «1 хүн (нийт)» дүнг нэг л удаа тооцно.<br>Шууд засах нь үнийг <b>бүх огноонд</b> дариулна. Тодорхой огнооноос эхлэх үнийн өөрчлөлт хэрэгтэй бол (жиш: 7-р сарын 1-нээс) 📅 товчийг ашиглана уу.</div>
+      <div style="overflow-x:auto"><table class="mini-tbl"><thead><tr><th>№</th><th>00</th><th>Ор</th><th>Хүн тус бүрийн үнэ (2+)</th><th>1 хүн (нийт)</th><th>2 хүн (нийт)</th><th></th></tr></thead><tbody>
+      ${S.rooms.map((r,i)=>{const pp=(r.price!=null?r.price:0);return `<tr>
+        <td><input type="number" value="${r.num}" style="width:60px" onchange="S.rooms[${i}].num=parseInt(this.value)||0"></td>
+        <td><select style="width:90px" onchange="S.rooms[${i}].oo=this.value==='1'"><option value="1" ${r.oo?'selected':''}>00-той</option><option value="0" ${!r.oo?'selected':''}>00-гүй</option></select></td>
+        <td><input type="number" value="${r.beds}" style="width:55px" onchange="S.rooms[${i}].beds=parseInt(this.value)||1"></td>
+        <td><input type="number" value="${pp}" style="width:120px" onchange="S.rooms[${i}].price=parseInt(this.value)||0;renderSettings()"></td>
+        <td style="color:var(--muted)">${money(pp+S.pricing.singleAdd)}</td>
+        <td style="color:var(--muted)">${money(pp*2)}</td>
+        <td><div class="row" style="gap:4px">
+          <button class="btn-icon" title="Огнооноос үнэ товлох" onclick="openRoomPriceSchedule(${i})">📅${r.priceHistory&&r.priceHistory.length>1?' <span style=\'font-size:10px\'>'+r.priceHistory.length+'</span>':''}</button>
+          <button class="btn-icon" onclick="delRoomCfg(${i})">✕</button>
+        </div></td></tr>`;}).join('')}
+      </tbody></table></div>
+      <div class="row" style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="addRoomCfg()">+ Өрөө</button><button class="btn btn-primary btn-sm" onclick="saveRooms()">Хадгалах</button></div>
+    </div>
+
+    <div class="card set-sec">
+      <h3>🧒 Хүүхдийн ангилал (нас/хоол)</h3>
+      <table class="mini-tbl"><thead><tr><th>Нэр</th><th>Үнэ (₮)</th><th></th></tr></thead><tbody>
+      ${S.tiers.map((t,i)=>`<tr>
+        <td><input value="${t.name}" onchange="S.tiers[${i}].name=this.value"></td>
+        <td><input type="number" value="${t.price}" style="width:110px" onchange="S.tiers[${i}].price=parseInt(this.value)||0"></td>
+        <td><button class="btn-icon" onclick="delTier(${i})">✕</button></td></tr>`).join('')}
+      </tbody></table>
+      <div class="row" style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="addTier()">+ Ангилал</button><button class="btn btn-primary btn-sm" onclick="saveTiers()">Хадгалах</button></div>
+    </div>
+
+    <div class="card set-sec">
+      <h3>🏦 Данс</h3>
+      <table class="mini-tbl"><thead><tr><th>Нэр</th><th>Дугаар</th><th></th></tr></thead><tbody>
+      ${S.accounts.map((a,i)=>`<tr>
+        <td><input value="${a.name}" onchange="S.accounts[${i}].name=this.value"></td>
+        <td><input value="${a.num}" onchange="S.accounts[${i}].num=this.value"></td>
+        <td><button class="btn-icon" onclick="delAcc(${i})">✕</button></td></tr>`).join('')}
+      </tbody></table>
+      <div class="row" style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="addAcc()">+ Данс</button><button class="btn btn-primary btn-sm" onclick="saveAccounts()">Хадгалах</button></div>
+    </div>
+
+    <div class="card set-sec">
+      <h3>⚠️ Цуцлалт / хойшлолын торгууль</h3>
+      <div class="form-grid">
+        <div><label class="field">Торгууль (₮)</label><input type="number" id="s_cancel" value="${S.fees.cancel}"></div>
+        <div><label class="field">Мэдэгдэх хугацаа (хоног)</label><input type="number" id="s_notice" value="${S.fees.noticeDays}"></div>
+        <div><label class="field">Хасах эх үүсвэр</label><select id="s_deduct">
+          <option value="prepay" ${S.fees.deductFrom==='prepay'?'selected':''}>Урьдчилгаанаас</option>
+          <option value="balance" ${S.fees.deductFrom==='balance'?'selected':''}>Үлдэгдэл төлбөрөөс</option></select></div>
+      </div>
+      <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="saveFees()">Хадгалах</button>
+    </div>
+
+    <div class="card set-sec">
+      <h3>✉️ Баталгаажуулах мессежийн загвар</h3>
+      <div class="hint" style="margin-bottom:8px">Талбарууд: {урьдчилгаа} {данс} {ирэхцаг} {гарахцаг} {мэдэгдэх} {цуцлалт}</div>
+      <textarea id="s_tpl" style="min-height:220px">${S.template}</textarea>
+      <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="saveTemplate()">Хадгалах</button>
+    </div>
+
+    <div class="card set-sec">
+      <h3>💆 Барианы үйлчилгээ</h3>
+      <div class="hint" style="margin-bottom:8px">«Бариач оролцох» — оролцоно (дараалан) эсвэл оролцохгүй (бэлтгэж өгөөд орхино). «Нэмэлт төлбөртэй» — тэмдэглэвэл хийхэд төлбөр нэхэмжлэлд нэмэгдэнэ; тэмдэглээгүй бол үндсэн төлбөрт багтсан гэж үзэж нэхэмжлэхгүй. «Бариа» нь насаар хугацаатай (0-1:15, 2-5:20, 6-8:25, 9-13:30, том:45-50).</div>
+      <div style="overflow-x:auto"><table class="mini-tbl"><thead><tr><th>Нэр</th><th>Үнэ (₮)</th><th>Минут</th><th>Бариач оролцох</th><th>Нэмэлт төлбөртэй</th><th>Орц</th><th></th></tr></thead><tbody>
+      ${S.massageServices.map((s,i)=>`<tr>
+        <td><input value="${s.name}" style="width:140px" onchange="S.massageServices[${i}].name=this.value"></td>
+        <td><input type="number" value="${s.price}" style="width:100px" onchange="S.massageServices[${i}].price=parseInt(this.value)||0"></td>
+        <td>${s.ageBased?'<span style="color:var(--muted);font-size:12px">насаар</span>':`<input type="number" value="${s.mins}" style="width:70px" onchange="S.massageServices[${i}].mins=parseInt(this.value)||0">`}</td>
+        <td style="text-align:center"><input type="checkbox" ${s.therapist?'checked':''} onchange="S.massageServices[${i}].therapist=this.checked"></td>
+        <td style="text-align:center"><input type="checkbox" ${s.billable?'checked':''} onchange="S.massageServices[${i}].billable=this.checked"></td>
+        <td><button class="btn btn-ghost btn-sm" onclick="openSvcNorms('${s.id}')">📦 ${(s.norms||[]).length||'—'}</button></td>
+        <td><button class="btn-icon" onclick="delMsgSvc(${i})">✕</button></td></tr>`).join('')}
+      </tbody></table></div>
+      <div class="row" style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="addMsgSvc()">+ Үйлчилгээ</button><button class="btn btn-primary btn-sm" onclick="saveMsgSvc()">Хадгалах</button></div>
+    </div>
+
+    <div class="card set-sec">
+      <h3>🧑‍⚕️ Массажчид</h3>
+      <div class="hint" style="margin-bottom:8px">«Жин» = оролцооны түвшин. 1 = бүрэн, 0.5 = бага оролцдог (тэр хэрээр цөөн үйлчилгээ ноогдоно), 0 = хувиарлахгүй.</div>
+      <table class="mini-tbl"><thead><tr><th>Нэр</th><th>Жин</th><th></th></tr></thead><tbody>
+      ${S.therapists.map((t,i)=>`<tr>
+        <td><input value="${t.name}" onchange="S.therapists[${i}].name=this.value"></td>
+        <td><input type="number" step="0.1" min="0" style="width:80px" value="${t.weight!=null?t.weight:1}" onchange="S.therapists[${i}].weight=parseFloat(this.value)||0"></td>
+        <td><button class="btn-icon" onclick="delTherapist(${i})">✕</button></td></tr>`).join('')}
+      </tbody></table>
+      <div class="row" style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="addTherapist()">+ Массажч</button><button class="btn btn-primary btn-sm" onclick="saveTherapists()">Хадгалах</button></div>
+    </div>
+
+    <div class="card set-sec">
+      <h3>🎯 Барианы автомат дүрэм</h3>
+      <div class="hint" style="margin-bottom:10px">«🎯 Автомат төлөвлөгөө» дарахад ангилал бүр ингэж хувиарлагдана: <b>сондгой хоног (1,3,5...) → Бариа</b>, <b>тэгш хоног (2,4...) → ээлжийн эмчилгээ</b>. Ангилал насаар автомат: Том хүн, Хүүхэд 4-13, Усанд оруулах 0-3. Дараа нь сүлжээнээс гараар өөрчилж болно.</div>
+      ${msgRuleRow('adult','Том хүн','Сондгой хоногийн нэмэлт (үсний спа)')}
+      ${msgRuleRow('child','Хүүхэд (4-13)','Тэгш хоногт ээлжлэх эмчилгээ')}
+      ${msgRuleRow('water','Усанд оруулах (0-3)','Тэгш хоногт ээлжлэх эмчилгээ')}
+      <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="save();toast('Хадгаллаа','ok')">Хадгалах</button>
+    </div>
+
+    <div class="card set-sec">
+      <h3>☁️ Синк — олон төхөөрөмж</h3>
+      <div class="hint" style="margin-bottom:10px">Firebase-ээр холбовол таны утас, компьютер, бариачийн утас бүгд <b>нэг өгөгдөлтэй</b> ажиллана. Холбоогүй бол өгөгдөл зөвхөн энэ төхөөрөмжид хадгалагдана.</div>
+      <div id="syncDot" style="margin-bottom:10px"><i class="dot" style="background:#9aa3ad"></i> <span style="font-size:12.5px;color:var(--muted)">Унтраалттай</span></div>
+      <button class="btn btn-primary btn-sm" onclick="openSyncSetup()">Синк тохируулах</button>
+    </div>
+
+    <div class="card set-sec">
+      <h3>🗑 Өгөгдөл</h3>
+      <div class="hint" style="margin-bottom:10px">Бүх захиалга, тохиргоог устгаж анхны байдалд шилжүүлнэ.</div>
+      <button class="btn btn-berry btn-sm" onclick="resetAll()">Бүх өгөгдөл цэвэрлэх</button>
+    </div>`;
+  document.getElementById('setBody').innerHTML=body;
+}
+function savePricing(){S.pricing.baseOO=+document.getElementById('s_oo').value||0;S.pricing.baseNoOO=+document.getElementById('s_nooo').value||0;S.pricing.singleAdd=+document.getElementById('s_single').value||0;S.prepay.percent=+document.getElementById('s_prep').value||50;save();toast('Хадгаллаа','ok');renderAll();}
+function addRoomCfg(){const nums=S.rooms.map(r=>r.num);let n=1;while(nums.includes(n))n++;S.rooms.push({num:n,oo:false,beds:2,price:125000});renderSettings();}
+function delRoomCfg(i){S.rooms.splice(i,1);renderSettings();}
+function saveRooms(){S.rooms.sort((a,b)=>a.num-b.num);save();toast('Хадгаллаа','ok');renderAll();}
+
+function openRoomPriceSchedule(i){
+  const r=S.rooms[i];
+  const hist=(r.priceHistory&&r.priceHistory.length)?[...r.priceHistory].sort((a,b)=>a.from.localeCompare(b.from)):[{from:'0000-01-01',price:r.price}];
+  const histRows=hist.map((h,hi)=>`<div class="sumline"><span>${h.from==='0000-01-01'?'Үндсэн (эхлэлээс)':h.from+'-с эхлэн'}</span><span>${money(h.price)}${hist.length>1?` <button class="btn-icon" style="padding:2px 6px;margin-left:4px" onclick="delRoomPriceHist(${i},${hi})">✕</button>`:''}</span></div>`).join('');
+  openModal('№'+r.num+' — Үнэ огнооноос товлох',
+    `<div class="hint" style="margin-bottom:8px">Одоогийн болон товлогдсон үнийн түүх (хамгийн сүүлд нэмэгдсэн огноо ирвэл шинэ үнэ хүчинтэй болно):</div>
+     <div class="card" style="padding:10px 12px;margin-bottom:14px">${histRows}</div>
+     <div class="form-grid">
+       <div><label class="field">Эхлэх огноо *</label><input type="date" id="rps_from" value="${todayStr()}"></div>
+       <div><label class="field">Шинэ үнэ (хүн тус бүр) *</label><input type="number" id="rps_price" value="${r.price}"></div>
+     </div>
+     <div class="hint" style="margin-top:8px">Жиш: 7 сарын 1-нээс шинэ үнэ хүчинтэй болгохын тулд огноог 2026-07-01 гэж оруулна. Энэ өдрөөс өмнөх захиалгын хоногууд хуучин үнээрээ тооцогдоно.</div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="addRoomPriceHist(${i})">Товлох</button>`);
+}
+function addRoomPriceHist(i){
+  const r=S.rooms[i];
+  const from=document.getElementById('rps_from').value;
+  const price=+document.getElementById('rps_price').value||0;
+  if(!from){toast('Огноо оруулна уу','err');return;}
+  if(!price){toast('Үнэ оруулна уу','err');return;}
+  if(!r.priceHistory||!r.priceHistory.length) r.priceHistory=[{from:'0000-01-01',price:r.price}];
+  r.priceHistory=r.priceHistory.filter(h=>h.from!==from);
+  r.priceHistory.push({from,price});
+  r.priceHistory.sort((a,b)=>a.from.localeCompare(b.from));
+  r.price=r.priceHistory[r.priceHistory.length-1].price;
+  save();renderSettings();renderAll();toast('Үнийн өөрчлөлт товлогдлоо ✓','ok');
+  openRoomPriceSchedule(i);
+}
+function delRoomPriceHist(i,hi){
+  const r=S.rooms[i];
+  if(!r.priceHistory||r.priceHistory.length<=1)return;
+  r.priceHistory.splice(hi,1);
+  r.price=r.priceHistory[r.priceHistory.length-1].price;
+  save();renderSettings();renderAll();
+  openRoomPriceSchedule(i);
+}
+function addTier(){S.tiers.push({id:uid('t'),name:'Шинэ ангилал',price:0});renderSettings();}
+function delTier(i){S.tiers.splice(i,1);renderSettings();}
+function saveTiers(){save();toast('Хадгаллаа','ok');renderSettings();}
+function addAcc(){S.accounts.push({id:uid('a'),name:'',num:''});renderSettings();}
+function delAcc(i){S.accounts.splice(i,1);renderSettings();}
+function saveAccounts(){save();toast('Хадгаллаа','ok');renderSettings();}
+function saveFees(){S.fees.cancel=+document.getElementById('s_cancel').value||0;S.fees.noticeDays=+document.getElementById('s_notice').value||2;S.fees.deductFrom=document.getElementById('s_deduct').value;save();toast('Хадгаллаа','ok');}
+function saveTemplate(){S.template=document.getElementById('s_tpl').value;save();toast('Хадгаллаа','ok');}
+function openSvcNorms(sid){
+  const s=svcById(sid);if(!s)return;
+  s.norms=s.norms||[];
+  const mats=S.products.filter(p=>['massage','house','goods','food'].includes(p.group||'goods'));
+  if(!mats.length){toast('Эхлээд «Худалдан авалт» табад бараа бүртгэнэ үү','err');return;}
+  const rows=s.norms.map((n,i)=>{
+    const p=S.products.find(x=>x.id===n.productId);
+    return `<div class="row" style="gap:6px;margin-bottom:6px;align-items:center">
+      <select style="flex:1" onchange="S.massageServices.find(x=>x.id==='${sid}').norms[${i}].productId=this.value;openSvcNorms('${sid}')">
+        ${mats.map(m=>`<option value="${m.id}" ${m.id===n.productId?'selected':''}>${m.name} (${m.unit||'ш'})</option>`).join('')}
+      </select>
+      <input type="number" step="0.01" min="0" style="width:80px" value="${n.qty||0}" onchange="S.massageServices.find(x=>x.id==='${sid}').norms[${i}].qty=parseFloat(this.value)||0">
+      <span style="font-size:12px;color:var(--muted);min-width:26px">${p?p.unit||'ш':''}</span>
+      <button class="btn-icon" onclick="S.massageServices.find(x=>x.id==='${sid}').norms.splice(${i},1);openSvcNorms('${sid}')">✕</button>
+    </div>`;
+  }).join('');
+  openModal('📦 Орц норм — '+s.name,
+    `<div class="hint" style="margin-bottom:10px">Энэ үйлчилгээг <b>нэг хүнд</b> хийхэд хэрэглэгдэх бараа, тоо хэмжээ. «✓ Хийсэн» тэмдэглэхэд агуулахаас автоматаар хасагдана (хүний тоогоор үржинэ).</div>
+     ${rows||'<div class="hint" style="padding:6px 0">Орц бүртгээгүй байна.</div>'}
+     <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="S.massageServices.find(x=>x.id==='${sid}').norms.push({productId:'${mats[0].id}',qty:1});openSvcNorms('${sid}')">+ Орц нэмэх</button>`,
+    `<button class="btn btn-primary" onclick="save();closeModal();renderSettings();toast('Хадгаллаа','ok')">Хадгалах</button>`);
+}
+function addMsgSvc(){S.massageServices.push({id:uid('ms'),name:'Шинэ үйлчилгээ',price:0,mins:15,therapist:true,ageBased:false,billable:false,norms:[]});renderSettings();}
+function svcOptsMsg(sel,allowNone){return (allowNone?`<option value="">— байхгүй —</option>`:'')+S.massageServices.map(s=>`<option value="${s.id}" ${s.id===sel?'selected':''}>${s.name}</option>`).join('');}
+function msgRuleRow(cat,label,evenLabel){
+  const cfg=(S.msgDefaults&&S.msgDefaults[cat])||{};
+  const rot=cfg.rotate||[];
+  let evenH='';
+  if(cat==='adult'){
+    evenH=`<div style="margin-top:6px"><span style="font-size:12px;color:var(--muted)">${evenLabel}: </span>
+      <select onchange="S.msgDefaults.adult.bonus=this.value;renderSettings()">${svcOptsMsg(cfg.bonus,true)}</select></div>`;
+  } else {
+    evenH=`<div style="margin-top:6px"><span style="font-size:12px;color:var(--muted)">${evenLabel}: </span>`
+      +rot.map((rid,i)=>`<select style="margin-right:4px" onchange="S.msgDefaults.${cat}.rotate[${i}]=this.value;renderSettings()">${svcOptsMsg(rid,false)}</select>`).join('')
+      +`<button class="btn-icon" title="Нэмэх" onclick="S.msgDefaults.${cat}.rotate.push(S.massageServices.find(s=>s.id!=='ms_baria')?.id||'ms_water');renderSettings()">+</button>`
+      +(rot.length>1?`<button class="btn-icon" title="Хасах" onclick="S.msgDefaults.${cat}.rotate.pop();renderSettings()">−</button>`:'')
+      +`</div>`;
+  }
+  return `<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px">
+    <div style="font-weight:700;color:var(--navy);font-size:13.5px">${label}</div>
+    <div style="margin-top:6px"><span style="font-size:12px;color:var(--muted)">Сондгой хоног: </span>
+      <select onchange="S.msgDefaults.${cat}.baria=this.value;renderSettings()">${svcOptsMsg(cfg.baria||'ms_baria',false)}</select></div>
+    ${evenH}
+  </div>`;
+}
+function delMsgSvc(i){S.massageServices.splice(i,1);renderSettings();}
+function saveMsgSvc(){save();toast('Хадгаллаа','ok');renderMassage();}
+function addTherapist(){S.therapists.push({id:uid('th'),name:'Шинэ массажч',weight:1});renderSettings();}
+function delTherapist(i){S.therapists.splice(i,1);renderSettings();}
+function saveTherapists(){save();toast('Хадгаллаа','ok');renderMassage();}
+function resetAll(){openModal('Бүх өгөгдөл цэвэрлэх?',`<p style="font-size:14px">Бүх захиалга, тохиргоо устана. Буцаах боломжгүй!</p>`,
+  `<button class="btn btn-ghost" onclick="closeModal()">Болих</button><button class="btn btn-berry" onclick="doReset()">Устгах</button>`);}
+function doReset(){S=defaults();save();closeModal();renderAll();toast('Цэвэрлэлээ');}
+
+/* ============================================================ RENDER ALL */
+document.getElementById('newBkBtn').onclick=()=>{editId=null;openBookingModal();};
+document.getElementById('newBkBtn2').onclick=()=>{editId=null;openBookingModal();};
+/* ============================================================ MASSAGE */
+function guestsStayingOn(date){
+  return S.bookings.filter(b=>b.status!=='cancelled' && b.checkIn<=date && date<addDays(b.checkIn,b.nights));
+}
+function guestLabel(bk){
+  const rooms=bk.rooms.map(r=>'№'+r.num).join(',');
+  return (bk.name||bk.phone)+' ('+rooms+')';
+}
+function svcById(id){return S.massageServices.find(s=>s.id===id);}
+function thById(id){return S.therapists.find(t=>t.id===id);}
+
+/* ============================================================ БАРИАНЫ ТӨЛӨВЛӨГӨӨ */
+const MCATS=[['adult','Том хүн'],['child','Хүүхэд'],['water','Усанд оруулах']];
+function catLabel(c){const f=MCATS.find(x=>x[0]===c);return f?f[1]:c;}
+function roomCats(r,date){
+  const occ=date?roomOccupancyOn(r,date):{adults:r.adults||0,children:(r.children||[])};
+  let adult=occ.adults, child=0, water=0;
+  occ.children.forEach(k=>{
+    const a=k.age||0;
+    if(a<=3) water++;        // 0-3 нас → усанд оруулах
+    else if(a<=13) child++;  // 4-13 нас → хүүхэд
+    else adult++;            // 14+ → том хүн
+  });
+  return {adult, child, water, totalKids:occ.children.length};
+}
+function msgCfg(cat){return (S.msgDefaults&&S.msgDefaults[cat])||{};}
+function isSummer(d){const md=(d||'').slice(5);return md>='06-20'&&md<='08-20';}
+function ensurePlan(bk,regen){
+  bk.msgPlan=bk.msgPlan||{};
+  const valid={};
+  bk.rooms.forEach(r=>{const ci=rCheckIn(bk,r),n=rNights(bk,r);for(let i=0;i<n;i++){const d=addDays(ci,i);valid[d]=valid[d]||{};valid[d][r.num]=r;}});
+  Object.keys(bk.msgPlan).forEach(d=>{
+    if(!valid[d]){delete bk.msgPlan[d];return;}
+    Object.keys(bk.msgPlan[d]).forEach(rn=>{if(!valid[d][rn])delete bk.msgPlan[d][rn];});
+  });
+  Object.keys(valid).forEach(d=>{
+    bk.msgPlan[d]=bk.msgPlan[d]||{};
+    Object.keys(valid[d]).forEach(rn=>{
+      bk.msgPlan[d][rn]=bk.msgPlan[d][rn]||{};
+      ['adult','child','water'].forEach(cat=>{
+        if(!bk.msgPlan[d][rn][cat]) bk.msgPlan[d][rn][cat]={svc:'rest',done:false,billed:false};
+      });
+    });
+  });
+}
+function setAutoCell(bk,d,rn,cat,svc){
+  bk.msgPlan[d]=bk.msgPlan[d]||{};bk.msgPlan[d][rn]=bk.msgPlan[d][rn]||{};
+  const cur=bk.msgPlan[d][rn][cat];
+  if(cur&&cur.done)return; // хийсэн бол хэвээр
+  bk.msgPlan[d][rn][cat]={svc,done:false,billed:false};
+}
+// Заавар ёсны ротаци: сондгой хоног→Бариа, тэгш хоног→ангиллын ээлжийн эмчилгээ
+function autoPlanBooking(bk){
+  ensurePlan(bk);
+  bk.rooms.forEach(r=>{
+    const ci=rCheckIn(bk,r),n=rNights(bk,r);
+    const days=[];for(let i=0;i<n;i++)days.push(addDays(ci,i));
+    const ctr={child:0,water:0};
+    days.forEach((d,i)=>{
+      const odd=((i+1)%2===1);
+      const cc=roomCats(r,d);
+      ['adult','child','water'].forEach(cat=>{
+        if(cc[cat]<=0){ setAutoCell(bk,d,r.num,cat,'rest'); return; }
+        const cfg=msgCfg(cat);
+        let svc;
+        if(odd){ svc=cfg.baria||'ms_baria'; }
+        else if(cat==='adult'){ svc='rest'; }
+        else {
+          const rot=cfg.rotate||[];
+          if(rot.length){ svc=rot[ctr[cat]%rot.length]; ctr[cat]++;
+            if(cat==='water'&&cfg.summerFrom&&svc===cfg.summerFrom&&isSummer(d)) svc=cfg.summerTo||svc; }
+          else svc='rest';
+        }
+        setAutoCell(bk,d,r.num,cat,svc);
+      });
+    });
+    // Том хүн: нийт шөнө сондгой бол +1 үсний спа (амралтын өдөрт)
+    const acfg=msgCfg('adult');
+    if(n%2===1 && acfg.bonus){
+      const bonusDay=days.find((d,i)=>((i+1)%2===0)&&roomCats(r,d).adult>0&&bk.msgPlan[d]?.[r.num]?.adult&&bk.msgPlan[d][r.num].adult.svc==='rest'&&!bk.msgPlan[d][r.num].adult.done);
+      if(bonusDay) setAutoCell(bk,bonusDay,r.num,'adult',acfg.bonus);
+    }
+  });
+}
+function ensureAllPlans(regen){S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>ensurePlan(bk,regen));}
+function autoPlanAll(regen){
+  S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>autoPlanBooking(bk));
+  save();renderAll();toast('Автомат төлөвлөгөө үүслээ ✓','ok');
+}
+function confirmAutoPlan(){
+  openModal('🎯 Автомат төлөвлөгөө',
+    `<p style="font-size:14px">Бүх идэвхтэй захиалгын зочдод, өрөө бүрийн бүрэлдэхүүнээс хамааруулан өдөр бүрийн барианы төлөвлөгөөг автоматаар үүсгэнэ.</p>
+     <div class="hint" style="margin-top:8px">Хийсэн гэж тэмдэглэсэн үйлчилгээ хэвээр хадгалагдана. Дараа нь сүлжээнээс өдөр бүрийг гараар засаж болно.</div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="closeModal();autoPlanAll(true)">Үүсгэх</button>`);
+}
+// Тухайн өдөр эзэлсэн өрөөнүүд: [{roomNum, bk, room}]
+function roomsOccupiedOn(date){
+  const out=[];
+  S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>{
+    const nums=effectiveRoomsForDate(bk,date);
+    nums.forEach(n=>{const room=bk.rooms.find(r=>+r.num===+n);if(room)out.push({roomNum:+n,bk,room});});
+  });
+  return out.sort((a,b)=>a.roomNum-b.roomNum);
+}
+function setRoomCell(bkId,date,roomNum,cat,svc){
+  const bk=S.bookings.find(b=>b.id===bkId);if(!bk)return;ensurePlan(bk);
+  const cell=bk.msgPlan[date]?.[roomNum]?.[cat];if(!cell)return;
+  if(cell.done){toast('Хийсэн үйлчилгээг өөрчлөхийн тулд эхлээд ✓-г авна уу','err');renderMassage();return;}
+  cell.svc=svc;save();renderMassage();
+}
+function toggleRoomDone(bkId,date,roomNum,cat,checked){
+  const bk=S.bookings.find(b=>b.id===bkId);if(!bk)return;ensurePlan(bk);
+  const room=bk.rooms.find(r=>+r.num===+roomNum);const cell=bk.msgPlan[date]?.[roomNum]?.[cat];if(!cell||!room)return;
+  const cc=roomCats(room,date);const svc=svcById(cell.svc);
+  const key='msg:'+bkId+':'+date+':'+roomNum+':'+cat;
+  bk.extras=bk.extras||[];cell.done=checked;
+  if(checked && !cell.time){ const n=new Date(); cell.time=pad(n.getHours())+':'+pad(n.getMinutes()); }
+  // Барианы бараа материал (норм) — хэрэглэхэд хасагдана
+  const cnt0=cc[cat]||1;
+  if(checked){
+    if(cell.svc!=='rest'&&svc&&!cell.stockTaken){
+      (svc.norms||[]).forEach(n=>{
+        const p=S.products.find(x=>x.id===n.productId);if(!p)return;
+        const q=(n.qty||0)*cnt0; if(q<=0)return;
+        p.stock-=q; logMove(p.id,-q,'massage',{who:svc.name+' (№'+roomNum+')',note:'Барианы хэрэглээ'});
+      });
+      cell.stockTaken=true;
+    }
+  }else if(cell.stockTaken){
+    (svc?(svc.norms||[]):[]).forEach(n=>{
+      const p=S.products.find(x=>x.id===n.productId);if(!p)return;
+      const q=(n.qty||0)*cnt0; if(q<=0)return;
+      p.stock+=q; logMove(p.id,q,'massage',{who:svc.name+' (№'+roomNum+')',note:'Барианы хэрэглээ буцаалт'});
+    });
+    cell.stockTaken=false;
+  }
+  if(checked){
+    if(cell.svc!=='rest'&&svc&&svc.billable&&!cell.billed){
+      const cnt=cc[cat]||1;
+      bk.extras.push({name:svc.name+' (№'+roomNum+' '+catLabel(cat)+(cnt>1?' ×'+cnt:'')+')',price:(svc.price||0)*cnt,qty:1,_msgKey:key});
+      cell.billed=true;
+    }
+  }else{bk.extras=bk.extras.filter(e=>e._msgKey!==key);cell.billed=false;}
+  save();renderMassage();
+}
+function setCellTime(bkId,date,roomNum,cat,val){
+  const bk=S.bookings.find(b=>b.id===bkId);if(!bk)return;
+  const cell=bk.msgPlan[date]?.[roomNum]?.[cat];if(!cell)return;
+  cell.time=val;save();renderMassage();
+}
+function setDayStatus(date,st){S.msgDayStatus=S.msgDayStatus||{};S.msgDayStatus[date]=st;save();renderMassage();}
+function dayStatusOf(date){return (S.msgDayStatus&&S.msgDayStatus[date])||'normal';}
+const DAYSTATUS=[['normal','Хэвийн'],['off','Бариач амарсан'],['closed','Боломжгүй өдөр']];
+
+// Өдрийн статистик (бүх өрөө)
+function dayStats(date){
+  ensureAllPlans(false);
+  let adult=0,child=0,water=0,services=0,mins=0,total=0,done=0;
+  roomsOccupiedOn(date).forEach(({bk,room,roomNum})=>{
+    const cc=roomCats(room,date);const cells=bk.msgPlan[date]?.[roomNum];if(!cells)return;
+    ['adult','child','water'].forEach(cat=>{
+      const c=cells[cat];if(!c)return;const cnt=cc[cat]||0;
+      if(c.svc!=='rest'&&cnt>0){total++;services++;const svc=svcById(c.svc);mins+=(svc?svc.mins:0)*cnt;if(c.done)done++;}
+    });
+    adult+=cc.adult;child+=cc.child;water+=cc.water;
+  });
+  return {adult,child,water,services,mins,total,done};
+}
+function planUndoneCount(){
+  const today=todayStr();let n=0;
+  S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>{ensurePlan(bk);
+    Object.keys(bk.msgPlan).forEach(d=>{
+      const off=dayStatusOf(d)!=='normal';
+      Object.keys(bk.msgPlan[d]).forEach(rn=>{
+        ['adult','child','water'].forEach(cat=>{
+          const c=bk.msgPlan[d][rn][cat];
+          if(c&&c.svc!=='rest'&&!c.done&&(d<today||off))n++;
+        });
+      });
+    });
+  });
+  return n;
+}
+function redistributeUndone(){
+  const today=todayStr();let moved=0;
+  S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>{ensurePlan(bk);
+    bk.rooms.forEach(r=>{
+      const rn=r.num;const ci=rCheckIn(bk,r),n=rNights(bk,r);
+      const days=[];for(let i=0;i<n;i++)days.push(addDays(ci,i));
+      ['adult','child','water'].forEach(cat=>{
+        days.forEach(d=>{
+          const off=dayStatusOf(d)!=='normal';
+          const c=bk.msgPlan[d]?.[rn]?.[cat];
+          if(c&&c.svc!=='rest'&&!c.done&&(d<today||off)){
+            const target=days.find(fd=>fd>=today&&fd>d&&dayStatusOf(fd)==='normal'&&bk.msgPlan[fd]?.[rn]?.[cat]&&bk.msgPlan[fd][rn][cat].svc==='rest'&&!bk.msgPlan[fd][rn][cat].done);
+            if(target){bk.msgPlan[target][rn][cat]={svc:c.svc,done:false,billed:false};bk.msgPlan[d][rn][cat]={svc:'rest',done:false,billed:false};moved++;}
+          }
+        });
+      });
+    });
+  });
+  save();renderAll();toast(moved?moved+' үйлчилгээ үлдсэн өдрүүдэд шилжлээ ✓':'Шилжүүлэх боломжтой өдөр олдсонгүй',moved?'ok':'err');
+}
+
+function renderMassageDay(){
+  if(!msgDate) msgDate=todayStr();
+  const d=parseD(msgDate);
+  const el=document.getElementById('msgDayLbl');
+  if(el) el.textContent=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' ('+WK[d.getDay()]+')';
+}
+document.getElementById('prevD').onclick=()=>{msgDate=addDays(msgDate,-1);renderMassage();};
+document.getElementById('nextD').onclick=()=>{msgDate=addDays(msgDate,1);renderMassage();};
+document.getElementById('todayD').onclick=()=>{msgDate=todayStr();renderMassage();};
+function selectMsgDay(d){msgDate=d;if(!msgCalYM)msgCalYM=d.slice(0,7);renderMassage();}
+
+function svcSelectOpts(sel){
+  return `<option value="rest" ${sel==='rest'?'selected':''}>— Амралт —</option>`+
+    S.massageServices.map(s=>`<option value="${s.id}" ${s.id===sel?'selected':''}>${s.name}</option>`).join('');
+}
+function renderMassageSummary(){
+  renderMassageDay();
+  const box=document.getElementById('msgDaySummary');if(!box)return;
+  const st2=dayStats(msgDate);
+  const hh=Math.floor(st2.mins/60),mm=st2.mins%60;
+  const undone=planUndoneCount();
+  const st=dayStatusOf(msgDate);
+  box.innerHTML=`
+    <div class="msum">
+      <div class="card"><div class="v">${st2.adult}</div><div class="l">Том хүн</div></div>
+      <div class="card"><div class="v">${st2.child}</div><div class="l">Хүүхэд</div></div>
+      <div class="card"><div class="v">${st2.water}</div><div class="l">Усанд оруулах</div></div>
+      <div class="card"><div class="v">${st2.done}/${st2.total}</div><div class="l">Үйлчилгээ (хийсэн/нийт)</div></div>
+      <div class="card time"><div class="v">${hh}ц ${mm}м</div><div class="l">Бариачийн цаг</div></div>
+    </div>
+    <div class="row" style="align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+      <label class="field" style="margin:0">Өдрийн төлөв</label>
+      <select style="width:auto" onchange="setDayStatus('${msgDate}',this.value)">${DAYSTATUS.map(s=>`<option value="${s[0]}" ${s[0]===st?'selected':''}>${s[1]}</option>`).join('')}</select>
+    </div>
+    ${undone?`<div class="rcard warn" style="border:1px solid #f0d9a8;border-radius:12px;padding:12px 15px;background:#fdf7ec">
+      <div style="font-size:13.5px;margin-bottom:8px">⚠️ ${undone} хийгдээгүй/боломжгүй үйлчилгээ байна.</div>
+      <button class="btn btn-berry btn-sm" onclick="redistributeUndone()">↻ Үлдсэн өдрүүдэд багтаах</button>
+    </div>`:''}`;
+}
+// Гол сүлжээ: мөр = өрөө, багана = 3 ангилал
+function renderMassageGrid(){
+  const box=document.getElementById('msgRoomGrid');if(!box)return;
+  const off=dayStatusOf(msgDate)!=='normal';
+  const rooms=roomsOccupiedOn(msgDate);
+  if(!rooms.length){box.innerHTML='<div class="empty">Энэ өдөр буудаллаж буй зочин алга.</div>';return;}
+  rooms.forEach(({bk})=>ensurePlan(bk));
+  const rowHtml=rooms.map(({roomNum,bk,room})=>{
+    const cc=roomCats(room,msgDate);const cells=bk.msgPlan[msgDate][roomNum];
+    const cellHtml=(cat)=>{
+      const c=cells[cat];const cnt=cc[cat]||0;
+      if(cnt<=0)return `<td><div class="cellwrap na">—</div></td>`;
+      const svc=svcById(c.svc);
+      const dur = (c.svc!=='rest'&&svc&&!svc.ageBased&&svc.mins) ? svc.mins+'м' : '';
+      const timeInput = c.svc!=='rest'
+        ? `<input type="time" class="cst" value="${c.time||''}" title="Эхлэх цаг" onchange="setCellTime('${bk.id}','${msgDate}',${roomNum},'${cat}',this.value)">`
+        : '';
+      return `<td class="${c.done?'cell-done':''}"><div class="cellwrap">
+        <span class="cnt">${cnt}</span>
+        <select onchange="setRoomCell('${bk.id}','${msgDate}',${roomNum},'${cat}',this.value)" ${c.done?'disabled':''}>${svcSelectOpts(c.svc)}</select>
+        ${timeInput}
+        <input type="checkbox" class="dchk ${c.done?'is-done':''}" ${c.done?'checked':''} title="Хийсэн" onchange="toggleRoomDone('${bk.id}','${msgDate}',${roomNum},'${cat}',this.checked)">
+      </div>${dur?`<div class="cdur">${dur}</div>`:''}</td>`;
+    };
+    return `<tr class="${off?'offday':''}">
+      <td class="dayc">№${roomNum}<div style="font-size:10.5px;color:var(--muted);font-weight:400">${bk.name||bk.phone}</div></td>
+      ${cellHtml('adult')}${cellHtml('child')}${cellHtml('water')}
+    </tr>`;
+  }).join('');
+  box.innerHTML=`<div style="overflow-x:auto"><table class="ptbl2">
+    <thead><tr><th>Өрөө</th><th class="adult">Том хүн</th><th class="child">Хүүхэд</th><th class="water">Усанд оруулах</th></tr></thead>
+    <tbody>${rowHtml}</tbody></table></div>`;
+}
+// Доод бяцхан календарь: өдөр бүрийн хийсэн/нийт
+let msgCalYM=null;
+function msgDayCounts(date){
+  let total=0,done=0;
+  roomsOccupiedOn(date).forEach(({bk,room,roomNum})=>{
+    const cc=roomCats(room,date);const cells=bk.msgPlan?.[date]?.[roomNum];if(!cells)return;
+    ['adult','child','water'].forEach(cat=>{const c=cells[cat];if(c&&c.svc!=='rest'&&(cc[cat]||0)>0){total++;if(c.done)done++;}});
+  });
+  return {total,done};
+}
+function renderMassageMiniCal(){
+  const box=document.getElementById('msgMiniCal');if(!box)return;
+  ensureAllPlans(false);
+  if(!msgCalYM) msgCalYM=(msgDate||todayStr()).slice(0,7);
+  const [y,m]=msgCalYM.split('-').map(Number);
+  const first=new Date(y,m-1,1),start=(first.getDay()+6)%7,dim=new Date(y,m,0).getDate();
+  const today=todayStr();
+  let cells='';
+  for(let i=0;i<start;i++)cells+='<div class="mc-empty"></div>';
+  for(let dd=1;dd<=dim;dd++){
+    const ds=y+'-'+pad(m)+'-'+pad(dd);
+    const {total,done}=msgDayCounts(ds);
+    const off=dayStatusOf(ds)!=='normal';
+    let cls='mc-day';
+    if(ds===msgDate)cls+=' sel';
+    if(ds===today)cls+=' today';
+    let badge='';
+    if(total>0){
+      const allDone=done>=total, pastUndone=ds<today&&done<total;
+      const bcls=allDone?'mc-done':pastUndone?'mc-undone':'mc-part';
+      badge=`<span class="mc-b ${bcls}">${done}/${total}</span>`;
+    }
+    cells+=`<div class="${cls} ${off?'mc-off':''}" onclick="selectMsgDay('${ds}')"><span class="mc-n">${dd}</span>${badge}</div>`;
+  }
+  box.innerHTML=`
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
+      <button class="btn-icon" onclick="msgCalStep(-1)">‹</button>
+      <b style="font-size:14px">${y} оны ${m}-р сар</b>
+      <button class="btn-icon" onclick="msgCalStep(1)">›</button>
+    </div>
+    <div class="mc-grid">${['Да','Мя','Лх','Пү','Ба','Бя','Ня'].map(w=>`<div class="mc-w">${w}</div>`).join('')}${cells}</div>
+    <div class="row" style="gap:12px;margin-top:8px;font-size:11px;color:var(--muted);flex-wrap:wrap">
+      <span><i class="dot" style="background:var(--green)"></i> Бүрэн хийсэн</span>
+      <span><i class="dot" style="background:var(--amber)"></i> Дутуу</span>
+      <span><i class="dot" style="background:var(--red)"></i> Хугацаа хэтэрсэн</span>
+    </div>`;
+}
+function msgCalStep(d){const [y,m]=msgCalYM.split('-').map(Number);const nd=new Date(y,m-1+d,1);msgCalYM=nd.getFullYear()+'-'+pad(nd.getMonth()+1);renderMassageMiniCal();}
+
+function renderMassage(){
+  renderMassageSummary();
+  renderMassageGrid();
+  renderMassageMiniCal();
+}
+
+/* ============================================================ INVENTORY (Хөргөгчний бараа) */
+function stockStatus(p){
+  if(p.stock<=0) return {cls:'canc', txt:'Дууссан'};
+  if(p.stock<=(p.minStock||5)) return {cls:'pend', txt:'Бага'};
+  return {cls:'conf', txt:'Хангалттай'};
+}
+
+/* ---- Inventory management ---- */
+const PGROUPS=[['goods','Зарах бараа (хөргөгч)'],['food','Хоолны материал'],['house','Ахуйн хэрэглээ'],['build','Барилгын материал'],['massage','Барианы бараа'],['service','Нэмэлт үйлчилгээ']];
+function pGroupLabel(g){const f=PGROUPS.find(x=>x[0]===(g||'goods'));return f?f[1]:g;}
+function productForm(p){
+  const g=p?(p.group||'goods'):'goods';
+  return `<div class="form-grid">
+    <div style="grid-column:1/-1"><label class="field">Бүлэг *</label>
+      <select id="p_group">
+        ${PGROUPS.map(x=>`<option value="${x[0]}" ${g===x[0]?'selected':''}>${x[1]}</option>`).join('')}
+      </select></div>
+    <div style="grid-column:1/-1"><label class="field">Барааны нэр *</label><input id="p_name" value="${p?p.name:''}" placeholder="ж: Ус 0.5л / Тансаг цэвэрлэгээ"></div>
+    <div><label class="field">Ангилал</label><input id="p_cat" value="${p?p.category||'':''}" placeholder="ж: Ундаа"></div>
+    <div><label class="field">Нэгж</label><input id="p_unit" value="${p?p.unit||'ш':'ш'}"></div>
+    <div><label class="field">Өртөг (₮)</label><input id="p_cost" type="number" min="0" value="${p?p.cost:''}"></div>
+    <div><label class="field">Зарах үнэ (₮) *</label><input id="p_price" type="number" min="0" value="${p?p.price:''}"></div>
+    <div><label class="field">Үлдэгдэл *</label><input id="p_stock" type="number" min="0" value="${p?p.stock:''}"></div>
+    <div><label class="field">Доод хязгаар</label><input id="p_min" type="number" min="0" value="${p?(p.minStock??5):5}"></div>
+  </div>`;
+}
+function openProductModal(id){
+  const p=id?S.products.find(x=>x.id===id):null;
+  openModal(p?'Бараа засах':'Шинэ бараа', productForm(p),
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="saveProduct('${id||''}')">Хадгалах</button>`);
+}
+function logMove(productId,qty,type,opts){
+  opts=opts||{};
+  const p=S.products.find(x=>x.id===productId);
+  S.stockMoves.push({id:uid('mv'),productId,qty,type,date:opts.date||todayStr(),who:opts.who||'',note:opts.note||'',
+    name:opts.name||(p?p.name:''),unitPrice:opts.unitPrice!=null?opts.unitPrice:(p?p.price:0),ts:new Date().toISOString()});
+}
+function saveProduct(id){
+  const name=document.getElementById('p_name').value.trim();
+  const price=+document.getElementById('p_price').value;
+  if(!name){toast('Барааны нэр оруулна уу','err');return;}
+  if(!price||price<0){toast('Зарах үнэ оруулна уу','err');return;}
+  const data={group:document.getElementById('p_group').value,name,category:document.getElementById('p_cat').value.trim()||'Бусад',unit:document.getElementById('p_unit').value.trim()||'ш',
+    cost:+document.getElementById('p_cost').value||0,price,stock:+document.getElementById('p_stock').value||0,minStock:+document.getElementById('p_min').value||0};
+  if(id){Object.assign(S.products.find(x=>x.id===id),data);toast('Шинэчлэгдлээ','ok');}
+  else{const np={id:uid('p'),...data};S.products.push(np);if(np.stock>0)logMove(np.id,np.stock,'init',{note:'Эхний үлдэгдэл'});toast('Нэмэгдлээ','ok');}
+  save();closeModal();renderAll();
+}
+function restockProduct(id){
+  const p=S.products.find(x=>x.id===id);
+  openModal('Нөхөн дүүргэх — '+p.name,
+    `<label class="field">Нэмэх тоо хэмжээ</label><input id="r_add" type="number" min="1" placeholder="0"><div class="hint">Одоогийн үлдэгдэл: ${p.stock} ${p.unit}</div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button><button class="btn btn-green" onclick="confirmRestockProduct('${id}')">Нэмэх</button>`);
+}
+function confirmRestockProduct(id){
+  const add=+document.getElementById('r_add').value;
+  if(!add||add<=0){toast('Тоо хэмжээ оруулна уу','err');return;}
+  S.products.find(x=>x.id===id).stock+=add;
+  logMove(id,add,'restock',{note:'Нөхөн дүүргэлт'});
+  save();closeModal();renderAll();toast('Үлдэгдэл нэмэгдлээ','ok');
+}
+function deleteProduct(id){
+  const p=S.products.find(x=>x.id===id);
+  openModal('Устгах уу?',`<p style="font-size:14px"><b>${p.name}</b> барааг устгах уу?</p>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button><button class="btn btn-berry" onclick="confirmDelProduct('${id}')">Устгах</button>`);
+}
+function confirmDelProduct(id){
+  S.products=S.products.filter(x=>x.id!==id);
+  save();closeModal();renderAll();toast('Устгагдлаа');
+}
+function seedProducts(){
+  const samples=[
+    ['Ус 0.5л','Ундаа','ш',500,1500,40,10,'goods'],['Кока кола 0.5л','Ундаа','ш',1500,3000,24,8,'goods'],
+    ['Жүүс','Ундаа','ш',1200,2500,18,6,'goods'],['Чипс','Идээ','ш',1800,3500,15,5,'goods'],['Шоколад','Идээ','ш',2000,4000,20,6,'goods'],
+    ['Ор нэмэлт даавуу','Үйлчилгээ','ш',10000,10000,10,3,'service'],['Массажны тос (baby oil)','Үйлчилгээ','ш',8000,15000,10,3,'service']
+  ];
+  samples.forEach(s=>S.products.push({id:uid('p'),name:s[0],category:s[1],unit:s[2],cost:s[3],price:s[4],stock:s[5],minStock:s[6],group:s[7]}));
+  save();renderAll();toast('Жишээ бараа нэмэгдлээ','ok');
+}
+/* ---- Дотоод хэрэглээ (ажилчид/гэр бүл) ---- */
+let iuDraft=null,iuRange=null;
+function openInternalUse(){
+  const goods=S.products.filter(p=>(p.group||'goods')!=='service');
+  if(!goods.length){toast('Эхлээд бараа бүртгэнэ үү','err');return;}
+  iuDraft={productId:goods[0].id,qty:1,who:''};
+  iuRange=monthRange(0);
+  renderInternalUse();
+}
+function setIuRange(kind){
+  if(kind==='month')iuRange=monthRange(0);
+  else if(kind==='last')iuRange=monthRange(-1);
+  else iuRange={from:'2000-01-01',to:'2099-12-31'};
+  renderInternalUse();
+}
+function moveValue(m){const up=(m.unitPrice!=null?m.unitPrice:(S.products.find(p=>p.id===m.productId)?.price||0));return up*(-m.qty);}
+function internalSummaryHtml(){
+  if(!iuRange)iuRange=monthRange(0);
+  const moves=S.stockMoves.filter(m=>m.type==='internal'&&m.date>=iuRange.from&&m.date<=iuRange.to);
+  const byWho={};
+  moves.forEach(m=>{const who=m.who||'Тодорхойгүй';byWho[who]=byWho[who]||{qty:0,val:0};byWho[who].qty+=-m.qty;byWho[who].val+=moveValue(m);});
+  const whoRows=Object.entries(byWho).sort((a,b)=>b[1].val-a[1].val);
+  const total=whoRows.reduce((s,[,d])=>s+d.val,0);
+  const isAll=iuRange.from==='2000-01-01';
+  const detail=moves.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,12);
+  return `<div style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px">
+    <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <h4 style="font-size:14px;color:var(--navy);margin:0">Хэн авсан — цалингаас суутгах</h4>
+      <div class="row" style="gap:5px">
+        <button class="btn ${(!isAll&&iuRange.from===monthRange(0).from)?'btn-primary':'btn-ghost'} btn-sm" onclick="setIuRange('month')">Энэ сар</button>
+        <button class="btn ${(!isAll&&iuRange.from===monthRange(-1).from)?'btn-primary':'btn-ghost'} btn-sm" onclick="setIuRange('last')">Өнгөрсөн сар</button>
+        <button class="btn ${isAll?'btn-primary':'btn-ghost'} btn-sm" onclick="setIuRange('all')">Бүх цаг</button>
+      </div>
+    </div>
+    ${whoRows.length?`<div style="overflow-x:auto"><table class="ptbl"><thead><tr><th>Хэн</th><th>Тоо</th><th>Суутгах дүн</th></tr></thead><tbody>${
+      whoRows.map(([who,d])=>`<tr><td><b>${who}</b></td><td>${d.qty}</td><td><b style="color:var(--berry)">${money(d.val)}</b></td></tr>`).join('')
+    }<tr style="border-top:2px solid var(--line)"><td><b>Нийт</b></td><td><b>${whoRows.reduce((s,[,d])=>s+d.qty,0)}</b></td><td><b>${money(total)}</b></td></tr></tbody></table></div>
+    ${detail.length?`<div class="hint" style="margin-top:10px;margin-bottom:4px">Сүүлийн бүртгэлүүд:</div><div style="overflow-x:auto"><table class="ptbl"><thead><tr><th>Огноо</th><th>Хэн</th><th>Бараа</th><th>Тоо</th><th>Дүн</th><th></th></tr></thead><tbody>${
+      detail.map(m=>`<tr><td style="white-space:nowrap">${m.date}</td><td>${m.who||'—'}</td><td>${m.name||(S.products.find(p=>p.id===m.productId)?.name||'—')}</td><td>${-m.qty}</td><td>${money(moveValue(m))}</td>
+        <td><div class="row" style="gap:4px"><button class="btn-icon" title="Засах" onclick="editInternalMove('${m.id}')">✎</button><button class="btn-icon" title="Устгах" onclick="delInternalMove('${m.id}')">🗑</button></div></td></tr>`).join('')
+    }</tbody></table></div>`:''}`
+    :'<div class="hint" style="padding:6px 0">Энэ хугацаанд бүртгэл алга.</div>'}
+  </div>`;
+}
+function renderInternalUse(){
+  const p=S.products.find(x=>x.id===iuDraft.productId);
+  const opts=S.products.filter(x=>(x.group||'goods')!=='service').map(x=>`<option value="${x.id}" ${x.id===iuDraft.productId?'selected':''}>${x.name} · үлдэгдэл ${x.stock}</option>`).join('');
+  const max=p?p.stock:0;
+  if(iuDraft.qty>max)iuDraft.qty=Math.max(1,max);
+  openModal('🏠 Дотоод хэрэглээ (ажилтан/гэр бүл)',
+    `<div class="hint" style="margin-bottom:10px">Зарагдаагүй, дотоод хүн (хөвгүүд, ажилчид) авсан барааг бүртгэнэ. Агуулахаас хасагдана.</div>
+     <label class="field">Бараа</label>
+     <select onchange="iuDraft.productId=this.value;iuDraft.qty=1;renderInternalUse()">${opts}</select>
+     <div style="margin-top:12px;display:flex;align-items:center;gap:10px">
+       <label class="field" style="margin-bottom:0">Тоо ширхэг</label>
+       <div class="qty" style="gap:8px"><button class="btn-icon" onclick="iuChangeQty(-1)">−</button><span style="min-width:26px;text-align:center;font-weight:700">${iuDraft.qty}</span><button class="btn-icon" onclick="iuChangeQty(1)">+</button></div>
+       ${max<=0?'<span style="color:var(--red);font-size:12.5px">Үлдэгдэл дууссан</span>':''}
+     </div>
+     <div style="margin-top:12px"><label class="field">Хэн авсан бэ?</label><input id="iu_who" value="${iuDraft.who||''}" placeholder="ж: Ажилтан Болд / гэр бүл" onchange="iuDraft.who=this.value"></div>
+     <div style="margin-top:12px"><button class="btn btn-primary btn-sm" ${max<=0?'disabled':''} onclick="confirmInternalUse()">+ Бүртгэх</button></div>
+     ${internalSummaryHtml()}`,
+    `<button class="btn btn-primary" onclick="closeModal()">Хаах</button>`);
+}
+function iuChangeQty(d){const p=S.products.find(x=>x.id===iuDraft.productId);const max=p?p.stock:0;const nv=iuDraft.qty+d;if(nv<1||nv>max)return;iuDraft.qty=nv;renderInternalUse();}
+function editInternalMove(id){
+  const m=S.stockMoves.find(x=>x.id===id);if(!m)return;
+  const p=S.products.find(x=>x.id===m.productId);
+  const curAbs=-m.qty;
+  openModal('Дотоод хэрэглээ засах',
+    `<div class="hint" style="margin-bottom:10px">${m.name||(p?p.name:'')}${p?' · одоогийн үлдэгдэл '+p.stock:''}</div>
+     <div class="form-grid">
+       <div><label class="field">Огноо</label><input id="ie_date" type="date" value="${m.date}"></div>
+       <div><label class="field">Тоо ширхэг</label><input id="ie_qty" type="number" min="1" value="${curAbs}"></div>
+     </div>
+     <div style="margin-top:12px"><label class="field">Хэн авсан</label><input id="ie_who" value="${m.who||''}"></div>`,
+    `<button class="btn btn-berry btn-sm" onclick="delInternalMove('${id}')">Устгах</button>
+     <button class="btn btn-ghost" onclick="renderInternalUse()">Болих</button>
+     <button class="btn btn-primary" onclick="saveInternalMove('${id}')">Хадгалах</button>`);
+}
+function saveInternalMove(id){
+  const m=S.stockMoves.find(x=>x.id===id);if(!m)return;
+  const p=S.products.find(x=>x.id===m.productId);
+  const newAbs=parseInt(document.getElementById('ie_qty').value)||0;
+  const who=(document.getElementById('ie_who').value||'').trim();
+  const dt=document.getElementById('ie_date').value;
+  if(newAbs<1){toast('Тоо ширхэг буруу','err');return;}
+  if(!dt){toast('Огноо оруулна уу','err');return;}
+  const oldAbs=-m.qty;
+  const delta=oldAbs-newAbs; // агуулахад буцаах/нэмэх зөрүү
+  if(p){ if(p.stock+delta<0){toast('Үлдэгдэл хүрэлцэхгүй','err');return;} p.stock+=delta; }
+  m.qty=-newAbs; m.who=who||'Тодорхойгүй'; m.date=dt;
+  save();renderInventory();renderInternalUse();toast('Засагдлаа ✓','ok');
+}
+function delInternalMove(id){
+  const m=S.stockMoves.find(x=>x.id===id);if(!m)return;
+  const p=S.products.find(x=>x.id===m.productId);
+  if(p) p.stock += (-m.qty); // хэрэглээг цуцалж үлдэгдлийг сэргээнэ
+  S.stockMoves=S.stockMoves.filter(x=>x.id!==id);
+  save();renderInventory();renderInternalUse();toast('Устгагдлаа · үлдэгдэл сэргэлээ','ok');
+}
+function confirmInternalUse(){
+  const p=S.products.find(x=>x.id===iuDraft.productId);
+  const who=(document.getElementById('iu_who').value||'').trim();
+  if(iuDraft.qty<1||iuDraft.qty>p.stock){toast('Үлдэгдэл хүрэлцэхгүй','err');return;}
+  p.stock-=iuDraft.qty;
+  logMove(p.id,-iuDraft.qty,'internal',{who:who||'Тодорхойгүй',note:'Дотоод хэрэглээ'});
+  save();
+  // цонхыг хаалгүй, шинэ мөрөнд бэлдэж, жагсаалтыг шинэчилнэ
+  iuDraft={productId:iuDraft.productId,qty:1,who:who};
+  renderInternalUse();renderInventory();
+  toast('Бүртгэгдлээ ✓ · '+who,'ok');
+}
+
+/* ---- Тулгалт (stock-take) ---- */
+function lastStockTake(){return S.stockTakes.length?S.stockTakes[S.stockTakes.length-1]:null;}
+function movesSince(productId,fromDate){
+  return S.stockMoves.filter(m=>m.productId===productId && (!fromDate || m.date>=fromDate));
+}
+function moveSummary(productId,fromDate){
+  const ms=movesSince(productId,fromDate);
+  let inQty=0,guest=0,internal=0,adjust=0,used=0;
+  ms.forEach(m=>{
+    if(m.qty>0) inQty+=m.qty;
+    else if(m.type==='guest') guest+=-m.qty;
+    else if(m.type==='internal') internal+=-m.qty;
+    else if(m.type==='massage'||m.type==='kitchen') used+=-m.qty;
+    else if(m.type==='adjust') adjust+=m.qty;
+  });
+  return{inQty,guest,internal,adjust,used};
+}
+function renderStockTakeInfo(){
+  const el=document.getElementById('stockTakeInfo');if(!el)return;
+  const lt=lastStockTake();
+  if(!lt){el.innerHTML=`<div class="rcard" style="margin-bottom:14px;border:1px solid var(--line);border-radius:12px;padding:12px 15px;background:var(--card)"><div class="rt" style="font-size:12px;font-weight:700;color:var(--muted)">🧾 Тулгалт</div><div class="rv" style="font-size:14px;margin-top:4px">Тулгалт хараахан хийгээгүй байна. 15 хоног тутам бодит үлдэгдлээ тоолж тулгаж байхыг зөвлөж байна.</div></div>`;return;}
+  const days=daysBetween(lt.date,todayStr());
+  const overdue=days>=15;
+  el.innerHTML=`<div class="rcard" style="margin-bottom:14px;border:1px solid ${overdue?'#f0d9a8':'var(--line)'};border-radius:12px;padding:12px 15px;background:${overdue?'#fdf7ec':'var(--card)'}">
+    <div class="rt" style="font-size:12px;font-weight:700;color:${overdue?'var(--amber)':'var(--muted)'}">🧾 Сүүлийн тулгалт</div>
+    <div class="rv" style="font-size:14px;margin-top:4px">${lt.date} (${days} хоногийн өмнө)${overdue?' · <b>15 хоног өнгөрсөн, дахин тулгах цаг болжээ</b>':''}</div>
+  </div>`;
+}
+let stDraft=null;
+function openStockTake(){
+  if(!S.products.length){toast('Бараа бүртгэгдээгүй байна','err');return;}
+  const lt=lastStockTake();
+  const from=lt?lt.date:null;
+  stDraft={from,physical:{}};
+  S.products.forEach(p=>stDraft.physical[p.id]=p.stock); // анхдагч = систем дэх үлдэгдэл
+  renderStockTake();
+}
+function renderStockTake(){
+  const lt=lastStockTake();
+  const rows=S.products.map(p=>{
+    const sum=moveSummary(p.id,stDraft.from);
+    const phys=stDraft.physical[p.id];
+    const diff=phys-p.stock;
+    return `<tr>
+      <td><b>${p.name}</b></td>
+      <td style="color:var(--green)">+${sum.inQty}</td>
+      <td style="color:var(--berry)">−${sum.guest}</td>
+      <td style="color:#1c6ea4">−${sum.internal}</td>
+      <td style="color:var(--navy)">−${sum.used}</td>
+      <td><b>${p.stock}</b></td>
+      <td><input type="number" min="0" style="width:80px;padding:5px 7px" value="${phys}" onchange="stDraft.physical['${p.id}']=parseInt(this.value)||0;renderStockTake()"></td>
+      <td style="font-weight:700;color:${diff===0?'var(--green)':'var(--red)'}">${diff===0?'0':(diff>0?'+':'')+diff}</td>
+    </tr>`;
+  }).join('');
+  openModal('🧾 Тулгалт'+(stDraft.from?' (сүүлийн тулгалт '+stDraft.from+'-с хойш)':''),
+    `<div class="hint" style="margin-bottom:10px">Бодит үлдэгдлээ тоолж бичнэ. Зөрүү = Бодит − Систем. Зөрүү гарвал бараа бүртгэлгүй гарсан (дутсан) гэсэн үг.</div>
+     <div style="overflow-x:auto"><table class="ptbl">
+       <thead><tr><th>Бараа</th><th title="Нөхсөн">+Нэмсэн</th><th title="Зочинд зарсан">−Зочин</th><th title="Дотоод хэрэглээ">−Дотоод</th><th title="Бариа/Хоолны хэрэглээ">−Хэрэглээ</th><th>Систем</th><th>Бодит</th><th>Зөрүү</th></tr></thead>
+       <tbody>${rows}</tbody>
+     </table></div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="confirmStockTake()">Тулгаж хаах</button>`);
+}
+function confirmStockTake(){
+  const lines=[];
+  S.products.forEach(p=>{
+    const phys=stDraft.physical[p.id]!=null?stDraft.physical[p.id]:p.stock;
+    const diff=phys-p.stock;
+    lines.push({productId:p.id,name:p.name,system:p.stock,physical:phys,diff});
+    if(diff!==0){ p.stock=phys; logMove(p.id,diff,'adjust',{note:'Тулгалтын зөрүү'}); }
+  });
+  S.stockTakes.push({id:uid('st'),date:todayStr(),from:stDraft.from,lines,ts:new Date().toISOString()});
+  stDraft=null;save();closeModal();renderAll();toast('Тулгалт хаагдлаа ✓','ok');
+}
+
+/* ---- Барааны хөдөлгөөний түүх ---- */
+function openMoves(id){
+  const p=S.products.find(x=>x.id===id);
+  const ms=S.stockMoves.filter(m=>m.productId===id).slice().reverse().slice(0,50);
+  const typeLbl={init:'Эхний үлдэгдэл',restock:'Нөхсөн',guest:'Зочин',internal:'Дотоод',massage:'Бариа',kitchen:'Хоол',adjust:'Тулгалт'};
+  const rows=ms.length?ms.map(m=>`<tr>
+      <td style="white-space:nowrap">${m.date}</td>
+      <td>${typeLbl[m.type]||m.type}</td>
+      <td style="font-weight:700;color:${m.qty>0?'var(--green)':'var(--red)'}">${m.qty>0?'+':''}${m.qty}</td>
+      <td style="font-size:12px;color:var(--muted)">${m.who||m.note||''}</td>
+    </tr>`).join('') : '<tr><td colspan="4" class="hint" style="padding:12px">Хөдөлгөөн алга</td></tr>';
+  openModal('Хөдөлгөөн — '+p.name,
+    `<div class="hint" style="margin-bottom:8px">Одоогийн үлдэгдэл: <b>${p.stock} ${p.unit}</b></div>
+     <div style="overflow-x:auto"><table class="ptbl"><thead><tr><th>Огноо</th><th>Төрөл</th><th>Тоо</th><th>Тайлбар</th></tr></thead><tbody>${rows}</tbody></table></div>`,
+    `<button class="btn btn-primary" onclick="closeModal()">Хаах</button>`);
+}
+
+let invGroupFilt='all';
+let stockDay=null;
+function renderInventory(){
+  const q=(document.getElementById('invSearch').value||'').toLowerCase();
+  const list=S.products.filter(p=>{
+    if(invGroupFilt!=='all'&&(p.group||'goods')!==invGroupFilt)return false;
+    return p.name.toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q);
+  });
+  const body=document.getElementById('invBody');
+  if(!list.length){body.innerHTML=`<tr><td colspan="8" class="hint" style="padding:14px">Бараа бүртгэгдээгүй байна.</td></tr>`;return;}
+  body.innerHTML=list.map(p=>{
+    const s=stockStatus(p);
+    const grp=(p.group||'goods')==='service'?'<span class="pill service">Үйлчилгээ</span>':`<span class="pill goods">${pGroupLabel(p.group)}</span>`;
+    return `<tr>
+      <td><b>${p.name}</b><div style="font-size:11px;color:var(--muted)">${p.unit}</div></td>
+      <td>${grp}</td>
+      <td>${p.category}</td><td>${money(p.cost)}</td><td>${money(p.price)}</td><td><b>${p.stock}</b></td>
+      <td><span class="pill ${s.cls}">${s.txt}</span></td>
+      <td><div class="row" style="gap:5px"><button class="btn-icon" title="Нөхөх" onclick="restockProduct('${p.id}')">➕</button>
+        <button class="btn-icon" title="Хөдөлгөөн харах" onclick="openMoves('${p.id}')">📜</button>
+        <button class="btn-icon" title="Засах" onclick="openProductModal('${p.id}')">✎</button>
+        <button class="btn-icon" title="Устгах" onclick="deleteProduct('${p.id}')">🗑</button></div></td>
+    </tr>`;
+  }).join('');
+  renderStockTakeInfo();
+  renderDailyStock();
+}
+function renderDailyStock(){
+  if(!stockDay) stockDay=todayStr();
+  const d=parseD(stockDay);
+  const lbl=document.getElementById('stockDayLbl'); if(lbl) lbl.textContent=stockDay+' ('+WK[d.getDay()]+')';
+  const box=document.getElementById('dailyStockBox'); if(!box) return;
+  if(!S.products.length){box.innerHTML='';return;}
+  const rows=S.products.map(p=>{
+    const closing = p.stock - S.stockMoves.filter(m=>m.productId===p.id && m.date>stockDay).reduce((s,m)=>s+m.qty,0);
+    const dayMv=S.stockMoves.filter(m=>m.productId===p.id && m.date===stockDay);
+    const dayNet=dayMv.reduce((s,m)=>s+m.qty,0);
+    const opening=closing-dayNet;
+    let inQ=0,guest=0,internal=0,adjust=0,used=0;
+    dayMv.forEach(m=>{ if(m.type==='restock'||m.type==='init')inQ+=m.qty; else if(m.type==='guest')guest+=-m.qty; else if(m.type==='internal')internal+=-m.qty; else if(m.type==='massage'||m.type==='kitchen')used+=-m.qty; else if(m.type==='adjust')adjust+=m.qty; });
+    return {p,opening,inQ,guest,internal,adjust,used,closing,has:dayMv.length>0};
+  });
+  const anyMove=rows.some(r=>r.has);
+  box.innerHTML=`<table class="ptbl"><thead><tr><th>Бараа</th><th>Эхэн</th><th>+Нэмсэн</th><th>−Зочин</th><th>−Дотоод</th><th>−Хэрэглээ</th><th>±Тохир.</th><th>Эцэс</th></tr></thead><tbody>${
+    rows.map(r=>`<tr style="${r.has?'':'opacity:.45'}">
+      <td><b>${r.p.name}</b></td>
+      <td>${r.opening}</td>
+      <td style="color:var(--green)">${r.inQ?'+'+r.inQ:'—'}</td>
+      <td style="color:var(--berry)">${r.guest?'−'+r.guest:'—'}</td>
+      <td style="color:#1c6ea4">${r.internal?'−'+r.internal:'—'}</td>
+      <td style="color:var(--navy)">${r.used?'−'+r.used:'—'}</td>
+      <td style="color:${r.adjust?'var(--red)':'inherit'}">${r.adjust?(r.adjust>0?'+':'')+r.adjust:'—'}</td>
+      <td><b>${r.closing}</b></td>
+    </tr>`).join('')
+  }</tbody></table>${anyMove?'':'<div class="hint" style="padding:8px 4px">Энэ өдөр хөдөлгөөн гараагүй байна.</div>'}`;
+}
+document.getElementById('invGroupFilt').querySelectorAll('button').forEach(b=>{
+  b.onclick=()=>{
+    document.getElementById('invGroupFilt').querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');invGroupFilt=b.dataset.g;renderInventory();
+  };
+});
+
+/* ============================================================ REPORT */
+function monthRange(offset){
+  const d=new Date();d.setMonth(d.getMonth()+offset);
+  const from=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-01';
+  const lastDay=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+  const to=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(lastDay);
+  return{from,to};
+}
+function setReportRange(kind){
+  let r;
+  if(kind==='month') r=monthRange(0);
+  else if(kind==='lastmonth') r=monthRange(-1);
+  else r={from:'2000-01-01',to:'2099-12-31'};
+  document.getElementById('rp_from').value=r.from;
+  document.getElementById('rp_to').value=r.to;
+  renderReport();
+}
+function buildReport(from,to){
+  const inRange=b=>b.checkIn>=from&&b.checkIn<=to;
+  const list=S.bookings.filter(inRange);
+  const active=list.filter(b=>b.status!=='cancelled');
+  const cancelled=list.filter(b=>b.status==='cancelled');
+  let grand=0,paid=0,balance=0,extrasRev=0,adultRev=0,childRev=0;
+  const roomAgg={},tierAgg={};
+  active.forEach(bk=>{
+    const t=bookingTotals(bk);
+    grand+=t.grand;paid+=t.paid;balance+=t.balance;extrasRev+=t.extras;
+    bk.rooms.forEach(r=>{
+      roomAgg[r.num]=roomAgg[r.num]||{nights:0,revenue:0,bookings:0};
+      roomAgg[r.num].bookings+=1;
+      for(let i=0;i<bk.nights;i++){
+        const date=addDays(bk.checkIn,i);
+        const pr=roomPricing(r,date); // тухайн шөнийн огнооны түүхэн үнэ
+        roomAgg[r.num].nights+=1;
+        roomAgg[r.num].revenue+=pr.total;
+        pr.lines.forEach(l=>{
+          const isChild=l.label.indexOf('Хүүхэд')===0;
+          if(isChild)childRev+=l.sum;else adultRev+=l.sum;
+        });
+      }
+      (r.children||[]).forEach(k=>{
+        if(k.adultPriced)return;
+        const tier=tierById(k.tierId);
+        const key=k.tierId||'unknown';
+        tierAgg[key]=tierAgg[key]||{name:tier?tier.name:'Тодорхойгүй',count:0,nights:0,revenue:0};
+        tierAgg[key].count+=1;
+        tierAgg[key].nights+=bk.nights;
+        tierAgg[key].revenue+=(tier?tier.price:0)*bk.nights;
+      });
+    });
+  });
+  let feeRev=0;
+  cancelled.forEach(b=>{if(b.cancelInfo)feeRev+=b.cancelInfo.fee||0;});
+  return{count:active.length,cancelledCount:cancelled.length,grand,paid,balance,extrasRev,adultRev,childRev,feeRev,roomAgg,tierAgg};
+}
+function renderReport(){
+  const fromEl=document.getElementById('rp_from'),toEl=document.getElementById('rp_to');
+  if(!fromEl.value||!toEl.value){const r=monthRange(0);fromEl.value=r.from;toEl.value=r.to;}
+  const from=fromEl.value,to=toEl.value;
+  const rp=buildReport(from,to);
+  document.getElementById('rpStats').innerHTML=`
+    <div class="card stat"><div class="label">Захиалга</div><div class="value">${rp.count}${rp.cancelledCount?' <span style="font-size:13px;color:var(--muted);font-weight:500">('+rp.cancelledCount+' цуцалсан)</span>':''}</div></div>
+    <div class="card stat"><div class="label">Нийт орлого</div><div class="value berry">${money(rp.grand)}</div></div>
+    <div class="card stat"><div class="label">Хүлээн авсан төлбөр</div><div class="value green">${money(rp.paid)}</div></div>
+    <div class="card stat"><div class="label">Үлдэгдэл</div><div class="value">${money(rp.balance)}</div></div>
+    <div class="card stat"><div class="label">Том хүний орлого</div><div class="value">${money(rp.adultRev)}</div></div>
+    <div class="card stat"><div class="label">Хүүхдийн орлого</div><div class="value">${money(rp.childRev)}</div></div>
+    <div class="card stat"><div class="label">Нэмэлт үйлчилгээ</div><div class="value">${money(rp.extrasRev)}</div></div>
+    <div class="card stat"><div class="label">Цуцлалтын торгууль</div><div class="value blue">${money(rp.feeRev)}</div></div>`;
+  const roomRows=Object.entries(rp.roomAgg).sort((a,b)=>a[0]-b[0]);
+  document.getElementById('rpRoomTbl').innerHTML = roomRows.length
+    ? `<thead><tr><th>Өрөө</th><th>Захиалга</th><th>Хоног</th><th>Орлого</th></tr></thead><tbody>${
+        roomRows.map(([num,d])=>`<tr><td>№${num}</td><td>${d.bookings}</td><td>${d.nights}</td><td>${money(d.revenue)}</td></tr>`).join('')
+      }</tbody>`
+    : `<tbody><tr><td class="hint" style="padding:10px 0">Энэ хугацаанд захиалга алга.</td></tr></tbody>`;
+  const tierRows=Object.values(rp.tierAgg).sort((a,b)=>b.revenue-a.revenue);
+  document.getElementById('rpKidTbl').innerHTML = tierRows.length
+    ? `<thead><tr><th>Ангилал</th><th>Хүүхэд</th><th>Нийт хоног</th><th>Орлого</th></tr></thead><tbody>${
+        tierRows.map(d=>`<tr><td>${d.name}</td><td>${d.count}</td><td>${d.nights}</td><td>${money(d.revenue)}</td></tr>`).join('')
+      }</tbody>`
+    : `<tbody><tr><td class="hint" style="padding:10px 0">Энэ хугацаанд хүүхэд бүртгэгдээгүй.</td></tr></tbody>`;
+}
+
+function renderAll(){renderReminders();renderCalendar();renderList();renderMassage();renderInventory();renderSettings();renderReport();}
+/* ============================================================ ☁️ СИНК (Firebase) */
+const SYNC_KEY='gt_sync_cfg_v1';
+let syncCfg=null, syncDB=null, syncRef=null, syncOn=false, syncPushT=null, syncApplying=false, syncStatus='off';
+function loadSyncCfg(){try{const r=localStorage.getItem(SYNC_KEY);syncCfg=r?JSON.parse(r):null;}catch(e){syncCfg=null;}return syncCfg;}
+function saveSyncCfg(c){syncCfg=c;try{localStorage.setItem(SYNC_KEY,JSON.stringify(c));}catch(e){}}
+function setSyncStatus(s){syncStatus=s;const el=document.getElementById('syncDot');if(el){
+  const map={off:['#9aa3ad','Унтраалттай'],connecting:['#e0a13c','Холбогдож байна…'],on:['#2e8b57','Холбогдсон ✓'],err:['#c0392b','Алдаа']};
+  const m=map[s]||map.off;el.innerHTML=`<i class="dot" style="background:${m[0]}"></i> <span style="font-size:12.5px;color:var(--muted)">${m[1]}</span>`;}}
+function syncInit(){
+  const c=loadSyncCfg();
+  if(!c||!c.enabled||!c.databaseURL){setSyncStatus('off');return;}
+  if(typeof firebase==='undefined'){setSyncStatus('err');return;}
+  try{
+    setSyncStatus('connecting');
+    if(!firebase.apps.length) firebase.initializeApp({apiKey:c.apiKey||'',authDomain:c.authDomain||'',databaseURL:c.databaseURL,projectId:c.projectId||''});
+    syncDB=firebase.database();
+    syncRef=syncDB.ref((c.path||'gt_system')+'/state');
+    syncOn=true;
+    syncRef.on('value',snap=>{
+      const v=snap.val();
+      if(!v||!v.data){ syncPush(true); return; }
+      const localRev=S._rev||0;
+      if((v._rev||0)>localRev){
+        try{
+          syncApplying=true;
+          S=JSON.parse(v.data);
+          try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+          renderAll();
+          toast('Шинэчлэгдлээ ☁️','ok');
+        }catch(e){}finally{syncApplying=false;}
+      }
+      setSyncStatus('on');
+    },err=>{setSyncStatus('err');});
+  }catch(e){setSyncStatus('err');}
+}
+function syncPush(force){
+  if(!syncOn||!syncRef||syncApplying)return;
+  clearTimeout(syncPushT);
+  syncPushT=setTimeout(()=>{
+    try{
+      S._rev=Date.now();
+      syncRef.set({_rev:S._rev,data:JSON.stringify(S),at:new Date().toISOString()});
+      try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+    }catch(e){setSyncStatus('err');}
+  },force?0:600);
+}
+function openSyncSetup(){
+  const c=loadSyncCfg()||{};
+  const url=c.databaseURL||'https://gurvan-tooroi-default-rtdb.firebaseio.com';
+  openModal('☁️ Синк тохиргоо',
+    `<div class="hint" style="margin-bottom:12px">Холбовол таны утас, компьютер, бариачийн утас бүгд <b>нэг өгөгдөлтэй</b> ажиллана.</div>
+     <label class="field">Өгөгдлийн сангийн хаяг (Firebase Realtime Database URL)</label>
+     <input id="sy_url" value="${url}" style="font-family:monospace;font-size:12px">
+     <div class="hint" style="margin-top:4px">Firebase консол → Realtime Database → дээд талд харагдах <b>https://...firebaseio.com</b> хаяг.</div>
+     <div style="margin-top:12px"><label class="field">Хадгалах хэсэг</label><input id="sy_path" value="${c.path||'gt_system'}">
+       <div class="hint" style="margin-top:4px">Хэвээр орхино уу. Энэ нь хуучин системүүдийн өгөгдлөөс тусдаа хадгална.</div></div>
+     <div class="row" style="align-items:center;gap:8px;margin-top:14px"><input type="checkbox" id="sy_on" ${c.enabled?'checked':''} style="width:18px;height:18px"><label for="sy_on" style="font-size:14px;font-weight:600">Синк идэвхжүүлэх</label></div>
+     <div class="hint" style="margin-top:12px">⚠️ Хамгийн сүүлд хадгалсан төхөөрөмжийн өгөгдөл давамгайлна.</div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="saveSyncSetup()">Хадгалж холбох</button>`);
+}
+function saveSyncSetup(){
+  const url=(document.getElementById('sy_url').value||'').trim();
+  const on=document.getElementById('sy_on').checked;
+  const path=(document.getElementById('sy_path').value||'gt_system').trim();
+  if(on&&!/^https:\/\/.+firebaseio\.com\/?$/.test(url)){toast('Хаяг буруу байна — https://...firebaseio.com байх ёстой','err');return;}
+  saveSyncCfg({databaseURL:url.replace(/\/$/,''),path,enabled:on});
+  closeModal();
+  toast(on?'Хадгаллаа · холбогдож байна…':'Синк унтраалаа','ok');
+  setTimeout(()=>location.reload(),700);
+}
+
+load();renderAll();
+loadSyncCfg();syncInit();setSyncStatus(syncStatus);
+</script>
+</body>
+</html>
