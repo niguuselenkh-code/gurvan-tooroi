@@ -1313,9 +1313,23 @@ function renderSettings(){
 
     <div class="card set-sec">
       <h3>☁️ Синк — олон төхөөрөмж</h3>
-      <div class="hint" style="margin-bottom:10px">Firebase-ээр холбовол таны утас, компьютер, бариачийн утас бүгд <b>нэг өгөгдөлтэй</b> ажиллана. Холбоогүй бол өгөгдөл зөвхөн энэ төхөөрөмжид хадгалагдана.</div>
+      <div class="hint" style="margin-bottom:10px">Бүх төхөөрөмж <b>нэг өгөгдөлтэй</b> ажиллана. Анхдагчаар шууд холбогдоно.</div>
       <div id="syncDot" style="margin-bottom:10px"><i class="dot" style="background:#9aa3ad"></i> <span style="font-size:12.5px;color:var(--muted)">Унтраалттай</span></div>
-      <button class="btn btn-primary btn-sm" onclick="openSyncSetup()">Синк тохируулах</button>
+      <div class="row" style="gap:6px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="openSyncSetup()">Тохируулах</button>
+        <button class="btn btn-ghost btn-sm" onclick="syncPushNow()">⬆ Одоо илгээх</button>
+        <button class="btn btn-ghost btn-sm" onclick="syncPullNow()">⬇ Үүлнээс татах</button>
+      </div>
+      <div class="hint" style="margin-top:8px">⬆ Илгээх = энэ төхөөрөмжийн өгөгдлийг үүлэнд тавина (бусад дээр очно). ⬇ Татах = үүлнээс авч энэ төхөөрөмжид тавина.</div>
+    </div>
+
+    <div class="card set-sec">
+      <h3>🔗 Бариачийн линк</h3>
+      <div class="hint" style="margin-bottom:10px">Энэ хаягийг бариачдаа явуулна. Нээхэд <b>зөвхөн Бариа таб</b> харагдана — захиалга, тайлан, тохиргоо харагдахгүй.</div>
+      <div class="row" style="gap:6px">
+        <input id="bariaLink" readonly value="${(typeof location!=='undefined'?location.origin+location.pathname:'')}?baria" style="flex:1;font-size:12px;font-family:monospace">
+        <button class="btn btn-primary btn-sm" onclick="copyBariaLink()">Хуулах</button>
+      </div>
     </div>
 
     <div class="card set-sec">
@@ -2198,11 +2212,16 @@ function renderReport(){
 function renderAll(){renderReminders();renderCalendar();renderList();renderMassage();renderInventory();renderSettings();renderReport();}
 /* ============================================================ ☁️ СИНК (Firebase) */
 const SYNC_KEY='gt_sync_cfg_v1';
+const DEFAULT_SYNC={databaseURL:'https://gurvan-tooroi-default-rtdb.firebaseio.com',path:'gt_system',enabled:true};
 let syncCfg=null, syncDB=null, syncRef=null, syncOn=false, syncPushT=null, syncApplying=false, syncStatus='off';
-function loadSyncCfg(){try{const r=localStorage.getItem(SYNC_KEY);syncCfg=r?JSON.parse(r):null;}catch(e){syncCfg=null;}return syncCfg;}
+function loadSyncCfg(){
+  try{const r=localStorage.getItem(SYNC_KEY);syncCfg=r?JSON.parse(r):null;}catch(e){syncCfg=null;}
+  if(!syncCfg) syncCfg={...DEFAULT_SYNC}; // анхдагчаар шууд холбогдоно
+  return syncCfg;
+}
 function saveSyncCfg(c){syncCfg=c;try{localStorage.setItem(SYNC_KEY,JSON.stringify(c));}catch(e){}}
 function setSyncStatus(s){syncStatus=s;const el=document.getElementById('syncDot');if(el){
-  const map={off:['#9aa3ad','Унтраалттай'],connecting:['#e0a13c','Холбогдож байна…'],on:['#2e8b57','Холбогдсон ✓'],err:['#c0392b','Алдаа']};
+  const map={off:['#9aa3ad','Унтраалттай'],connecting:['#e0a13c','Холбогдож байна…'],on:['#2e8b57','Холбогдсон ✓'],err:['#c0392b','Алдаа — хаяг эсвэл Rules шалгана уу']};
   const m=map[s]||map.off;el.innerHTML=`<i class="dot" style="background:${m[0]}"></i> <span style="font-size:12.5px;color:var(--muted)">${m[1]}</span>`;}}
 function syncInit(){
   const c=loadSyncCfg();
@@ -2210,12 +2229,13 @@ function syncInit(){
   if(typeof firebase==='undefined'){setSyncStatus('err');return;}
   try{
     setSyncStatus('connecting');
-    if(!firebase.apps.length) firebase.initializeApp({apiKey:c.apiKey||'',authDomain:c.authDomain||'',databaseURL:c.databaseURL,projectId:c.projectId||''});
+    if(!firebase.apps.length) firebase.initializeApp({databaseURL:c.databaseURL});
     syncDB=firebase.database();
     syncRef=syncDB.ref((c.path||'gt_system')+'/state');
     syncOn=true;
     syncRef.on('value',snap=>{
       const v=snap.val();
+      setSyncStatus('on');
       if(!v||!v.data){ syncPush(true); return; }
       const localRev=S._rev||0;
       if((v._rev||0)>localRev){
@@ -2227,9 +2247,21 @@ function syncInit(){
           toast('Шинэчлэгдлээ ☁️','ok');
         }catch(e){}finally{syncApplying=false;}
       }
-      setSyncStatus('on');
     },err=>{setSyncStatus('err');});
   }catch(e){setSyncStatus('err');}
+}
+function syncPullNow(){
+  if(!syncRef){toast('Синк холбогдоогүй байна','err');return;}
+  syncRef.once('value').then(snap=>{
+    const v=snap.val();
+    if(!v||!v.data){toast('Үүлэнд өгөгдөл алга','err');return;}
+    try{syncApplying=true;S=JSON.parse(v.data);try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}renderAll();toast('Үүлнээс татлаа ☁️','ok');}
+    catch(e){toast('Уншиж чадсангүй','err');}finally{syncApplying=false;}
+  }).catch(()=>toast('Татаж чадсангүй','err'));
+}
+function syncPushNow(){
+  if(!syncRef){toast('Синк холбогдоогүй байна','err');return;}
+  syncPush(true);toast('Үүл рүү илгээлээ ☁️','ok');
 }
 function syncPush(force){
   if(!syncOn||!syncRef||syncApplying)return;
@@ -2241,6 +2273,12 @@ function syncPush(force){
       try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
     }catch(e){setSyncStatus('err');}
   },force?0:600);
+}
+function copyBariaLink(){
+  const el=document.getElementById('bariaLink');if(!el)return;
+  const v=el.value;
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(v).then(()=>toast('Хууллаа ✓','ok'),()=>toast('Хуулж чадсангүй','err'));}
+  else{try{el.select();document.execCommand('copy');toast('Хууллаа ✓','ok');}catch(e){toast('Хуулж чадсангүй','err');}}
 }
 function openSyncSetup(){
   const c=loadSyncCfg()||{};
@@ -2268,8 +2306,20 @@ function saveSyncSetup(){
   setTimeout(()=>location.reload(),700);
 }
 
+/* ---- Хандах эрх: ?baria → зөвхөн Бариа таб ---- */
+function applyRole(){
+  const q=(location.search||'')+(location.hash||'');
+  const isBaria=/[?&#]baria\b/i.test(q);
+  if(!isBaria)return false;
+  document.querySelectorAll('nav.tabs button').forEach(b=>{ if(b.dataset.tab!=='massage') b.style.display='none'; else b.classList.add('active'); });
+  document.querySelectorAll('main .panel').forEach(p=>{ p.classList.toggle('active', p.id==='massage'); });
+  const sub=document.querySelector('.brand .sub'); if(sub) sub.textContent='Барианы систем';
+  return true;
+}
+
 load();renderAll();
 loadSyncCfg();syncInit();setSyncStatus(syncStatus);
+applyRole();
 </script>
 </body>
 </html>
