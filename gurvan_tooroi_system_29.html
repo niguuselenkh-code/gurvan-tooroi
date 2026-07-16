@@ -2,6 +2,9 @@
 <html lang="mn">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Гурван Тоорой — Удирдлагын систем</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -149,21 +152,22 @@
   .gplan .gh{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
   .gplan .gh .nm{font-weight:700;font-size:15px;color:var(--navy)}
   .gplan .gh .sub{font-size:12px;color:var(--muted);margin-top:2px}
-  .ptbl2{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px;min-width:560px}
+  .ptbl2{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px;min-width:620px}
   .ptbl2 th{background:var(--soft);padding:7px 8px;font-size:11px;font-weight:700;color:var(--navy);text-align:left;border:1px solid var(--line)}
-  .ptbl2 th.adult{background:#eef2f7}.ptbl2 th.child{background:#f3ecec}.ptbl2 th.water{background:#e9f2f4}
   .ptbl2 td{padding:5px 7px;border:1px solid var(--line);vertical-align:middle}
-  .ptbl2 td.dayc{white-space:nowrap;color:var(--muted);font-weight:600;font-size:11.5px}
-  .ptbl2 select{width:100%;min-width:100px;padding:5px 6px;font-size:12px}
-  .ptbl2 .cellwrap{display:flex;align-items:center;gap:5px}
-  .ptbl2 .cellwrap.na{opacity:.4}
-  .ptbl2 .cnt{flex:0 0 auto;min-width:18px;font-weight:700;color:var(--navy);font-size:12px}
-  .ptbl2 .dchk{width:16px;height:16px;flex:0 0 auto;cursor:pointer;accent-color:var(--green)}
-  .ptbl2 .dchk.is-done{transform:scale(1.15)}
-  .ptbl2 td.cell-done{background:#eaf5ee}
-  .ptbl2 td.cell-done select{border-color:#bfe0cb}
-  .ptbl2 .cst{width:74px;padding:3px 5px;font-size:11px;flex:0 0 auto}
-  .ptbl2 .cdur{font-size:10px;color:var(--muted);margin-top:2px;text-align:right;padding-right:26px}
+  .ptbl2 td.rmc{white-space:nowrap;background:#fafbfc;vertical-align:top;font-size:12.5px;color:var(--navy)}
+  .ptbl2 td.rmc .sm{font-size:10.5px;color:var(--muted);font-weight:400;margin-top:2px}
+  .ptbl2 td.pc{white-space:nowrap;font-weight:600;color:var(--navy);font-size:12px}
+  .ptbl2 td.mc{white-space:nowrap;color:var(--muted);font-size:11.5px}
+  .ptbl2 td.mc .par{display:block;font-size:9.5px;color:var(--clay,#b06a3f);opacity:.8}
+  .ptbl2 .cb{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:1px}
+  .ptbl2 .cb.adult{background:#4a6fa5}.ptbl2 .cb.child{background:#b23a5d}.ptbl2 .cb.water{background:#3d8ea3}
+  .ptbl2 select{width:100%;min-width:120px;padding:5px 6px;font-size:12px}
+  .ptbl2 .dchk{width:17px;height:17px;cursor:pointer;accent-color:var(--green)}
+  .ptbl2 .cst{width:104px;min-width:104px;padding:3px 5px;font-size:11px}
+  .ptbl2 tr.rdone td{background:#eaf5ee}
+  .ptbl2 tr.rdone select{border-color:#bfe0cb}
+  .ptbl2 tr.rdone td.rmc{background:#fafbfc}
   .ptbl2 tr.offday td{background:#fbeceb}
   /* mini calendar */
   .mc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
@@ -187,7 +191,7 @@
 <header class="app">
   <div class="brand">
     <div class="berries"><span></span><span></span><span></span></div>
-    <div><h1>Гурван Тоорой</h1><div class="sub">Амралтын газрын удирдлагын систем</div></div>
+    <div><h1>Гурван Тоорой</h1><div class="sub">Амралтын газрын удирдлагын систем <span style="opacity:.6;font-size:11px">· v<span id="appVer">—</span></span></div></div>
   </div>
   <nav class="tabs">
     <button data-tab="cal" class="active">📅 Календарь</button>
@@ -454,6 +458,7 @@ function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):defaults
   delete S.serviceRules;
   S.massages=S.massages||[];
   S.msgDayStatus=S.msgDayStatus||{};
+  S.pins=Object.assign({manager:'',therapist:''},S.pins||{});
   S.products=S.products||[];
   S.products.forEach(p=>{ if(!p.group) p.group='goods'; });
   S.productSales=S.productSales||[];
@@ -1304,7 +1309,11 @@ function renderSettings(){
 
     <div class="card set-sec">
       <h3>🎯 Барианы автомат дүрэм</h3>
-      <div class="hint" style="margin-bottom:10px">«🎯 Автомат төлөвлөгөө» дарахад ангилал бүр ингэж хувиарлагдана: <b>сондгой хоног (1,3,5...) → Бариа</b>, <b>тэгш хоног (2,4...) → ээлжийн эмчилгээ</b>. Ангилал насаар автомат: Том хүн, Хүүхэд 4-13, Усанд оруулах 0-3. Дараа нь сүлжээнээс гараар өөрчилж болно.</div>
+      <div class="hint" style="margin-bottom:10px">«🎯 Автомат төлөвлөгөө» дарахад ангилал бүр ингэж хувиарлагдана: <b>2 хоногт 1 удаа Бариа</b>, хооронд нь ээлжийн эмчилгээ. Ангилал насаар автомат: Том хүн, Хүүхэд 4-13, Усанд оруулах 0-3. Дараа нь сүлжээнээс гараар өөрчилж болно.</div>
+      <div class="row" style="align-items:center;gap:8px;margin-bottom:12px;background:var(--soft);padding:9px 11px;border-radius:9px">
+        <input type="checkbox" id="skipArr" ${S.msgSkipArrival!==false?'checked':''} style="width:17px;height:17px" onchange="S.msgSkipArrival=this.checked;save();toast('Хадгаллаа','ok')">
+        <label for="skipArr" style="font-size:13px;font-weight:600">Ирсэн өдөр барианд оруулахгүй</label>
+      </div>
       ${msgRuleRow('adult','Том хүн','Сондгой хоногийн нэмэлт (үсний спа)')}
       ${msgRuleRow('child','Хүүхэд (4-13)','Тэгш хоногт ээлжлэх эмчилгээ')}
       ${msgRuleRow('water','Усанд оруулах (0-3)','Тэгш хоногт ээлжлэх эмчилгээ')}
@@ -1321,6 +1330,19 @@ function renderSettings(){
         <button class="btn btn-ghost btn-sm" onclick="syncPullNow()">⬇ Үүлнээс татах</button>
       </div>
       <div class="hint" style="margin-top:8px">⬆ Илгээх = энэ төхөөрөмжийн өгөгдлийг үүлэнд тавина (бусад дээр очно). ⬇ Татах = үүлнээс авч энэ төхөөрөмжид тавина.</div>
+    </div>
+
+    <div class="card set-sec">
+      <h3>🔒 Нэвтрэх код</h3>
+      <div class="hint" style="margin-bottom:10px">Хаяг нээлттэй тул код тавихыг зөвлөж байна. Хоосон орхивол код асуухгүй.</div>
+      <table class="mini-tbl"><thead><tr><th>Хэн</th><th>Код</th></tr></thead><tbody>
+        <tr><td style="font-weight:600">Менежер (та)<div style="font-size:11px;color:var(--muted);font-weight:400">Бүх таб</div></td>
+          <td><input value="${(S.pins&&S.pins.manager)||''}" inputmode="numeric" placeholder="жиш: 5550" style="width:120px" onchange="S.pins.manager=this.value.trim()"></td></tr>
+        <tr><td style="font-weight:600">Бариач<div style="font-size:11px;color:var(--muted);font-weight:400">Зөвхөн Бариа таб</div></td>
+          <td><input value="${(S.pins&&S.pins.therapist)||''}" inputmode="numeric" placeholder="жиш: 7890" style="width:120px" onchange="S.pins.therapist=this.value.trim()"></td></tr>
+      </tbody></table>
+      <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="savePins()">Хадгалах</button>
+      <div class="hint" style="margin-top:8px">⚠️ Код тавьсны дараа бүх төхөөрөмж дээр нэг удаа асууна. Өөрийн кодоо мартаж болохгүй.</div>
     </div>
 
     <div class="card set-sec">
@@ -1459,21 +1481,57 @@ function thById(id){return S.therapists.find(t=>t.id===id);}
 
 /* ============================================================ БАРИАНЫ ТӨЛӨВЛӨГӨӨ */
 const MCATS=[['adult','Том хүн'],['child','Хүүхэд'],['water','Усанд оруулах']];
+const CATORDER={adult:0,child:1,water:2};
 function catLabel(c){const f=MCATS.find(x=>x[0]===c);return f?f[1]:c;}
-function roomCats(r,date){
-  const occ=date?roomOccupancyOn(r,date):{adults:r.adults||0,children:(r.children||[])};
-  let adult=occ.adults, child=0, water=0;
-  occ.children.forEach(k=>{
-    const a=k.age||0;
-    if(a<=3) water++;        // 0-3 нас → усанд оруулах
-    else if(a<=13) child++;  // 4-13 нас → хүүхэд
-    else adult++;            // 14+ → том хүн
+function catOfAge(a){ return a<=3?'water' : a<=13?'child' : 'adult'; }
+// Бариа хийх хугацаа (насаар) — зааврын дагуу
+function bariaMins(age){
+  if(age==null) return 50;          // том хүн 45-50
+  if(age<=1) return 15;
+  if(age<=5) return 20;
+  if(age<=8) return 25;
+  if(age<=13) return 30;
+  return 50;
+}
+function svcMinsFor(svcId,person){
+  const s=svcById(svcId); if(!s) return 0;
+  return s.ageBased ? bariaMins(person?person.age:null) : (s.mins||0);
+}
+// Өрөөнд тухайн өдөр байгаа ХҮН БҮР
+function roomPeople(r,date){
+  const out=[];
+  const adults=r.adults||0;
+  for(let i=0;i<adults;i++) out.push({key:'a'+i,cat:'adult',age:null,label:'Том хүн'+(adults>1?' '+(i+1):'')});
+  (r.children||[]).forEach((k,i)=>{
+    const a=k.age||0, cat=catOfAge(a);
+    out.push({key:'c'+i,cat,age:a,label:(cat==='adult'?'Том хүн ':'Хүүхэд ')+a+'н'});
   });
-  return {adult, child, water, totalKids:occ.children.length};
+  (r.joiners||[]).forEach((j,i)=>{
+    if(!(date && j.fromDate && date>=j.fromDate)) return;
+    if(j.kind==='adult') out.push({key:'j'+i,cat:'adult',age:null,label:'Том хүн (нэмэгдсэн)'});
+    else { const a=j.age||0, cat=catOfAge(a); out.push({key:'j'+i,cat,age:a,label:'Хүүхэд '+a+'н (нэмэгдсэн)'}); }
+  });
+  out.sort((x,y)=>(CATORDER[x.cat]-CATORDER[y.cat])||(x.key<y.key?-1:1));
+  return out;
+}
+// Хуучин ангилал-түлхүүрийг (adult/child/water) хүний түлхүүр рүү шилжүүлнэ
+function migrateRoomCells(cells,people){
+  if(!cells) return {};
+  const hasOld=['adult','child','water'].some(k=>cells[k]&&cells[k].svc!==undefined);
+  if(!hasOld) return cells;
+  const out={};
+  Object.keys(cells).forEach(k=>{ if(!['adult','child','water'].includes(k)) out[k]=cells[k]; });
+  ['adult','child','water'].forEach(cat=>{
+    const old=cells[cat]; if(!old||old.svc===undefined) return;
+    const first=people.find(p=>p.cat===cat&&!out[p.key]);
+    if(first) out[first.key]=old;
+  });
+  return out;
 }
 function msgCfg(cat){return (S.msgDefaults&&S.msgDefaults[cat])||{};}
 function isSummer(d){const md=(d||'').slice(5);return md>='06-20'&&md<='08-20';}
-function ensurePlan(bk,regen){
+
+function ensurePlan(bk){
   bk.msgPlan=bk.msgPlan||{};
   const valid={};
   bk.rooms.forEach(r=>{const ci=rCheckIn(bk,r),n=rNights(bk,r);for(let i=0;i<n;i++){const d=addDays(ci,i);valid[d]=valid[d]||{};valid[d][r.num]=r;}});
@@ -1484,65 +1542,74 @@ function ensurePlan(bk,regen){
   Object.keys(valid).forEach(d=>{
     bk.msgPlan[d]=bk.msgPlan[d]||{};
     Object.keys(valid[d]).forEach(rn=>{
-      bk.msgPlan[d][rn]=bk.msgPlan[d][rn]||{};
-      ['adult','child','water'].forEach(cat=>{
-        if(!bk.msgPlan[d][rn][cat]) bk.msgPlan[d][rn][cat]={svc:'rest',done:false,billed:false};
-      });
+      const people=roomPeople(valid[d][rn],d);
+      bk.msgPlan[d][rn]=migrateRoomCells(bk.msgPlan[d][rn]||{},people);
+      people.forEach(p=>{ if(!bk.msgPlan[d][rn][p.key]) bk.msgPlan[d][rn][p.key]={svc:'rest',done:false,billed:false}; });
     });
   });
 }
-function setAutoCell(bk,d,rn,cat,svc){
+function setAutoCell(bk,d,rn,key,svc){
   bk.msgPlan[d]=bk.msgPlan[d]||{};bk.msgPlan[d][rn]=bk.msgPlan[d][rn]||{};
-  const cur=bk.msgPlan[d][rn][cat];
+  const cur=bk.msgPlan[d][rn][key];
   if(cur&&cur.done)return; // хийсэн бол хэвээр
-  bk.msgPlan[d][rn][cat]={svc,done:false,billed:false};
+  bk.msgPlan[d][rn][key]={svc,done:false,billed:false,time:cur?cur.time:''};
 }
-// Заавар ёсны ротаци: сондгой хоног→Бариа, тэгш хоног→ангиллын ээлжийн эмчилгээ
+/* Автомат хувиарлалт — хүн тус бүрээр, ачаалал тэнцвэржүүлнэ.
+   · Бариа 2 хоногт 1 удаа · ирсэн өдөр орохгүй
+   · Нэг ангилалд 2+ хүн байвал ээлжлүүлж (нэг өдөр нэг хүн) ачааллыг тарааж болвол тараана */
 function autoPlanBooking(bk){
   ensurePlan(bk);
+  const skip=(S.msgSkipArrival!==false)?1:0;
   bk.rooms.forEach(r=>{
-    const ci=rCheckIn(bk,r),n=rNights(bk,r);
-    const days=[];for(let i=0;i<n;i++)days.push(addDays(ci,i));
+    const ci=rCheckIn(bk,r), n=rNights(bk,r);
+    const days=[]; for(let i=0;i<n;i++) days.push(addDays(ci,i));
+    const start=Math.min(skip,Math.max(0,n-1));
+    // Бүх өдрийн хүмүүсийн нэгдэл
+    const all=[]; days.forEach(d=>roomPeople(r,d).forEach(p=>{ if(!all.find(x=>x.key===p.key)) all.push(p); }));
+    const catIdx={adult:0,child:0,water:0};
     const ctr={child:0,water:0};
-    days.forEach((d,i)=>{
-      const odd=((i+1)%2===1);
-      const cc=roomCats(r,d);
-      ['adult','child','water'].forEach(cat=>{
-        if(cc[cat]<=0){ setAutoCell(bk,d,r.num,cat,'rest'); return; }
-        const cfg=msgCfg(cat);
-        let svc;
-        if(odd){ svc=cfg.baria||'ms_baria'; }
-        else if(cat==='adult'){ svc='rest'; }
-        else {
-          const rot=cfg.rotate||[];
-          if(rot.length){ svc=rot[ctr[cat]%rot.length]; ctr[cat]++;
-            if(cat==='water'&&cfg.summerFrom&&svc===cfg.summerFrom&&isSummer(d)) svc=cfg.summerTo||svc; }
-          else svc='rest';
-        }
-        setAutoCell(bk,d,r.num,cat,svc);
+    all.forEach(p=>{
+      const idx=catIdx[p.cat]++;
+      const pDays=days.filter((d,i)=> i>=start && roomPeople(r,d).some(x=>x.key===p.key));
+      // Ээлжлүүлэх нь тоог алдагдуулахгүй бол ээлжлүүлнэ (тэгш өдөртэй үед л боломжтой)
+      const offset=(pDays.length%2===0)?(idx%2):0;
+      const cfg=msgCfg(p.cat);
+      const bariaSvc=cfg.baria||'ms_baria';
+      const bset=new Set();
+      pDays.forEach((d,k)=>{ if(k>=offset && (k-offset)%2===0) bset.add(d); });
+      // Хуваарь бичих
+      days.forEach(d=>{
+        if(!pDays.includes(d)){ setAutoCell(bk,d,r.num,p.key,'rest'); return; }
+        if(bset.has(d)){ setAutoCell(bk,d,r.num,p.key,bariaSvc); return; }
+        if(p.cat==='adult'){ setAutoCell(bk,d,r.num,p.key,'rest'); return; }
+        const rot=cfg.rotate||[];
+        if(!rot.length){ setAutoCell(bk,d,r.num,p.key,'rest'); return; }
+        let svc=rot[ctr[p.cat]%rot.length]; ctr[p.cat]++;
+        if(p.cat==='water'&&cfg.summerFrom&&svc===cfg.summerFrom&&isSummer(d)) svc=cfg.summerTo||svc;
+        setAutoCell(bk,d,r.num,p.key,svc);
       });
+      // Том хүн: сондгой хоногтой бол +1 үсний спа (сүүлийн амралтын өдөрт)
+      if(p.cat==='adult' && n%2===1 && cfg.bonus){
+        let bonusDay=null;
+        pDays.forEach(d=>{ const c=bk.msgPlan[d]?.[r.num]?.[p.key]; if(c&&c.svc==='rest'&&!c.done) bonusDay=d; });
+        if(bonusDay) setAutoCell(bk,bonusDay,r.num,p.key,cfg.bonus);
+      }
     });
-    // Том хүн: нийт шөнө сондгой бол +1 үсний спа (амралтын өдөрт)
-    const acfg=msgCfg('adult');
-    if(n%2===1 && acfg.bonus){
-      const bonusDay=days.find((d,i)=>((i+1)%2===0)&&roomCats(r,d).adult>0&&bk.msgPlan[d]?.[r.num]?.adult&&bk.msgPlan[d][r.num].adult.svc==='rest'&&!bk.msgPlan[d][r.num].adult.done);
-      if(bonusDay) setAutoCell(bk,bonusDay,r.num,'adult',acfg.bonus);
-    }
   });
 }
-function ensureAllPlans(regen){S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>ensurePlan(bk,regen));}
-function autoPlanAll(regen){
+function ensureAllPlans(){S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>ensurePlan(bk));}
+function autoPlanAll(){
   S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>autoPlanBooking(bk));
   save();renderAll();toast('Автомат төлөвлөгөө үүслээ ✓','ok');
 }
 function confirmAutoPlan(){
   openModal('🎯 Автомат төлөвлөгөө',
-    `<p style="font-size:14px">Бүх идэвхтэй захиалгын зочдод, өрөө бүрийн бүрэлдэхүүнээс хамааруулан өдөр бүрийн барианы төлөвлөгөөг автоматаар үүсгэнэ.</p>
-     <div class="hint" style="margin-top:8px">Хийсэн гэж тэмдэглэсэн үйлчилгээ хэвээр хадгалагдана. Дараа нь сүлжээнээс өдөр бүрийг гараар засаж болно.</div>`,
+    `<p style="font-size:14px">Бүх идэвхтэй захиалгын хүн бүрд өдөр бүрийн барианы төлөвлөгөөг зааврын дагуу автоматаар үүсгэнэ.</p>
+     <div class="hint" style="margin-top:8px">2 хоногт 1 удаа Бариа · ирсэн өдөр орохгүй · нэг өрөөнд олон хүн байвал ачааллыг өдрүүдэд тарааж ээлжлүүлнэ. Хийсэн гэж тэмдэглэсэн үйлчилгээ хэвээр үлдэнэ.</div>`,
     `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
-     <button class="btn btn-primary" onclick="closeModal();autoPlanAll(true)">Үүсгэх</button>`);
+     <button class="btn btn-primary" onclick="closeModal();autoPlanAll()">Үүсгэх</button>`);
 }
-// Тухайн өдөр эзэлсэн өрөөнүүд: [{roomNum, bk, room}]
+// Тухайн өдөр эзэлсэн өрөөнүүд
 function roomsOccupiedOn(date){
   const out=[];
   S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>{
@@ -1551,69 +1618,70 @@ function roomsOccupiedOn(date){
   });
   return out.sort((a,b)=>a.roomNum-b.roomNum);
 }
-function setRoomCell(bkId,date,roomNum,cat,svc){
+function setPersonCell(bkId,date,roomNum,key,svc){
   const bk=S.bookings.find(b=>b.id===bkId);if(!bk)return;ensurePlan(bk);
-  const cell=bk.msgPlan[date]?.[roomNum]?.[cat];if(!cell)return;
+  const cell=bk.msgPlan[date]?.[roomNum]?.[key];if(!cell)return;
   if(cell.done){toast('Хийсэн үйлчилгээг өөрчлөхийн тулд эхлээд ✓-г авна уу','err');renderMassage();return;}
   cell.svc=svc;save();renderMassage();
 }
-function toggleRoomDone(bkId,date,roomNum,cat,checked){
+function setCellTime(bkId,date,roomNum,key,val){
+  const bk=S.bookings.find(b=>b.id===bkId);if(!bk)return;
+  const cell=bk.msgPlan[date]?.[roomNum]?.[key];if(!cell)return;
+  cell.time=val;save();renderMassage();
+}
+function togglePersonDone(bkId,date,roomNum,key,checked){
   const bk=S.bookings.find(b=>b.id===bkId);if(!bk)return;ensurePlan(bk);
-  const room=bk.rooms.find(r=>+r.num===+roomNum);const cell=bk.msgPlan[date]?.[roomNum]?.[cat];if(!cell||!room)return;
-  const cc=roomCats(room,date);const svc=svcById(cell.svc);
-  const key='msg:'+bkId+':'+date+':'+roomNum+':'+cat;
+  const room=bk.rooms.find(r=>+r.num===+roomNum);const cell=bk.msgPlan[date]?.[roomNum]?.[key];if(!cell||!room)return;
+  const person=roomPeople(room,date).find(p=>p.key===key);
+  const svc=svcById(cell.svc);
+  const ekey='msg:'+bkId+':'+date+':'+roomNum+':'+key;
   bk.extras=bk.extras||[];cell.done=checked;
-  if(checked && !cell.time){ const n=new Date(); cell.time=pad(n.getHours())+':'+pad(n.getMinutes()); }
-  // Барианы бараа материал (норм) — хэрэглэхэд хасагдана
-  const cnt0=cc[cat]||1;
+  if(checked && !cell.time){ const nw=new Date(); cell.time=pad(nw.getHours())+':'+pad(nw.getMinutes()); }
+  // Нэмэлт төлбөртэй үйлчилгээ
+  if(checked){
+    if(cell.svc!=='rest'&&svc&&svc.billable&&!cell.billed){
+      bk.extras.push({name:svc.name+' (№'+roomNum+' '+(person?person.label:'')+')',price:(svc.price||0),qty:1,_msgKey:ekey});
+      cell.billed=true;
+    }
+  }else{bk.extras=bk.extras.filter(e=>e._msgKey!==ekey);cell.billed=false;}
+  // Барианы бараа материал (норм) — хүн тус бүрд
   if(checked){
     if(cell.svc!=='rest'&&svc&&!cell.stockTaken){
-      (svc.norms||[]).forEach(n=>{
-        const p=S.products.find(x=>x.id===n.productId);if(!p)return;
-        const q=(n.qty||0)*cnt0; if(q<=0)return;
+      (svc.norms||[]).forEach(nm=>{
+        const p=S.products.find(x=>x.id===nm.productId);if(!p)return;
+        const q=(nm.qty||0); if(q<=0)return;
         p.stock-=q; logMove(p.id,-q,'massage',{who:svc.name+' (№'+roomNum+')',note:'Барианы хэрэглээ'});
       });
       cell.stockTaken=true;
     }
   }else if(cell.stockTaken){
-    (svc?(svc.norms||[]):[]).forEach(n=>{
-      const p=S.products.find(x=>x.id===n.productId);if(!p)return;
-      const q=(n.qty||0)*cnt0; if(q<=0)return;
+    (svc?(svc.norms||[]):[]).forEach(nm=>{
+      const p=S.products.find(x=>x.id===nm.productId);if(!p)return;
+      const q=(nm.qty||0); if(q<=0)return;
       p.stock+=q; logMove(p.id,q,'massage',{who:svc.name+' (№'+roomNum+')',note:'Барианы хэрэглээ буцаалт'});
     });
     cell.stockTaken=false;
   }
-  if(checked){
-    if(cell.svc!=='rest'&&svc&&svc.billable&&!cell.billed){
-      const cnt=cc[cat]||1;
-      bk.extras.push({name:svc.name+' (№'+roomNum+' '+catLabel(cat)+(cnt>1?' ×'+cnt:'')+')',price:(svc.price||0)*cnt,qty:1,_msgKey:key});
-      cell.billed=true;
-    }
-  }else{bk.extras=bk.extras.filter(e=>e._msgKey!==key);cell.billed=false;}
   save();renderMassage();
-}
-function setCellTime(bkId,date,roomNum,cat,val){
-  const bk=S.bookings.find(b=>b.id===bkId);if(!bk)return;
-  const cell=bk.msgPlan[date]?.[roomNum]?.[cat];if(!cell)return;
-  cell.time=val;save();renderMassage();
 }
 function setDayStatus(date,st){S.msgDayStatus=S.msgDayStatus||{};S.msgDayStatus[date]=st;save();renderMassage();}
 function dayStatusOf(date){return (S.msgDayStatus&&S.msgDayStatus[date])||'normal';}
 const DAYSTATUS=[['normal','Хэвийн'],['off','Бариач амарсан'],['closed','Боломжгүй өдөр']];
 
-// Өдрийн статистик (бүх өрөө)
 function dayStats(date){
-  ensureAllPlans(false);
-  let adult=0,child=0,water=0,services=0,mins=0,total=0,done=0;
+  ensureAllPlans();
+  let adult=0,child=0,water=0,total=0,done=0,mins=0,freeMins=0;
   roomsOccupiedOn(date).forEach(({bk,room,roomNum})=>{
-    const cc=roomCats(room,date);const cells=bk.msgPlan[date]?.[roomNum];if(!cells)return;
-    ['adult','child','water'].forEach(cat=>{
-      const c=cells[cat];if(!c)return;const cnt=cc[cat]||0;
-      if(c.svc!=='rest'&&cnt>0){total++;services++;const svc=svcById(c.svc);mins+=(svc?svc.mins:0)*cnt;if(c.done)done++;}
+    const cells=bk.msgPlan[date]?.[roomNum];if(!cells)return;
+    roomPeople(room,date).forEach(p=>{
+      if(p.cat==='adult')adult++;else if(p.cat==='child')child++;else water++;
+      const c=cells[p.key];if(!c||c.svc==='rest')return;
+      total++; if(c.done)done++;
+      const svc=svcById(c.svc);const m=svcMinsFor(c.svc,p);
+      if(svc&&svc.therapist===false) freeMins+=m; else mins+=m;
     });
-    adult+=cc.adult;child+=cc.child;water+=cc.water;
   });
-  return {adult,child,water,services,mins,total,done};
+  return {adult,child,water,total,done,mins,freeMins};
 }
 function planUndoneCount(){
   const today=todayStr();let n=0;
@@ -1621,8 +1689,8 @@ function planUndoneCount(){
     Object.keys(bk.msgPlan).forEach(d=>{
       const off=dayStatusOf(d)!=='normal';
       Object.keys(bk.msgPlan[d]).forEach(rn=>{
-        ['adult','child','water'].forEach(cat=>{
-          const c=bk.msgPlan[d][rn][cat];
+        Object.keys(bk.msgPlan[d][rn]).forEach(k=>{
+          const c=bk.msgPlan[d][rn][k];
           if(c&&c.svc!=='rest'&&!c.done&&(d<today||off))n++;
         });
       });
@@ -1636,13 +1704,14 @@ function redistributeUndone(){
     bk.rooms.forEach(r=>{
       const rn=r.num;const ci=rCheckIn(bk,r),n=rNights(bk,r);
       const days=[];for(let i=0;i<n;i++)days.push(addDays(ci,i));
-      ['adult','child','water'].forEach(cat=>{
+      const keys=new Set();days.forEach(d=>Object.keys(bk.msgPlan[d]?.[rn]||{}).forEach(k=>keys.add(k)));
+      keys.forEach(k=>{
         days.forEach(d=>{
           const off=dayStatusOf(d)!=='normal';
-          const c=bk.msgPlan[d]?.[rn]?.[cat];
+          const c=bk.msgPlan[d]?.[rn]?.[k];
           if(c&&c.svc!=='rest'&&!c.done&&(d<today||off)){
-            const target=days.find(fd=>fd>=today&&fd>d&&dayStatusOf(fd)==='normal'&&bk.msgPlan[fd]?.[rn]?.[cat]&&bk.msgPlan[fd][rn][cat].svc==='rest'&&!bk.msgPlan[fd][rn][cat].done);
-            if(target){bk.msgPlan[target][rn][cat]={svc:c.svc,done:false,billed:false};bk.msgPlan[d][rn][cat]={svc:'rest',done:false,billed:false};moved++;}
+            const target=days.find(fd=>fd>=today&&fd>d&&dayStatusOf(fd)==='normal'&&bk.msgPlan[fd]?.[rn]?.[k]&&bk.msgPlan[fd][rn][k].svc==='rest'&&!bk.msgPlan[fd][rn][k].done);
+            if(target){bk.msgPlan[target][rn][k]={svc:c.svc,done:false,billed:false};bk.msgPlan[d][rn][k]={svc:'rest',done:false,billed:false};moved++;}
           }
         });
       });
@@ -1676,10 +1745,10 @@ function renderMassageSummary(){
   box.innerHTML=`
     <div class="msum">
       <div class="card"><div class="v">${st2.adult}</div><div class="l">Том хүн</div></div>
-      <div class="card"><div class="v">${st2.child}</div><div class="l">Хүүхэд</div></div>
-      <div class="card"><div class="v">${st2.water}</div><div class="l">Усанд оруулах</div></div>
+      <div class="card"><div class="v">${st2.child}</div><div class="l">Хүүхэд (4-13)</div></div>
+      <div class="card"><div class="v">${st2.water}</div><div class="l">Усанд оруулах (0-3)</div></div>
       <div class="card"><div class="v">${st2.done}/${st2.total}</div><div class="l">Үйлчилгээ (хийсэн/нийт)</div></div>
-      <div class="card time"><div class="v">${hh}ц ${mm}м</div><div class="l">Бариачийн цаг</div></div>
+      <div class="card time"><div class="v">${hh}ц ${mm}м</div><div class="l">Бариачийн цаг${st2.freeMins?' (+'+st2.freeMins+'м зэрэгцүүлэн)':''}</div></div>
     </div>
     <div class="row" style="align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
       <label class="field" style="margin:0">Өдрийн төлөв</label>
@@ -1690,52 +1759,52 @@ function renderMassageSummary(){
       <button class="btn btn-berry btn-sm" onclick="redistributeUndone()">↻ Үлдсэн өдрүүдэд багтаах</button>
     </div>`:''}`;
 }
-// Гол сүлжээ: мөр = өрөө, багана = 3 ангилал
+// Гол сүлжээ: мөр = ХҮН
 function renderMassageGrid(){
   const box=document.getElementById('msgRoomGrid');if(!box)return;
   const off=dayStatusOf(msgDate)!=='normal';
   const rooms=roomsOccupiedOn(msgDate);
   if(!rooms.length){box.innerHTML='<div class="empty">Энэ өдөр буудаллаж буй зочин алга.</div>';return;}
   rooms.forEach(({bk})=>ensurePlan(bk));
-  const rowHtml=rooms.map(({roomNum,bk,room})=>{
-    const cc=roomCats(room,msgDate);const cells=bk.msgPlan[msgDate][roomNum];
-    const cellHtml=(cat)=>{
-      const c=cells[cat];const cnt=cc[cat]||0;
-      if(cnt<=0)return `<td><div class="cellwrap na">—</div></td>`;
+  let rowsH='';
+  rooms.forEach(({roomNum,bk,room})=>{
+    const people=roomPeople(room,msgDate);
+    const cells=bk.msgPlan[msgDate][roomNum]||{};
+    people.forEach((p,pi)=>{
+      const c=cells[p.key]||{svc:'rest',done:false};
+      const m=c.svc!=='rest'?svcMinsFor(c.svc,p):0;
       const svc=svcById(c.svc);
-      const dur = (c.svc!=='rest'&&svc&&!svc.ageBased&&svc.mins) ? svc.mins+'м' : '';
-      const timeInput = c.svc!=='rest'
-        ? `<input type="time" class="cst" value="${c.time||''}" title="Эхлэх цаг" onchange="setCellTime('${bk.id}','${msgDate}',${roomNum},'${cat}',this.value)">`
-        : '';
-      return `<td class="${c.done?'cell-done':''}"><div class="cellwrap">
-        <span class="cnt">${cnt}</span>
-        <select onchange="setRoomCell('${bk.id}','${msgDate}',${roomNum},'${cat}',this.value)" ${c.done?'disabled':''}>${svcSelectOpts(c.svc)}</select>
-        ${timeInput}
-        <input type="checkbox" class="dchk ${c.done?'is-done':''}" ${c.done?'checked':''} title="Хийсэн" onchange="toggleRoomDone('${bk.id}','${msgDate}',${roomNum},'${cat}',this.checked)">
-      </div>${dur?`<div class="cdur">${dur}</div>`:''}</td>`;
-    };
-    return `<tr class="${off?'offday':''}">
-      <td class="dayc">№${roomNum}<div style="font-size:10.5px;color:var(--muted);font-weight:400">${bk.name||bk.phone}</div></td>
-      ${cellHtml('adult')}${cellHtml('child')}${cellHtml('water')}
-    </tr>`;
-  }).join('');
+      const free=svc&&svc.therapist===false;
+      rowsH+=`<tr class="${off?'offday':''} ${c.done?'rdone':''}">
+        ${pi===0?`<td class="rmc" rowspan="${people.length}"><b>№${roomNum}</b><div class="sm">${bk.name||bk.phone}</div></td>`:''}
+        <td class="pc"><span class="cb ${p.cat}"></span>${p.label}</td>
+        <td><select ${c.done?'disabled':''} onchange="setPersonCell('${bk.id}','${msgDate}',${roomNum},'${p.key}',this.value)">${svcSelectOpts(c.svc)}</select></td>
+        <td class="mc">${m?m+'м':'—'}${free?'<span class="par">зэрэг</span>':''}</td>
+        <td>${c.svc!=='rest'?`<input type="time" class="cst" value="${c.time||''}" onchange="setCellTime('${bk.id}','${msgDate}',${roomNum},'${p.key}',this.value)">`:''}</td>
+        <td style="text-align:center">${c.svc!=='rest'?`<input type="checkbox" class="dchk" ${c.done?'checked':''} title="Хийсэн" onchange="togglePersonDone('${bk.id}','${msgDate}',${roomNum},'${p.key}',this.checked)">`:''}</td>
+      </tr>`;
+    });
+  });
   box.innerHTML=`<div style="overflow-x:auto"><table class="ptbl2">
-    <thead><tr><th>Өрөө</th><th class="adult">Том хүн</th><th class="child">Хүүхэд</th><th class="water">Усанд оруулах</th></tr></thead>
-    <tbody>${rowHtml}</tbody></table></div>`;
+    <thead><tr><th>Өрөө</th><th>Хэн</th><th>Үйлчилгээ</th><th>Хугацаа</th><th>Цаг</th><th>Хийсэн</th></tr></thead>
+    <tbody>${rowsH}</tbody></table></div>`;
 }
-// Доод бяцхан календарь: өдөр бүрийн хийсэн/нийт
+// Мини календарь
 let msgCalYM=null;
 function msgDayCounts(date){
   let total=0,done=0;
   roomsOccupiedOn(date).forEach(({bk,room,roomNum})=>{
-    const cc=roomCats(room,date);const cells=bk.msgPlan?.[date]?.[roomNum];if(!cells)return;
-    ['adult','child','water'].forEach(cat=>{const c=cells[cat];if(c&&c.svc!=='rest'&&(cc[cat]||0)>0){total++;if(c.done)done++;}});
+    const cells=bk.msgPlan?.[date]?.[roomNum];if(!cells)return;
+    roomPeople(room,date).forEach(p=>{
+      const c=cells[p.key];
+      if(c&&c.svc!=='rest'){total++;if(c.done)done++;}
+    });
   });
   return {total,done};
 }
 function renderMassageMiniCal(){
   const box=document.getElementById('msgMiniCal');if(!box)return;
-  ensureAllPlans(false);
+  ensureAllPlans();
   if(!msgCalYM) msgCalYM=(msgDate||todayStr()).slice(0,7);
   const [y,m]=msgCalYM.split('-').map(Number);
   const first=new Date(y,m-1,1),start=(first.getDay()+6)%7,dim=new Date(y,m,0).getDate();
@@ -2213,7 +2282,7 @@ function renderAll(){renderReminders();renderCalendar();renderList();renderMassa
 /* ============================================================ ☁️ СИНК (Firebase) */
 const SYNC_KEY='gt_sync_cfg_v1';
 const DEFAULT_SYNC={databaseURL:'https://gurvan-tooroi-default-rtdb.firebaseio.com',path:'gt_system',enabled:true};
-let syncCfg=null, syncDB=null, syncRef=null, syncOn=false, syncPushT=null, syncApplying=false, syncStatus='off';
+let syncCfg=null, syncDB=null, syncRef=null, syncOn=false, syncPushT=null, syncApplying=false, syncStatus='off', syncFirstSnap=false;
 function loadSyncCfg(){
   try{const r=localStorage.getItem(SYNC_KEY);syncCfg=r?JSON.parse(r):null;}catch(e){syncCfg=null;}
   if(!syncCfg) syncCfg={...DEFAULT_SYNC}; // анхдагчаар шууд холбогдоно
@@ -2236,7 +2305,7 @@ function syncInit(){
     syncRef.on('value',snap=>{
       const v=snap.val();
       setSyncStatus('on');
-      if(!v||!v.data){ syncPush(true); return; }
+      if(!v||!v.data){ syncFirstSnap=true; applyGate(); syncPush(true); return; }
       const localRev=S._rev||0;
       if((v._rev||0)>localRev){
         try{
@@ -2244,14 +2313,25 @@ function syncInit(){
           S=JSON.parse(v.data);
           try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
           renderAll();
-          toast('Шинэчлэгдлээ ☁️','ok');
+          if(syncFirstSnap) toast('Шинэчлэгдлээ ☁️','ok');
         }catch(e){}finally{syncApplying=false;}
       }
-    },err=>{setSyncStatus('err');});
+      if(!syncFirstSnap){syncFirstSnap=true;applyGate();}
+    },err=>{setSyncStatus('err');syncFirstSnap=true;applyGate();});
   }catch(e){setSyncStatus('err');}
 }
 function syncPullNow(){
   if(!syncRef){toast('Синк холбогдоогүй байна','err');return;}
+  openModal('⬇ Үүлнээс татах',
+    `<p style="font-size:14px">Үүлэн дэх өгөгдлийг татаж, <b>энэ төхөөрөмж дээрх бүх өгөгдлийг солино</b>.</p>
+     <div class="rcard" style="border:1px solid #f0d9a8;border-radius:10px;padding:10px 12px;background:#fdf7ec;margin-top:10px;font-size:13px">
+       ⚠️ Энэ төхөөрөмж дээр байгаа, үүлэнд ороогүй өөрчлөлт байвал <b>устана</b>.
+     </div>
+     <div class="hint" style="margin-top:10px">Ердийн үед энэ товч хэрэггүй — өгөгдөл автоматаар шинэчлэгддэг.</div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="closeModal();doSyncPull()">Татах</button>`);
+}
+function doSyncPull(){
   syncRef.once('value').then(snap=>{
     const v=snap.val();
     if(!v||!v.data){toast('Үүлэнд өгөгдөл алга','err');return;}
@@ -2261,7 +2341,14 @@ function syncPullNow(){
 }
 function syncPushNow(){
   if(!syncRef){toast('Синк холбогдоогүй байна','err');return;}
-  syncPush(true);toast('Үүл рүү илгээлээ ☁️','ok');
+  openModal('⬆ Одоо илгээх',
+    `<p style="font-size:14px">Энэ төхөөрөмжийн өгөгдлийг үүлэнд илгээж, <b>үүлэн дэх өгөгдлийг солино</b>.</p>
+     <div class="rcard" style="border:1px solid #f0d9a8;border-radius:10px;padding:10px 12px;background:#fdf7ec;margin-top:10px;font-size:13px">
+       ⚠️ Өөр төхөөрөмжөөс (жиш. утаснаас) бүртгэсэн, энд байхгүй өгөгдөл байвал <b>устана</b>.
+     </div>
+     <div class="hint" style="margin-top:10px">Ердийн үед энэ товч хэрэггүй — өгөгдөл автоматаар илгээгддэг.</div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="closeModal();syncPush(true);toast('Үүл рүү илгээлээ ☁️','ok')">Илгээх</button>`);
 }
 function syncPush(force){
   if(!syncOn||!syncRef||syncApplying)return;
@@ -2273,6 +2360,13 @@ function syncPush(force){
       try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
     }catch(e){setSyncStatus('err');}
   },force?0:600);
+}
+function savePins(){
+  S.pins=S.pins||{manager:'',therapist:''};
+  // Одоогийн төхөөрөмжөө шинэ кодоор нээлттэй байлгана (өөрөө түгжигдэхээс сэргийлнэ)
+  const role=currentRole();
+  if(S.pins[role]) setUnlocked(role,S.pins[role]);
+  save();renderSettings();toast('Код хадгалагдлаа ✓','ok');
 }
 function copyBariaLink(){
   const el=document.getElementById('bariaLink');if(!el)return;
@@ -2306,20 +2400,65 @@ function saveSyncSetup(){
   setTimeout(()=>location.reload(),700);
 }
 
-/* ---- Хандах эрх: ?baria → зөвхөн Бариа таб ---- */
-function applyRole(){
+/* ---- Хандах эрх: ?baria → зөвхөн Бариа таб · PIN түгжээ ---- */
+function currentRole(){
   const q=(location.search||'')+(location.hash||'');
-  const isBaria=/[?&#]baria\b/i.test(q);
-  if(!isBaria)return false;
+  return /[?&#]baria\b/i.test(q) ? 'therapist' : 'manager';
+}
+const APP_VER='1.7';
+function applyRole(){
+  if(currentRole()!=='therapist')return false;
   document.querySelectorAll('nav.tabs button').forEach(b=>{ if(b.dataset.tab!=='massage') b.style.display='none'; else b.classList.add('active'); });
   document.querySelectorAll('main .panel').forEach(p=>{ p.classList.toggle('active', p.id==='massage'); });
-  const sub=document.querySelector('.brand .sub'); if(sub) sub.textContent='Барианы систем';
+  const sub=document.querySelector('.brand .sub'); if(sub) sub.innerHTML='Барианы систем <span style="opacity:.6;font-size:11px">· v'+APP_VER+'</span>';
   return true;
+}
+const UNLOCK_KEY='gt_unlock_v1';
+function unlockedPin(role){try{const o=JSON.parse(localStorage.getItem(UNLOCK_KEY)||'{}');return o[role]||'';}catch(e){return '';}}
+function setUnlocked(role,pin){try{const o=JSON.parse(localStorage.getItem(UNLOCK_KEY)||'{}');o[role]=pin;localStorage.setItem(UNLOCK_KEY,JSON.stringify(o));}catch(e){}}
+function showGate(mode){
+  let el=document.getElementById('gate');
+  if(!el){el=document.createElement('div');el.id='gate';document.body.appendChild(el);}
+  el.style.cssText='position:fixed;inset:0;z-index:9999;background:linear-gradient(160deg,#1e3a5f,#132741);display:flex;align-items:center;justify-content:center;padding:20px';
+  if(mode==='loading'){
+    el.innerHTML=`<div style="text-align:center;color:#fff"><div style="font-size:15px;opacity:.8">Ачааллаж байна…</div></div>`;
+    return;
+  }
+  const role=currentRole();
+  el.innerHTML=`<div style="background:#fff;border-radius:16px;padding:26px 24px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3)">
+    <div style="font-size:30px;margin-bottom:6px">🔒</div>
+    <div style="font-weight:800;color:#1e3a5f;font-size:17px">Гурван Тоорой</div>
+    <div style="font-size:12.5px;color:#7a8492;margin-top:2px;margin-bottom:16px">${role==='therapist'?'Барианы систем':'Удирдлагын систем'}</div>
+    <input id="gatePin" type="password" inputmode="numeric" placeholder="Код" style="width:100%;text-align:center;font-size:19px;letter-spacing:5px;padding:11px;border:1px solid #dfe4ea;border-radius:10px">
+    <div id="gateErr" style="color:#c0392b;font-size:12.5px;height:16px;margin-top:6px"></div>
+    <button onclick="tryUnlock()" style="width:100%;margin-top:6px;padding:11px;border:0;border-radius:10px;background:#1e3a5f;color:#fff;font-weight:700;font-size:14px;cursor:pointer">Нэвтрэх</button>
+  </div>`;
+  const inp=document.getElementById('gatePin');
+  if(inp){inp.onkeydown=e=>{if(e.key==='Enter')tryUnlock();};setTimeout(()=>inp.focus(),80);}
+}
+function hideGate(){const el=document.getElementById('gate');if(el)el.remove();}
+function tryUnlock(){
+  const role=currentRole();
+  const v=(document.getElementById('gatePin').value||'').trim();
+  const pin=(S.pins&&S.pins[role])||'';
+  if(v===pin){setUnlocked(role,pin);hideGate();applyRole();}
+  else{const e=document.getElementById('gateErr');if(e)e.textContent='Код буруу байна';const i=document.getElementById('gatePin');if(i){i.value='';i.focus();}}
+}
+function applyGate(){
+  const role=currentRole();
+  const pin=(S.pins&&S.pins[role])||'';
+  if(!pin){hideGate();applyRole();return;}
+  if(unlockedPin(role)===pin){hideGate();applyRole();return;}
+  showGate('pin');
 }
 
 load();renderAll();
-loadSyncCfg();syncInit();setSyncStatus(syncStatus);
-applyRole();
+(function(){const v=document.getElementById('appVer');if(v)v.textContent=APP_VER;})();
+loadSyncCfg();
+// Синктэй бол эхний өгөгдөл ирэх хүртэл түгжээтэй хүлээнэ (код мэдэхгүй байж нээгдэхээс сэргийлнэ)
+if(syncCfg&&syncCfg.enabled&&syncCfg.databaseURL&&typeof firebase!=='undefined'){showGate('loading');setTimeout(()=>{if(!syncFirstSnap)applyGate();},4000);}
+syncInit();setSyncStatus(syncStatus);
+if(!(syncCfg&&syncCfg.enabled))applyGate();
 </script>
 </body>
 </html>
