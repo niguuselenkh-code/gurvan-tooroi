@@ -6,13 +6,13 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Гурван Тоорой — Удирдлагын систем</title>
-<link rel="manifest" href="manifest.json">
+<title id="pageTitle">Гурван Тоорой — Удирдлагын систем</title>
+<link rel="manifest" href="manifest.json" id="manifestLink">
 <meta name="theme-color" content="#1e3a5f">
 <!-- iOS: Add to Home Screen -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Гурван Тоорой">
+<meta name="apple-mobile-web-app-title" content="Гурван Тоорой" id="appleTitle">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <!-- Android/Chrome icon fallback -->
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -418,12 +418,12 @@
     <div class="section-head">
       <div><h2>Агуулах</h2><div class="desc">Дотоод хэрэглээний бараа: хүнс, ахуй, барилга, үндсэн хөрөнгө, барианы материал. Үлдэгдэл, хэрэглээ, тулгалт.</div></div>
       <div class="row">
-        <button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="openInternalUse()">🏠 Дотоод хэрэглээ</button>
-        <button class="btn btn-ghost btn-sm" onclick="openSetStock()">📝 Үлдэгдэл оруулах</button>
+        <button class="btn btn-sm" id="btnInternalUse" style="background:#1c6ea4;color:#fff" onclick="openInternalUse()">🏠 Дотоод хэрэглээ</button>
+        <button class="btn btn-ghost btn-sm" id="btnSetStock" onclick="openSetStock()">📝 Үлдэгдэл оруулах</button>
         <button class="btn btn-ghost btn-sm" onclick="openStockHistory()">📅 Өдрийн үлдэгдэл</button>
-        <button class="btn btn-ghost btn-sm" onclick="openMarketPrices()">🏪 Захын үнэ</button>
-        <button class="btn btn-berry btn-sm" onclick="openStockTake('stock')">🧾 Тулгалт хийх</button>
-        <button class="btn btn-primary btn-sm" onclick="openProductModal(null,'food')">+ Шинэ бараа</button>
+        <button class="btn btn-ghost btn-sm" id="btnMarketPrices" onclick="openMarketPrices()">🏪 Захын үнэ</button>
+        <button class="btn btn-berry btn-sm" id="btnStockTake" onclick="openStockTake('stock')">🧾 Тулгалт хийх</button>
+        <button class="btn btn-primary btn-sm" id="btnNewStockProduct" onclick="openProductModal(null,'food')">+ Шинэ бараа</button>
       </div>
     </div>
     <div class="seg" id="stockGroupFilt">
@@ -688,7 +688,7 @@ function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):defaults
   delete S.serviceRules;
   S.massages=S.massages||[];
   S.msgDayStatus=S.msgDayStatus||{};
-  S.pins=Object.assign({manager:'',therapist:'',operator:''},S.pins||{});
+  S.pins=Object.assign({manager:'',therapist:'',operator:'',cook:''},S.pins||{});
   S.products=S.products||[];
   S.products.forEach(p=>{ if(!p.group) p.group='goods'; });
   S.productSales=S.productSales||[];
@@ -701,6 +701,10 @@ function defaultRoomPrice(oo,beds){
   return 125000; // 00-гүй бүх өрөө
 }
 function save(){
+  try{
+    S._lastEditRole=(typeof currentRole==='function')?currentRole():'manager';
+    S._lastEditAt=new Date().toISOString();
+  }catch(e){}
   try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
   try{ if(typeof syncPush==='function') syncPush(); }catch(e){}
 }
@@ -1744,6 +1748,8 @@ function renderSettings(){
           <td><input value="${(S.pins&&S.pins.therapist)||''}" inputmode="numeric" placeholder="жиш: 7890" style="width:120px" onchange="S.pins.therapist=this.value.trim()"></td></tr>
         <tr><td style="font-weight:600">Оператор<div style="font-size:11px;color:var(--muted);font-weight:400">Зөвхөн Календарь+Захиалга</div></td>
           <td><input value="${(S.pins&&S.pins.operator)||''}" inputmode="numeric" placeholder="жиш: 3344" style="width:120px" onchange="S.pins.operator=this.value.trim()"></td></tr>
+        <tr><td style="font-weight:600">Тогооч<div style="font-size:11px;color:var(--muted);font-weight:400">Зөвхөн Хоол+Агуулах</div></td>
+          <td><input value="${(S.pins&&S.pins.cook)||''}" inputmode="numeric" placeholder="жиш: 2211" style="width:120px" onchange="S.pins.cook=this.value.trim()"></td></tr>
       </tbody></table>
       <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="savePins()">Хадгалах</button>
       <div class="hint" style="margin-top:8px">⚠️ Код тавьсны дараа бүх төхөөрөмж дээр нэг удаа асууна. Өөрийн кодоо мартаж болохгүй.</div>
@@ -1768,6 +1774,20 @@ function renderSettings(){
     </div>
 
     <div class="card set-sec">
+      <h3>🔗 Тогоочийн линк</h3>
+      <div class="hint" style="margin-bottom:10px">Энэ хаягийг тогоочид явуулна. Нээхэд <b>зөвхөн Хоол + Агуулах</b> харагдана — бусад таб харагдахгүй. Тогооч хоолны цэс харж, «Хийсэн» гэж тэмдэглэж, агуулахад бараа оруулж болно.</div>
+      <div class="row" style="gap:6px">
+        <input id="cookLink" readonly value="${(typeof location!=='undefined'?location.origin+location.pathname:'')}?cook" style="flex:1;font-size:12px;font-family:monospace">
+        <button class="btn btn-primary btn-sm" onclick="copyCookLink()">Хуулах</button>
+      </div>
+    </div>
+
+    <div class="card set-sec">
+      <h3>🕓 Сүүлд засварласан</h3>
+      <div id="lastEditBox"></div>
+    </div>
+
+    <div class="card set-sec">
       <h3>🗑 Өгөгдөл</h3>
       <div class="hint" style="margin-bottom:10px">Бүх захиалга, тохиргоог устгаж анхны байдалд шилжүүлнэ.</div>
       <button class="btn btn-berry btn-sm" onclick="resetAll()">Бүх өгөгдөл цэвэрлэх</button>
@@ -1776,6 +1796,16 @@ function renderSettings(){
   renderMealSlotsSettings();
   renderStaffSettings();
   renderRoomAssets();
+  renderLastEdit();
+}
+const ROLE_LABEL={manager:'Менежер',therapist:'Бариач',operator:'Оператор',cook:'Тогооч'};
+function renderLastEdit(){
+  const box=document.getElementById('lastEditBox'); if(!box)return;
+  if(!S._lastEditAt){box.innerHTML='<div class="hint">Мэдээлэл алга.</div>';return;}
+  const d=new Date(S._lastEditAt);
+  const dateStr=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+  const who=ROLE_LABEL[S._lastEditRole]||S._lastEditRole||'Тодорхойгүй';
+  box.innerHTML=`<div class="hint" style="margin:0">Хамгийн сүүлд <b style="color:var(--navy)">${who}</b> эрхээр <b>${dateStr}</b>-д өөрчлөлт хийгдсэн.</div>`;
 }
 /* ---- Өрөөний эд хөрөнгө ---- */
 let raRoom=1;
@@ -3311,15 +3341,16 @@ function renderStock(){
       if(daysLeft<0)exp=' <span style="color:#c0392b">⚠️</span>';
       else if(daysLeft<=7)exp=` <span style="color:#c98a2e">⏰${daysLeft}</span>`;
     }
+    const cookMode=(typeof currentRole==='function'&&currentRole()==='cook');
     return `<div class="stock-item">
       <span class="st ${stDot(p)}" title="${stockStatus(p).txt}"></span>
-      <div class="nm" onclick="openProductModal('${p.id}')" style="cursor:pointer"><b>${p.name}</b>${exp}${used?`<span class="sub"> · хэрэглээ −${used}</span>`:''}</div>
+      <div class="nm" ${cookMode?'':`onclick="openProductModal('${p.id}')" style="cursor:pointer"`}><b>${p.name}</b>${exp}${used?`<span class="sub"> · хэрэглээ −${used}</span>`:''}</div>
       <span class="qty">${p.stock}<span style="font-weight:400;color:var(--muted);font-size:10px"> ${p.unit}</span></span>
       <div class="acts">
         <button class="btn-icon" title="Нөөц нэмэх" onclick="restockProduct('${p.id}')">📥</button>
-        <button class="btn-icon" title="Хөдөлгөөн" onclick="openMoves('${p.id}')">📜</button>
+        ${cookMode?'':`<button class="btn-icon" title="Хөдөлгөөн" onclick="openMoves('${p.id}')">📜</button>
         <button class="btn-icon" title="Засах" onclick="openProductModal('${p.id}')">✎</button>
-        <button class="btn-icon" title="Устгах" onclick="deleteProduct('${p.id}')">🗑</button>
+        <button class="btn-icon" title="Устгах" onclick="deleteProduct('${p.id}')">🗑</button>`}
       </div>
     </div>`;
   };
@@ -4015,7 +4046,7 @@ function syncPush(force){
   },force?0:600);
 }
 function savePins(){
-  S.pins=S.pins||{manager:'',therapist:'',operator:''};
+  S.pins=S.pins||{manager:'',therapist:'',operator:'',cook:''};
   // Одоогийн төхөөрөмжөө шинэ кодоор нээлттэй байлгана (өөрөө түгжигдэхээс сэргийлнэ)
   const role=currentRole();
   if(S.pins[role]) setUnlocked(role,S.pins[role]);
@@ -4029,6 +4060,12 @@ function copyBariaLink(){
 }
 function copyOperatorLink(){
   const el=document.getElementById('operatorLink');if(!el)return;
+  const v=el.value;
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(v).then(()=>toast('Хууллаа ✓','ok'),()=>toast('Хуулж чадсангүй','err'));}
+  else{try{el.select();document.execCommand('copy');toast('Хууллаа ✓','ok');}catch(e){toast('Хуулж чадсангүй','err');}}
+}
+function copyCookLink(){
+  const el=document.getElementById('cookLink');if(!el)return;
   const v=el.value;
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(v).then(()=>toast('Хууллаа ✓','ok'),()=>toast('Хуулж чадсангүй','err'));}
   else{try{el.select();document.execCommand('copy');toast('Хууллаа ✓','ok');}catch(e){toast('Хуулж чадсангүй','err');}}
@@ -4064,9 +4101,40 @@ function currentRole(){
   const q=(location.search||'')+(location.hash||'');
   if(/[?&#]baria\b/i.test(q)) return 'therapist';
   if(/[?&#]operator\b/i.test(q)) return 'operator';
+  if(/[?&#]cook\b/i.test(q)) return 'cook';
   return 'manager';
 }
-const APP_VER='5.0';
+// Эрхийн дагуу гарчиг + PWA манифестыг тохируулна (Нүүр дэлгэцэнд нэмэхэд зөв нэр/хаягаар суулгагдана)
+function setupRoleApp(){
+  const role=currentRole();
+  const cfg={
+    manager:{title:'Гурван Тоорой — Удирдлагын систем',short:'Гурван Тоорой',appleTitle:'Гурван Тоорой'},
+    therapist:{title:'Гурван Тоорой — Бариа',short:'Бариа · Г.Тоорой',appleTitle:'Бариа'},
+    operator:{title:'Гурван Тоорой — Оператор',short:'Захиалга · Г.Тоорой',appleTitle:'Захиалга'},
+    cook:{title:'Гурван Тоорой — Тогооч',short:'Тогооч · Г.Тоорой',appleTitle:'Тогооч'}
+  }[role];
+  const titleEl=document.getElementById('pageTitle'); if(titleEl){titleEl.textContent=cfg.title;} document.title=cfg.title;
+  const appleEl=document.getElementById('appleTitle'); if(appleEl) appleEl.setAttribute('content',cfg.appleTitle);
+  // Динамик манифест: start_url нь одоогийн хаяг (query-тэй хамт) байхаар — Нүүр дэлгэцний дүрс зөв эрхээр нээгдэнэ
+  try{
+    const startUrl=location.pathname+location.search;
+    const manifest={
+      name:cfg.title, short_name:cfg.short, description:'Амралтын газрын систем',
+      start_url:startUrl, scope:'./', display:'standalone', orientation:'portrait-primary',
+      background_color:'#1e3a5f', theme_color:'#1e3a5f',
+      icons:[
+        {src:'icon-192.png',sizes:'192x192',type:'image/png',purpose:'any'},
+        {src:'icon-512.png',sizes:'512x512',type:'image/png',purpose:'any'},
+        {src:'icon-maskable.png',sizes:'512x512',type:'image/png',purpose:'maskable'}
+      ]
+    };
+    const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const link=document.getElementById('manifestLink'); if(link) link.setAttribute('href',url);
+  }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
+}
+setupRoleApp();
+const APP_VER='5.2';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
@@ -4083,6 +4151,20 @@ function applyRole(){
     });
     document.querySelectorAll('main .panel').forEach(p=>{ p.classList.toggle('active', p.id==='cal'); });
     const sub=document.querySelector('.brand .sub'); if(sub) sub.innerHTML='Захиалгын систем <span style="opacity:.6;font-size:11px">· v'+APP_VER+'</span>';
+    return true;
+  }
+  if(role==='cook'){
+    const allowed=['meals','stock'];
+    document.querySelectorAll('nav.tabs button').forEach(b=>{
+      if(!allowed.includes(b.dataset.tab)) b.style.display='none';
+      else b.classList.toggle('active', b.dataset.tab==='meals');
+    });
+    document.querySelectorAll('main .panel').forEach(p=>{ p.classList.toggle('active', p.id==='meals'); });
+    const sub=document.querySelector('.brand .sub'); if(sub) sub.innerHTML='Тогооны систем <span style="opacity:.6;font-size:11px">· v'+APP_VER+'</span>';
+    // Тогооч зөвхөн "Нөөц нэмэх" хийж чадна — хасалт/устгал хийдэг товчнуудыг нуана
+    ['btnInternalUse','btnSetStock','btnMarketPrices','btnStockTake','btnNewStockProduct'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.style.display='none';
+    });
     return true;
   }
   return false;
@@ -4102,7 +4184,7 @@ function showGate(mode){
   el.innerHTML=`<div style="background:#fff;border-radius:16px;padding:26px 24px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3)">
     <div style="font-size:30px;margin-bottom:6px">🔒</div>
     <div style="font-weight:800;color:#1e3a5f;font-size:17px">Гурван Тоорой</div>
-    <div style="font-size:12.5px;color:#7a8492;margin-top:2px;margin-bottom:16px">${role==='therapist'?'Барианы систем':role==='operator'?'Захиалгын систем':'Удирдлагын систем'}</div>
+    <div style="font-size:12.5px;color:#7a8492;margin-top:2px;margin-bottom:16px">${role==='therapist'?'Барианы систем':role==='operator'?'Захиалгын систем':role==='cook'?'Тогооны систем':'Удирдлагын систем'}</div>
     <input id="gatePin" type="password" inputmode="numeric" placeholder="Код" style="width:100%;text-align:center;font-size:19px;letter-spacing:5px;padding:11px;border:1px solid #dfe4ea;border-radius:10px">
     <div id="gateErr" style="color:#c0392b;font-size:12.5px;height:16px;margin-top:6px"></div>
     <button onclick="tryUnlock()" style="width:100%;margin-top:6px;padding:11px;border:0;border-radius:10px;background:#1e3a5f;color:#fff;font-weight:700;font-size:14px;cursor:pointer">Нэвтрэх</button>
