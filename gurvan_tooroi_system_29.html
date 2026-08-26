@@ -5,8 +5,17 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Гурван Тоорой — Удирдлагын систем</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e3a5f">
+<!-- iOS: Add to Home Screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Гурван Тоорой">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<!-- Android/Chrome icon fallback -->
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -83,6 +92,14 @@
   table.cal tbody td.cell:hover{background:#f0f4f8}
   table.cal td.oo-lab{background:var(--oo)}
   table.cal td.nooo-lab{background:var(--nooo)}
+  table.cal tfoot td{background:#f7f9fb;height:30px;font-weight:700;font-size:12px;color:var(--navy)}
+  table.cal tfoot td.sumlab{position:sticky;left:0;z-index:2;background:#eef2f7;text-align:left;padding:5px 10px;font-size:11.5px;white-space:nowrap}
+  table.cal tfoot td.z{color:#c3cad3;font-weight:400}
+  table.cal tfoot tr.tot td{background:#e9eff6;border-top:2px solid var(--navy)}
+  table.cal tfoot tr.tot td.sumlab{background:#dfe8f2}
+  table.cal tfoot tr.msg td{background:#eef7fa;border-top:1px dashed #9dc4d1}
+  table.cal tfoot tr.msg td.sumlab{background:#e2f0f5}
+  table.cal tfoot td .cb2{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:1px}
   .grp{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:var(--soft);padding:4px 10px;text-align:left;position:sticky;left:0}
   .occ{position:absolute;inset:2px;border-radius:5px;display:flex;align-items:center;padding:0 5px;font-size:11px;font-weight:600;overflow:hidden;white-space:nowrap;color:#fff}
   .occ.conf{background:var(--green)}
@@ -137,6 +154,31 @@
   .ptbl th{background:var(--soft);text-align:left;padding:8px 10px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--line);white-space:nowrap}
   .ptbl td{padding:8px 10px;border-bottom:1px solid var(--line)}
   .ptbl tr:last-child td{border-bottom:none}
+  /* Агуулахын нягт хүснэгт */
+  #stockBody td, #stockBody tr td{padding:4px 8px;font-size:12px}
+  #stock .ptbl th{padding:5px 8px;font-size:10px}
+  #stockBody b{font-size:12.5px}
+  #stockBody .row{gap:3px}
+  #stockBody .btn-icon{padding:2px 5px;font-size:12px}
+  #stockBody .pill{font-size:10px;padding:1px 6px}
+  /* Агуулахын багана (grid) харагдац */
+  .stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+  .stock-cat{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+  .stock-cat-h{background:var(--soft);padding:7px 11px;font-weight:700;font-size:12.5px;color:var(--navy);display:flex;justify-content:space-between;align-items:center}
+  .stock-cat-h .cnt{font-weight:400;color:var(--muted);font-size:11px}
+  .stock-item{display:flex;align-items:center;gap:8px;padding:6px 11px;border-top:1px solid var(--line);font-size:12.5px}
+  .stock-item:first-of-type{border-top:none}
+  .stock-item .nm{flex:1;min-width:0}
+  .stock-item .nm b{font-weight:600}
+  .stock-item .nm .sub{font-size:10px;color:var(--muted)}
+  .stock-item .qty{font-weight:700;white-space:nowrap;text-align:right}
+  .stock-item .st{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+  .stock-item .acts{display:none;gap:2px}
+  .stock-item:hover .acts{display:flex}
+  .stock-item:hover{background:#faf8f6}
+  .stock-item .btn-icon{padding:1px 4px;font-size:12px}
+  .st-ok{background:#3ba55d}.st-low{background:#e0a72e}.st-out{background:#c0392b}
+  @media(hover:none){.stock-item .acts{display:flex}.stock-item .nm{pointer-events:none}}
   .seg{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;margin-bottom:12px}
   .seg button{background:none;border:none;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);padding:6px 13px;border-radius:7px;cursor:pointer;white-space:nowrap}
   .seg button.active{background:#fff;color:var(--navy);box-shadow:0 1px 2px rgba(0,0,0,.07)}
@@ -146,6 +188,7 @@
   .msum{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));margin-bottom:12px}
   .msum .card{padding:12px 14px;text-align:center}
   .msum .v{font-size:22px;font-weight:800;color:var(--navy)}
+  .msum .v .of{font-size:13px;font-weight:600;color:var(--muted);opacity:.75}
   .msum .l{font-size:11px;color:var(--muted);font-weight:600;margin-top:2px}
   .msum .card.time .v{color:var(--berry)}
   .gplan{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px;background:var(--card);box-shadow:var(--shadow)}
@@ -184,6 +227,77 @@
   .mc-b.mc-part{background:var(--amber)}
   .mc-b.mc-undone{background:var(--red)}
   .mini-tbl td,.mini-tbl th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+  .mslot{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px;background:#fff}
+  .mslot-h{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:8px}
+  .mslot-cnt{display:flex;align-items:center;gap:10px}
+  .mslot-cnt>span{font-size:15px;font-weight:800;color:var(--navy);display:flex;flex-direction:column;align-items:center;line-height:1.1}
+  .mslot-cnt>span small{font-size:9px;font-weight:600;color:var(--muted)}
+  .mslot-meal{background:var(--soft);border-radius:9px;padding:9px 11px;margin-top:8px}
+  .mslot-meal.cooked{background:#eaf5ee}
+  /* Навигацийн дүрс/нэр (десктоп дээр хажуу зэрэгцээ) */
+  nav.tabs button .ti{margin-right:5px}
+  nav.tabs button .tl{display:inline}
+
+  /* ================= ГАР УТАС ================= */
+  @media(max-width:720px){
+    header.app{padding:10px 0 0}
+    .brand{padding:0 14px 10px;gap:9px}
+    .brand h1{font-size:18px}
+    .brand .sub{font-size:11px}
+    /* Таб цэсийг доод талд бэхлэх */
+    nav.tabs{
+      position:fixed;bottom:0;left:0;right:0;z-index:150;
+      background:var(--navy);max-width:none;margin:0;gap:0;
+      overflow-x:visible;justify-content:space-around;
+      box-shadow:0 -2px 12px rgba(0,0,0,.18);
+      padding:0 2px;padding-bottom:env(safe-area-inset-bottom,0);
+    }
+    nav.tabs button{
+      flex:1;flex-direction:column;align-items:center;gap:1px;
+      padding:7px 2px 6px;border-bottom:none;border-top:3px solid transparent;
+      font-size:9.5px;min-width:0;
+    }
+    nav.tabs button .ti{margin-right:0;font-size:19px;line-height:1.1}
+    nav.tabs button .tl{font-size:9px;line-height:1.1}
+    nav.tabs button.active{border-top-color:var(--berry);border-bottom:none}
+    main{padding:14px 12px 84px}  /* доод цэсэнд зай */
+    /* Гарчиг, товчнууд */
+    .section-head{flex-direction:column;align-items:stretch;gap:10px}
+    .section-head h2{font-size:19px}
+    .section-head .row{flex-wrap:wrap;gap:6px}
+    .section-head .row .btn{flex:1;min-width:calc(50% - 4px)}
+    /* Товч том, хүрэхэд амар */
+    .btn{padding:11px 14px;font-size:14px}
+    .btn-sm{padding:9px 12px;font-size:13px}
+    .btn-icon{padding:7px 9px;font-size:16px;min-width:38px;min-height:36px}
+    /* Оролт талбар том (iOS zoom-оос сэргийлж 16px) */
+    input,select,textarea{font-size:16px!important;padding:10px 12px}
+    .field{font-size:12px}
+    /* Цонх бүтэн өргөн, доороос гарах */
+    .modal-bg{align-items:flex-end;padding:0}
+    .modal{max-width:none;width:100%;border-radius:18px 18px 0 0;max-height:92vh;animation:slideUp .25s ease}
+    .modal-body{max-height:calc(92vh - 130px)}
+    .form-grid{grid-template-columns:1fr}
+    .modal-foot{position:sticky;bottom:0;background:#fff}
+    .modal-foot .btn{flex:1;padding:13px}
+    /* Grid нэг/хоёр багана */
+    .stock-grid{grid-template-columns:1fr;gap:10px}
+    .stock-item{padding:10px 12px;font-size:14px}
+    .stock-item .acts{display:flex;gap:3px}
+    .stock-item .btn-icon{padding:6px 8px;font-size:15px}
+    .msum{grid-template-columns:repeat(2,1fr)!important}
+    /* Хүснэгт хэвтээ гүйлгэх боломжтой хэвээр (nowrap) */
+    .card{padding:12px}
+    table.cal{font-size:12px}
+    /* Массажны grid, мини календарь */
+    .mc-day{min-height:38px}
+  }
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .ra-tabs{display:flex;flex-wrap:wrap;gap:5px}
+  .ra-tab{background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-family:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px}
+  .ra-tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .ra-tab .ra-cnt{background:var(--berry);color:#fff;font-size:10px;border-radius:8px;padding:0 5px;font-weight:700}
+  .rf-flag{display:inline-block;background:#c0392b;color:#fff;font-size:9px;font-weight:800;border-radius:50%;width:15px;height:15px;line-height:15px;text-align:center;margin-right:3px;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -194,12 +308,14 @@
     <div><h1>Гурван Тоорой</h1><div class="sub">Амралтын газрын удирдлагын систем <span style="opacity:.6;font-size:11px">· v<span id="appVer">—</span></span></div></div>
   </div>
   <nav class="tabs">
-    <button data-tab="cal" class="active">📅 Календарь</button>
-    <button data-tab="list">📋 Захиалгууд</button>
-    <button data-tab="massage">💆 Бариа</button>
-    <button data-tab="inv">🛒 Худалдан авалт</button>
-    <button data-tab="report">📊 Тайлан</button>
-    <button data-tab="settings">⚙️ Тохиргоо</button>
+    <button data-tab="cal" class="active"><span class="ti">📅</span><span class="tl">Календарь</span></button>
+    <button data-tab="list"><span class="ti">📋</span><span class="tl">Захиалга</span></button>
+    <button data-tab="massage"><span class="ti">💆</span><span class="tl">Бариа</span></button>
+    <button data-tab="inv"><span class="ti">🛒</span><span class="tl">Худ.авалт</span></button>
+    <button data-tab="stock"><span class="ti">📦</span><span class="tl">Агуулах</span></button>
+    <button data-tab="meals"><span class="ti">🍲</span><span class="tl">Хоол</span></button>
+    <button data-tab="report"><span class="ti">📊</span><span class="tl">Тайлан</span></button>
+    <button data-tab="settings"><span class="ti">⚙️</span><span class="tl">Тохиргоо</span></button>
   </nav>
 </header>
 
@@ -259,44 +375,92 @@
     <div id="msgRoomGrid" style="margin-bottom:22px"></div>
   </section>
 
-  <!-- ============ FRIDGE PRODUCTS (Хөргөгчний бараа) ============ -->
+  <!-- ============ ЗАРАХ БАРАА (Худалдан авалт) ============ -->
   <section class="panel" id="inv">
     <div class="section-head">
-      <div><h2>Худалдан авалт</h2><div class="desc">Хүнс/ахуйн бараа, нэмэлт үйлчилгээний нэр, үнэ, үлдэгдлийн бүртгэл. Захиалгын дэлгэрэнгүй дэх «Нэмэлт үйлчилгээ» хэсгээр сонгож нэмнэ.</div></div>
+      <div><h2>Худалдан авалт</h2><div class="desc">Зочид, ажилчдын худалдан авалт. Бараа сонгож, тоо оруулж, хэн авсныг тэмдэглэнэ. Зочны авалт захиалгын төлбөрт, ажилтны авалт цалингаас.</div></div>
       <div class="row">
-        <button class="btn btn-ghost btn-sm" onclick="seedProducts()">Жишээ бараа оруулах</button>
-        <button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="openInternalUse()">🏠 Дотоод хэрэглээ</button>
-        <button class="btn btn-berry btn-sm" onclick="openStockTake()">🧾 Тулгалт хийх</button>
-        <button class="btn btn-primary btn-sm" onclick="openProductModal()">+ Шинэ бараа</button>
+        <button class="btn btn-ghost btn-sm" onclick="seedProducts()">Жишээ бараа</button>
+        <button class="btn btn-berry btn-sm" onclick="openStockTake('sale')">🧾 Тулгалт</button>
+        <button class="btn btn-primary btn-sm" onclick="openProductModal(null,'goods')">+ Шинэ бараа</button>
       </div>
     </div>
-    <div class="card" style="padding:14px;margin-bottom:14px">
-      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-        <h3 style="font-size:15px;color:var(--navy);margin:0">📅 Өдрийн хяналт</h3>
+
+    <div class="card" style="padding:16px;margin-bottom:16px;background:linear-gradient(135deg,#fff,#f7f4f0)">
+      <h3 style="font-size:15px;color:var(--navy);margin:0 0 12px">🛒 Худалдан авалт бүртгэх</h3>
+      <div id="quickSellBox"></div>
+    </div>
+
+    <div class="card" style="padding:16px;margin-bottom:16px">
+      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <h3 style="font-size:15px;color:var(--navy);margin:0">📅 Өдрийн худалдан авалт</h3>
         <div style="display:flex;align-items:center;gap:8px">
-          <button class="btn-icon" onclick="stockDay=addDays(stockDay,-1);renderInventory()">‹</button>
-          <b id="stockDayLbl" style="min-width:130px;text-align:center;font-size:14px"></b>
-          <button class="btn-icon" onclick="stockDay=addDays(stockDay,1);renderInventory()">›</button>
-          <button class="btn btn-ghost btn-sm" onclick="stockDay=todayStr();renderInventory()">Өнөөдөр</button>
+          <button class="btn-icon" onclick="purchDay=addDays(purchDay,-1);renderPurchases()">‹</button>
+          <b id="purchDayLbl" style="min-width:130px;text-align:center;font-size:14px"></b>
+          <button class="btn-icon" onclick="purchDay=addDays(purchDay,1);renderPurchases()">›</button>
+          <button class="btn btn-ghost btn-sm" onclick="purchDay=todayStr();renderPurchases()">Өнөөдөр</button>
         </div>
       </div>
-      <div id="stockTakeInfo" style="margin-top:10px"></div>
-      <div id="dailyStockBox" style="overflow-x:auto;margin-top:10px"></div>
+      <div id="purchDayBox"></div>
     </div>
+
     <div class="seg" id="invGroupFilt">
       <button data-g="all" class="active">Бүгд</button>
       <button data-g="goods">Зарах бараа</button>
-      <button data-g="food">Хоолны материал</button>
-      <button data-g="house">Ахуйн хэрэглээ</button>
-      <button data-g="build">Барилгын материал</button>
-      <button data-g="massage">Барианы бараа</button>
       <button data-g="service">Нэмэлт үйлчилгээ</button>
     </div>
     <div class="search" style="margin-bottom:12px"><input id="invSearch" placeholder="🔍 Бараа хайх..." oninput="renderInventory()"></div>
-    <div class="card" style="overflow-x:auto">
-      <table class="ptbl"><thead><tr><th>Бараа</th><th>Бүлэг</th><th>Ангилал</th><th>Өртөг</th><th>Зарах үнэ</th><th>Үлдэгдэл</th><th>Төлөв</th><th></th></tr></thead>
-      <tbody id="invBody"></tbody></table>
+    <div id="invBody"></div>
+  </section>
+
+  <!-- ============ АГУУЛАХ (дотоод бараа) ============ -->
+  <section class="panel" id="stock">
+    <div class="section-head">
+      <div><h2>Агуулах</h2><div class="desc">Дотоод хэрэглээний бараа: хүнс, ахуй, барилга, үндсэн хөрөнгө, барианы материал. Үлдэгдэл, хэрэглээ, тулгалт.</div></div>
+      <div class="row">
+        <button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="openInternalUse()">🏠 Дотоод хэрэглээ</button>
+        <button class="btn btn-ghost btn-sm" onclick="openSetStock()">📝 Үлдэгдэл оруулах</button>
+        <button class="btn btn-ghost btn-sm" onclick="openStockHistory()">📅 Өдрийн үлдэгдэл</button>
+        <button class="btn btn-ghost btn-sm" onclick="openMarketPrices()">🏪 Захын үнэ</button>
+        <button class="btn btn-berry btn-sm" onclick="openStockTake('stock')">🧾 Тулгалт хийх</button>
+        <button class="btn btn-primary btn-sm" onclick="openProductModal(null,'food')">+ Шинэ бараа</button>
+      </div>
     </div>
+    <div class="seg" id="stockGroupFilt">
+      <button data-g="all" class="active">Бүгд</button>
+      <button data-g="food">🍲 Хүнс</button>
+      <button data-g="house">🧹 Ахуй</button>
+      <button data-g="build">🧱 Барилга</button>
+      <button data-g="asset">🏛 Үндсэн хөрөнгө</button>
+      <button data-g="massage">💆 Бариа</button>
+    </div>
+    <div class="search" style="margin-bottom:12px"><input id="stockSearch" placeholder="🔍 Бараа хайх..." oninput="renderStock()"></div>
+    <div id="stockSummary" style="margin-bottom:14px"></div>
+    <div id="stockBody"></div>
+  </section>
+
+  <!-- ============ ХООЛ ============ -->
+  <section class="panel" id="meals">
+    <div class="section-head">
+      <div><h2>Хоол</h2><div class="desc">Хоолны цэс, орц. Өдөр бүр хийх хоолоо сонгоход зочдын тоогоор орц агуулахаас автоматаар хасагдана.</div></div>
+      <button class="btn btn-primary btn-sm" onclick="openMealModal()">+ Шинэ хоол</button>
+    </div>
+
+    <div class="card" style="padding:16px;margin-bottom:18px">
+      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <h3 style="font-size:15px;color:var(--navy);margin:0">📅 Өдрийн хоол</h3>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn-icon" onclick="mealDay=addDays(mealDay,-1);renderMeals()">‹</button>
+          <b id="mealDayLbl" style="min-width:150px;text-align:center;font-size:14px"></b>
+          <button class="btn-icon" onclick="mealDay=addDays(mealDay,1);renderMeals()">›</button>
+          <button class="btn btn-ghost btn-sm" onclick="mealDay=todayStr();renderMeals()">Өнөөдөр</button>
+        </div>
+      </div>
+      <div id="mealDayBox"></div>
+    </div>
+
+    <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">🍽 Хоолны цэс</h3>
+    <div class="card" style="overflow-x:auto"><div id="mealListBox"></div></div>
   </section>
 
   <!-- ============ REPORT ============ -->
@@ -307,12 +471,15 @@
     <div class="rangebar">
       <div class="rf"><label>Эхлэх (ирэх өдөр)</label><input type="date" id="rp_from"></div>
       <div class="rf"><label>Дуустал</label><input type="date" id="rp_to"></div>
+      <button class="btn btn-ghost btn-sm" onclick="setReportRange('7')">Сүүлийн 7 хоног</button>
+      <button class="btn btn-ghost btn-sm" onclick="setReportRange('15')">Сүүлийн 15 хоног</button>
       <button class="btn btn-ghost btn-sm" onclick="setReportRange('month')">Энэ сар</button>
       <button class="btn btn-ghost btn-sm" onclick="setReportRange('lastmonth')">Өнгөрсөн сар</button>
       <button class="btn btn-ghost btn-sm" onclick="setReportRange('all')">Бүх цаг</button>
       <button class="btn btn-primary btn-sm" onclick="renderReport()">Шүүх</button>
     </div>
     <div class="stats" id="rpStats"></div>
+    <div id="rpRefundReminder"></div>
     <div class="grid" style="display:grid;gap:16px;grid-template-columns:1fr 1fr" id="rpCols">
       <div class="card" style="padding:16px">
         <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">🚪 Өрөөгөөр</h3>
@@ -323,9 +490,46 @@
         <div style="overflow-x:auto"><table class="mini-tbl" id="rpKidTbl"></table></div>
       </div>
     </div>
+    <div class="card" style="padding:16px;margin-top:16px">
+      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <h3 style="font-size:15px;color:var(--navy);margin:0">📦 Агуулахын хөдөлгөөн</h3>
+        <select id="rpStockGroup" style="width:auto;font-size:12.5px" onchange="renderReport()">
+          <option value="all">Бүх бүлэг</option>
+          <option value="food">🍲 Хүнс</option>
+          <option value="house">🧹 Ахуй</option>
+          <option value="build">🧱 Барилга</option>
+          <option value="asset">🏛 Үндсэн хөрөнгө</option>
+          <option value="massage">💆 Бариа</option>
+        </select>
+      </div>
+      <div class="hint" style="margin-bottom:10px">Сонгосон хугацаанд бараа бүрд хэдэн удаа, хэдэн нэгж орж/гарсныг харуулна.</div>
+      <div style="overflow-x:auto"><table class="mini-tbl" id="rpStockTbl"></table></div>
+    </div>
+    <div class="card" style="padding:16px;margin-top:16px">
+      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+        <h3 style="font-size:15px;color:var(--navy);margin:0">💸 Худалдан авалтын зардал</h3>
+        <div style="font-size:18px;font-weight:800;color:var(--berry)">Нийт: <span id="rpCostSum">0₮</span></div>
+      </div>
+      <div class="hint" style="margin-bottom:10px">Сонгосон хугацаанд нөөцөд зарцуулсан мөнгө — захаар болон бараагаар.</div>
+      <div class="grid" style="display:grid;gap:16px;grid-template-columns:1fr 1fr">
+        <div><h4 style="font-size:13px;color:var(--muted);margin-bottom:6px">🏪 Захаар</h4><div style="overflow-x:auto"><table class="mini-tbl" id="rpCostTbl"></table></div></div>
+        <div><h4 style="font-size:13px;color:var(--muted);margin-bottom:6px">📦 Бараагаар (топ 15)</h4><div style="overflow-x:auto"><table class="mini-tbl" id="rpCostProdTbl"></table></div></div>
+      </div>
+    </div>
+    <div class="card" style="padding:16px;margin-top:16px">
+      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+        <h3 style="font-size:15px;color:var(--navy);margin:0">🛒 Борлуулалт (зарагдсан)</h3>
+        <div style="font-size:18px;font-weight:800;color:var(--green)">Нийт: <span id="rpSalesSum">0₮</span></div>
+      </div>
+      <div class="hint" style="margin-bottom:10px">Сонгосон хугацаанд зочид, ажилчдад зарагдсан бараа, үйлчилгээ — ангиллаар, тоо ба дүнгээр.</div>
+      <div style="overflow-x:auto"><table class="mini-tbl" id="rpSalesTbl"></table></div>
+      <div style="margin-top:8px;font-size:12px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap">
+        <span>Зочдод: <b id="rpSalesRoom">0₮</b></span>
+        <span>Ажилчдад: <b id="rpSalesStaff">0₮</b></span>
+        <span>Ажилчид төлөөгүй: <b style="color:var(--berry)" id="rpSalesUnpaid">0₮</b></span>
+      </div>
+    </div>
   </section>
-
-  <!-- ============ SETTINGS ============ -->
   <section class="panel" id="settings">
     <div class="section-head"><div><h2>Тохиргоо</h2><div class="desc">Өрөө, үнэ, ангилал, данс, торгууль, мессежийн загвар.</div></div></div>
     <div id="setBody"></div>
@@ -405,7 +609,20 @@ function defaults(){return{
   products:[],
   productSales:[],
   stockMoves:[],
-  stockTakes:[]
+  stockTakes:[],
+  meals:[],
+  mealPlan:{},
+  markets:[],
+  marketPrices:{},
+  staff:[],
+  purchases:[],
+  roomAssets:{},
+  mealSlots:[
+    {id:'breakfast',name:'Өглөөний цай',start:'08:30',end:'09:30'},
+    {id:'lunch',name:'Өдрийн хоол',start:'13:00',end:'13:30'},
+    {id:'teatime',name:'Өдрийн цай',start:'16:00',end:'16:30'},
+    {id:'dinner',name:'Оройн хоол',start:'18:30',end:'19:00'}
+  ]
 };}
 
 let S=null, draft=null, editId=null, listFilter='all', calYM=null;
@@ -424,6 +641,19 @@ function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):defaults
     }
   });
   S.massageServices=S.massageServices||[];
+  S.meals=S.meals||[];
+  S.mealPlan=S.mealPlan||{};
+  S.markets=S.markets||[];
+  S.marketPrices=S.marketPrices||{};
+  S.staff=S.staff||[];
+  S.purchases=S.purchases||[];
+  S.roomAssets=S.roomAssets||{};
+  S.mealSlots=S.mealSlots||[
+    {id:'breakfast',name:'Өглөөний цай',start:'08:30',end:'09:30'},
+    {id:'lunch',name:'Өдрийн хоол',start:'13:00',end:'13:30'},
+    {id:'teatime',name:'Өдрийн цай',start:'16:00',end:'16:30'},
+    {id:'dinner',name:'Оройн хоол',start:'18:30',end:'19:00'}
+  ];
   // Зааврын үйлчилгээнүүд байхыг баталгаажуулна (байхгүйг нэмнэ)
   const GUIDE_SVC=[
     {id:'ms_baria',name:'Бариа',price:0,mins:0,therapist:true,ageBased:true,billable:false},
@@ -458,7 +688,7 @@ function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):defaults
   delete S.serviceRules;
   S.massages=S.massages||[];
   S.msgDayStatus=S.msgDayStatus||{};
-  S.pins=Object.assign({manager:'',therapist:''},S.pins||{});
+  S.pins=Object.assign({manager:'',therapist:'',operator:''},S.pins||{});
   S.products=S.products||[];
   S.products.forEach(p=>{ if(!p.group) p.group='goods'; });
   S.productSales=S.productSales||[];
@@ -570,7 +800,7 @@ function roomPricing(r,date){
   kids.forEach(k=>{
     if(k.adultPriced) return;
     const t=tierById(k.tierId);
-    lines.push({label:'Хүүхэд '+k.age+'н'+(t?' ('+t.name+')':''), each:t?t.price:0, qty:1});
+    lines.push({label:'Хүүхэд '+kidAgeLabel(k)+(t?' ('+t.name+')':''), each:t?t.price:0, qty:1});
   });
   lines.forEach(l=>l.sum=l.each*l.qty);
   return{lines,total:lines.reduce((a,b)=>a+b.sum,0)};
@@ -623,11 +853,14 @@ function bookingTotals(bk){
   const payments=bk.payments||[];
   const legacyFinal=(bk.finalPay&&bk.finalPay.received&&!payments.length)?(bk.finalPay.amount||0):0;
   const finalPaid=payments.reduce((s,p)=>s+(p.amount||0),0)+legacyFinal;
-  const paid=prepaid+finalPaid;
+  const refunded=(bk.refunds||[]).reduce((s,r)=>s+(r.amount||0),0);
+  const paid=prepaid+finalPaid;         // нийт орсон мөнгө
+  const netPaid=paid-refunded;          // буцаалт хассан цэвэр төлсөн
   const grand=stay+extras+fee;
-  const balance=grand-paid;
-  const fullyPaid = bk.status!=='cancelled' && paid>0 && balance<=0;
-  return{pn,nightly:sb.nightly,breakdown:sb,stay,extras,fee,grand,prepaid,finalPaid,paid,balance,fullyPaid};
+  const balance=grand-netPaid;          // үлдэгдэл (буцаалтыг тооцсон)
+  const overpaid=balance<0?-balance:0;  // илүү төлөлт
+  const fullyPaid = bk.status!=='cancelled' && netPaid>0 && balance<=0;
+  return{pn,nightly:sb.nightly,breakdown:sb,stay,extras,fee,grand,prepaid,finalPaid,refunded,paid,netPaid,balance,overpaid,fullyPaid};
 }
 function prepaySuggest(bk){const sb=stayBreakdown(bk);return Math.round(sb.total*(S.prepay.percent/100));}
 
@@ -655,7 +888,22 @@ function bookingAt(num,day){
 function blankRoom(){return{num:S.rooms[0].num,adults:1,children:[],custom:0};}
 function newDraft(){return{rooms:[blankRoom()],checkIn:todayStr(),nights:2,arrive:'12:00',leave:'11:00',phone:'',name:'',note:'',nightOverrides:[]};}
 function autoTier(ri,ki){const k=draft.rooms[ri].children[ki];const a=k.age;
-  if(a<1)k.tierId='t_inf';else if(a<=3)k.tierId='t_norm';else if(a<=8)k.tierId='t_68';else if(a<=13)k.tierId='t_913';else{k.adultPriced=true;}}
+  if(a<1){ k.tierId = (k.months||0)>=6 ? 't_bor' : 't_inf'; }   // 0-6 сар хоолгүй · 6 сар-1 нас бантан
+  else if(a<=3)k.tierId='t_norm';else if(a<=8)k.tierId='t_68';else if(a<=13)k.tierId='t_913';else{k.adultPriced=true;}}
+function kidAgeLabel(k){
+  const a=k.age||0;
+  if(a<1) return (k.months||0)+' сар';
+  return a+'н';
+}
+// Хүүхдийн хоолны бүлэг
+function kidFoodGroup(k){
+  const a=k.age||0;
+  if(a<1) return (k.months||0)>=6 ? 'bantan' : 'nofood';
+  if(a<=3) return 'norm';
+  if(a<=8) return 'k68';
+  if(a<=13) return 'k913';
+  return 'adult';
+}
 function syncNightOverrides(){
   const arr=draft.nightOverrides||[];
   const n=draft.nights||0;
@@ -719,8 +967,10 @@ function renderBookingModal(){
     (r.children||[]).forEach((k,ki)=>{
       roomsH+=`<div class="kid">
         <span style="font-size:12px;color:var(--muted);font-weight:600">Хүүхэд</span>
-        <input type="number" min="0" max="17" value="${k.age}" style="width:56px" onchange="draft.rooms[${ri}].children[${ki}].age=parseInt(this.value)||0;autoTier(${ri},${ki});renderBookingModal()">
+        <input type="number" min="0" max="17" value="${k.age}" style="width:52px" onchange="draft.rooms[${ri}].children[${ki}].age=parseInt(this.value)||0;autoTier(${ri},${ki});renderBookingModal()">
         <span style="font-size:12px;color:var(--muted)">нас</span>
+        ${(k.age||0)<1?`<input type="number" min="0" max="11" value="${k.months||0}" style="width:52px" title="Сар" onchange="draft.rooms[${ri}].children[${ki}].months=parseInt(this.value)||0;autoTier(${ri},${ki});renderBookingModal()">
+        <span style="font-size:12px;color:var(--muted)">сар</span>`:''}
         <select style="flex:1;min-width:120px" ${k.adultPriced?'disabled':''} onchange="draft.rooms[${ri}].children[${ki}].tierId=this.value;renderBookingModal()">${tierOpts(k.tierId)}</select>
         <label style="font-size:12px;display:flex;align-items:center;gap:4px"><input type="checkbox" style="width:auto" ${k.adultPriced?'checked':''} onchange="draft.rooms[${ri}].children[${ki}].adultPriced=this.checked;renderBookingModal()">том үнэ</label>
         <button class="btn-icon" onclick="delKid(${ri},${ki})">✕</button>
@@ -765,7 +1015,7 @@ function renderBookingModal(){
 
   const body=`
     <div class="form-grid" style="margin-bottom:12px">
-      <div><label class="field">Утас *</label><input id="d_phone" value="${draft.phone||''}" onchange="draft.phone=this.value"></div>
+      <div><label class="field">Утас *</label><input id="d_phone" value="${draft.phone||''}" oninput="draft.phone=this.value;checkPhoneHistory(this.value)" onchange="draft.phone=this.value"><div id="phoneHist"></div></div>
       <div><label class="field">Нэр</label><input id="d_name" value="${draft.name||''}" onchange="draft.name=this.value"></div>
       <div><label class="field">Ирэх өдөр *</label><input type="date" value="${draft.checkIn}" onchange="draft.checkIn=this.value;renderBookingModal()"></div>
       <div><label class="field">Хоног *</label><input type="number" min="1" value="${draft.nights}" onchange="draft.nights=parseInt(this.value)||1;renderBookingModal()"></div>
@@ -793,7 +1043,7 @@ function renderBookingModal(){
 function bookingTotalsFromDraft(){return stayBreakdown(draft);}
 function addRoom(){draft.rooms.push(blankRoom());renderBookingModal();}
 function delRoom(i){draft.rooms.splice(i,1);if(!draft.rooms.length)draft.rooms.push(blankRoom());renderBookingModal();}
-function addKid(ri){draft.rooms[ri].children.push({age:2,tierId:'t_norm',adultPriced:false});renderBookingModal();}
+function addKid(ri){draft.rooms[ri].children.push({age:2,months:0,tierId:'t_norm',adultPriced:false});renderBookingModal();}
 function delKid(ri,ki){draft.rooms[ri].children.splice(ki,1);renderBookingModal();}
 function addJoiner(ri){
   const r=draft.rooms[ri];
@@ -807,6 +1057,26 @@ function delJoiner(ri,ji){draft.rooms[ri].joiners.splice(ji,1);renderBookingModa
 function autoJoinerTier(ri,ji){const j=draft.rooms[ri].joiners[ji];const a=j.age;
   if(a<1)j.tierId='t_inf';else if(a<=3)j.tierId='t_norm';else if(a<=8)j.tierId='t_68';else if(a<=13)j.tierId='t_913';else{j.adultPriced=true;}}
 function cancelDraft(){editId=null;draft=null;closeModal();}
+function checkPhoneHistory(phone){
+  const box=document.getElementById('phoneHist'); if(!box)return;
+  phone=(phone||'').trim();
+  if(phone.length<6){box.innerHTML='';return;}
+  // Ижил утастай өмнөх захиалгууд (одоо засаж буйгаас бусад)
+  const prev=S.bookings.filter(b=>b.phone===phone&&b.id!==editId).sort((a,b)=>(b.checkIn||'').localeCompare(a.checkIn||''));
+  if(!prev.length){box.innerHTML='';return;}
+  const last=prev[0];
+  const name=last.name?' ('+last.name+')':'';
+  const visits=prev.map(b=>{
+    const st=b.status==='cancelled'?' цуцалсан':'';
+    const note=b.note?' · «'+b.note+'»':'';
+    return `${fmtD(b.checkIn)} · ${b.nights}хон${st}${note}`;
+  }).slice(0,4);
+  box.innerHTML=`<div style="margin-top:6px;background:#fff6e5;border:1px solid #f0d090;border-radius:9px;padding:8px 11px;font-size:12px">
+    <b style="color:#8a5a1a">⚠️ Өмнө ирж байсан зочин${name}</b> · ${prev.length} удаа
+    <div style="margin-top:4px;color:#6a5530;line-height:1.7">${visits.map(v=>'• '+v).join('<br>')}${prev.length>4?'<br>…бусад':''}</div>
+    ${last.name&&!draft.name?`<button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="draft.name='${(last.name||'').replace(/'/g,'')}';renderBookingModal()">Нэр «${last.name}» авах</button>`:''}
+  </div>`;
+}
 function saveBooking(){
   if(!draft.phone||!draft.phone.trim()){toast('Утасны дугаар оруулна уу','err');return;}
   if(!draft.checkIn||draft.nights<1){toast('Ирэх өдөр/хоног оруулна уу','err');return;}
@@ -888,7 +1158,8 @@ function openDetail(id){
       <div class="sumtot"><span>Нийт төлбөр</span><span>${money(t.grand)}</span></div>
       ${t.prepaid?`<div class="sumline" style="margin-top:6px"><span>Урьдчилгаа${acc?' ('+acc.name.split(' ')[0]+')':''}</span><span>${money(t.prepaid)}</span></div>`:''}
       ${(bk.payments||[]).map((p,pi)=>{const pa=accById(p.accountId);return `<div class="sumline"><span>Төлбөр ${pi+1}${pa?' ('+pa.name.split(' ')[0]+')':''} · ${p.date||''} <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Устгах" onclick="delPayment('${id}',${pi})">✕</button></span><span>${money(p.amount||0)}</span></div>`;}).join('')}
-      <div class="sumline" style="font-weight:700;color:${t.balance>0?'var(--berry)':'var(--green)'}"><span>${t.balance>0?'Үлдэгдэл төлбөр':t.balance<0?'Илүү төлөлт':'Бүрэн төлөгдсөн ✓'}</span><span>${money(Math.abs(t.balance))}</span></div>
+      ${(bk.refunds||[]).map((r,ri)=>{const ra=accById(r.accountId);return `<div class="sumline" style="color:var(--red)"><span>↩ Буцаалт${ra?' ('+ra.name.split(' ')[0]+')':''} · ${r.date||''}${r.reason?' · '+r.reason:''} <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Устгах" onclick="delRefund('${id}',${ri})">✕</button></span><span>−${money(r.amount||0)}</span></div>`;}).join('')}
+      <div class="sumline" style="font-weight:700;color:${t.balance>0?'var(--berry)':t.overpaid?'#c0392b':'var(--green)'}"><span>${t.balance>0?'Үлдэгдэл төлбөр':t.overpaid?'⚠️ Илүү төлөлт (буцаах)':'Бүрэн төлөгдсөн ✓'}</span><span>${money(Math.abs(t.balance))}</span></div>
     </div>
     <label class="field">Нэмэлт үйлчилгээ / худалдан авалт</label>
     <div id="extraBox">${extrasH||'<div class="hint">Одоогоор алга</div>'}</div>
@@ -906,6 +1177,7 @@ function openDetail(id){
     <button class="btn btn-ghost btn-sm" onclick="showMessage('${id}')">📤 Мессеж</button>
     ${!canc?`<button class="btn btn-green btn-sm" onclick="openConfirm('${id}')">${conf?'Урьдчилгаа засах':'Баталгаажуулах'}</button>`:''}
     ${!canc&&conf&&t.balance>0?`<button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="openFinalPay('${id}')">💎 Үлдэгдэл төлбөр хийх</button>`:''}
+    ${t.netPaid>0?`<button class="btn btn-ghost btn-sm" onclick="openRefund('${id}')">↩ Буцаалт хийх</button>`:''}
     ${!canc?`<button class="btn btn-berry btn-sm" onclick="openCancel('${id}')">Цуцлах/хойшлол</button>`:`<button class="btn btn-ghost btn-sm" onclick="uncancel('${id}')">Сэргээх</button>`}
     <button class="btn-icon" onclick="delBooking('${id}')" title="Устгах">🗑</button>`;
   openModal('Захиалгын дэлгэрэнгүй',body,foot);
@@ -1054,6 +1326,67 @@ function delPayment(id,idx){
   const bk=S.bookings.find(b=>b.id===id);
   bk.payments.splice(idx,1);save();renderAll();openDetail(id);toast('Төлбөр устгагдлаа');
 }
+function openRefund(id){
+  const bk=S.bookings.find(b=>b.id===id);
+  const t=bookingTotals(bk);
+  const suggest=t.overpaid>0?t.overpaid:0;
+  openModal('↩ Буцаалт хийх',
+    `<p class="hint" style="margin-bottom:10px">Нийт орсон: <b style="color:var(--green)">${money(t.paid)}</b> · Ёстой төлбөр: <b>${money(t.grand)}</b>${t.overpaid?` · <b style="color:#c0392b">Илүү: ${money(t.overpaid)}</b>`:''}</p>
+     <div class="form-grid">
+      <div><label class="field">Буцаах дүн (₮)</label><input id="rf_amt" type="number" min="0" value="${suggest}"></div>
+      <div><label class="field">Данс</label><select id="rf_acc">${S.accounts.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')}</select></div>
+      <div><label class="field">Огноо</label><input id="rf_date" type="date" value="${todayStr()}"></div>
+      <div><label class="field">Шалтгаан</label>
+        <select id="rf_reason" onchange="if(this.value==='__other'){document.getElementById('rf_reason_other').style.display='block'}else{document.getElementById('rf_reason_other').style.display='none'}">
+          <option>Илүү төлсөн</option>
+          <option>Эрт гарсан</option>
+          <option>Үйлчилгээ цуцлагдсан</option>
+          <option>Үйлчилгээ солигдсон (зөрүү)</option>
+          <option value="__other">Бусад…</option>
+        </select></div>
+    </div>
+    <input id="rf_reason_other" placeholder="Шалтгаан бичих" style="width:100%;margin-top:8px;display:none">
+    <div class="rcard" style="border:1px solid #d8e6f0;border-radius:10px;padding:10px 12px;background:#f0f6fb;margin-top:12px">
+      <div style="font-size:12.5px;font-weight:600;margin-bottom:6px">Эрт гарсан бол — үлдсэн хоногийн тооцоо</div>
+      <div class="row" style="gap:8px;align-items:center;flex-wrap:wrap">
+        <label style="font-size:12px">Бодит гарах өдөр</label>
+        <input id="rf_leave" type="date" value="${addDays(bk.checkIn,bk.nights)}" onchange="calcEarlyRefund('${id}')">
+        <button class="btn btn-ghost btn-sm" onclick="calcEarlyRefund('${id}')">Тооцоол</button>
+      </div>
+      <div id="rf_calc" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+    </div>`,
+    `<button class="btn btn-ghost" onclick="openDetail('${id}')">Буцах</button>
+     <button class="btn btn-berry" onclick="doRefund('${id}')">Буцаалт бүртгэх</button>`);
+}
+function calcEarlyRefund(id){
+  const bk=S.bookings.find(b=>b.id===id);
+  const leave=document.getElementById('rf_leave').value;
+  const actualNights=Math.max(0,daysBetween(bk.checkIn,leave));
+  const box=document.getElementById('rf_calc');
+  if(actualNights>=bk.nights){box.innerHTML='Эрт гараагүй байна (бүтэн хоносон).';return;}
+  // Нэг хоногийн дундаж үнэ × үлдсэн хоног
+  const sb=stayBreakdown(bk);
+  const perNight=bk.nights>0?Math.round(sb.total/bk.nights):0;
+  const unusedNights=bk.nights-actualNights;
+  const refund=perNight*unusedNights;
+  box.innerHTML=`Захиалсан ${bk.nights} хон, бодит ${actualNights} хон → <b>${unusedNights} хоног ашиглаагүй</b><br>Нэг хоног дундж ${money(perNight)} × ${unusedNights} = <b style="color:#c0392b">${money(refund)}</b> буцаах`;
+  document.getElementById('rf_amt').value=refund;
+  document.getElementById('rf_reason').value='Эрт гарсан';
+}
+function doRefund(id){
+  const bk=S.bookings.find(b=>b.id===id);
+  const amt=parseInt(document.getElementById('rf_amt').value)||0;
+  if(amt<=0){toast('Дүн оруулна уу','err');return;}
+  let reason=document.getElementById('rf_reason').value;
+  if(reason==='__other') reason=document.getElementById('rf_reason_other').value.trim()||'Бусад';
+  bk.refunds=bk.refunds||[];
+  bk.refunds.push({amount:amt,accountId:document.getElementById('rf_acc').value,date:document.getElementById('rf_date').value,reason,at:new Date().toISOString()});
+  save();closeModal();renderAll();openDetail(id);toast('Буцаалт бүртгэгдлээ ↩','ok');
+}
+function delRefund(id,idx){
+  const bk=S.bookings.find(b=>b.id===id);
+  bk.refunds.splice(idx,1);save();renderAll();openDetail(id);toast('Буцаалт устгагдлаа');
+}
 function openCancel(id){
   const bk=S.bookings.find(b=>b.id===id);
   openModal('Цуцлах / хойшлол',
@@ -1124,6 +1457,33 @@ function renderReminders(){
 }
 
 /* ============================================================ CALENDAR */
+// Хоолны бүлэг: том хүн · энгийн хоол · бор хоол (бантан) · хоолгүй (нярай)
+function tierFoodGroup(tid){
+  if(tid==='t_inf') return 'nofood';
+  if(tid==='t_bor') return 'bor';
+  return 'norm';   // энгийн хоол (1-3, 4-8, 9-13 бүгд)
+}
+function dayGuestCounts(date){
+  let a=0,c=0,bantan=0,norm=0,nofood=0;
+  const seen=new Set();
+  S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>{
+    effectiveRoomsForDate(bk,date).forEach(n=>{
+      const sk=bk.id+':'+(+n); if(seen.has(sk))return; seen.add(sk);   // нэг өрөө нэг л удаа
+      const r=bk.rooms.find(x=>+x.num===+n);if(!r)return;
+      const occ=roomOccupancyOn(r,date);
+      a+=occ.adults;
+      occ.children.forEach(k=>{
+        c++;
+        if(k.adultPriced){ a++; return; }          // том үнэ → том хүний хоол
+        const t=k.tierId||'t_norm';
+        if(t==='t_inf') nofood++;                  // 0-6 сар — хоол иддэггүй
+        else if(t==='t_bor') bantan++;             // бантан
+        else norm++;                               // энгийн хоол (1-13 нас)
+      });
+    });
+  });
+  return {a,c,bantan,norm,nofood};
+}
 function renderCalendar(){
   if(!calYM){const d=new Date();calYM=d.getFullYear()+'-'+pad(d.getMonth()+1);}
   const [y,m]=calYM.split('-').map(Number);
@@ -1146,9 +1506,11 @@ function renderCalendar(){
       if(bk){
         const idx=daysBetween(bk.checkIn,day);
         const isSegStart = idx===0 || !effectiveRoomsForNight(bk,idx-1).includes(+room.num);
+        const bt=bookingTotals(bk);
+        const refundFlag=bt.overpaid>0?'<span class="rf-flag" title="Буцаах төлбөртэй">Б</span>':'';
         const label=isSegStart?(bk.name||bk.phone):'';
-        bodyH+=`<td class="cell" data-bk="${bk.id}" title="${bk.phone}${bk.name?' · '+bk.name:''} · ${bk.nights}хон">
-          <div class="occ ${bookingTotals(bk).fullyPaid?'full':bk.status==='confirmed'?'conf':'pend'} ${isSegStart?'start':''}">${isSegStart?label:''}</div></td>`;
+        bodyH+=`<td class="cell" data-bk="${bk.id}" title="${bk.phone}${bk.name?' · '+bk.name:''} · ${bk.nights}хон${bt.overpaid>0?' · ⚠️буцаах '+money(bt.overpaid):''}">
+          <div class="occ ${bt.fullyPaid?'full':bk.status==='confirmed'?'conf':'pend'} ${isSegStart?'start':''}">${isSegStart?refundFlag:''}${isSegStart?label:''}</div></td>`;
       } else {
         bodyH+=`<td class="cell" data-new="${room.num}|${day}"></td>`;
       }
@@ -1156,8 +1518,24 @@ function renderCalendar(){
     bodyH+='</tr>';
   });
   bodyH+='</tbody>';
+  // Өдөр бүрийн хоолны тоо (тоотой мөр л харагдана)
+  const cnts=[];
+  for(let d=1;d<=dim;d++)cnts.push(dayGuestCounts(y+'-'+pad(m)+'-'+pad(d)));
+  const rowHtml=(label,vals,cls,dot)=>{
+    let s=`<tr class="${cls||''}"><td class="sumlab">${dot?`<span class="cb2" style="background:${dot}"></span>`:''}${label}</td>`;
+    vals.forEach(v=>s+=`<td class="${v?'':'z'}">${v||'·'}</td>`);
+    return s+'</tr>';
+  };
+  const any=vals=>vals.some(v=>v>0);
+  let foot='<tfoot>';
+  foot+=rowHtml('Том хүн',cnts.map(c=>c.a),'','#4a6fa5');
+  const vNorm=cnts.map(c=>c.norm); if(any(vNorm)) foot+=rowHtml('Энгийн хоол',vNorm,'','#b23a5d');
+  const vBor=cnts.map(c=>c.bantan); if(any(vBor)) foot+=rowHtml('Бор хоол (бантан)',vBor,'','#c98a2e');
+  const vNo=cnts.map(c=>c.nofood); if(any(vNo)) foot+=rowHtml('Хоолгүй (0-6 сар)',vNo,'','#9aa3ad');
+  foot+=rowHtml('Нийт хүн',cnts.map(c=>c.a+c.c),'tot');
+  foot+='</tfoot>';
   const tbl=document.getElementById('calTable');
-  tbl.innerHTML=head+bodyH;
+  tbl.innerHTML=head+bodyH+foot;
   tbl.querySelectorAll('td.cell').forEach(td=>{
     td.onclick=()=>{
       if(td.dataset.bk){openDetail(td.dataset.bk);}
@@ -1308,11 +1686,35 @@ function renderSettings(){
     </div>
 
     <div class="card set-sec">
+      <h3>🏠 Өрөөний эд хөрөнгө</h3>
+      <div class="hint" style="margin-bottom:10px">Өрөө тус бүрийн эд хөрөнгө (тавилга, техник). Байдал, тоо, үнэ бүртгэнэ. Нийт хөрөнгийн үнэлэлт гарна.</div>
+      <div id="roomAssetsBox"></div>
+    </div>
+
+    <div class="card set-sec">
+      <h3>👷 Ажилчид</h3>
+      <div class="hint" style="margin-bottom:10px">Ажилчдаа бүртгэнэ. Худалдан авалт хэсэгт «хэн авсан» сонголтод харагдана. Ажилтны худалдан авалт цалингаас хасагдана.</div>
+      <div id="staffBox"></div>
+    </div>
+
+    <div class="card set-sec">
+      <h3>🍲 Хоолны цаг</h3>
+      <div class="hint" style="margin-bottom:10px">Захиалгын ирэх/гарах цагаар аль хоолонд байгааг автоматаар тооцно. Хоол дуусах цаг ирэх цагаас хойш, эхлэх цаг гарах цагаас өмнө бол зочин орно.</div>
+      <div id="mealSlotsBox"></div>
+    </div>
+
+    <div class="card set-sec">
       <h3>🎯 Барианы автомат дүрэм</h3>
       <div class="hint" style="margin-bottom:10px">«🎯 Автомат төлөвлөгөө» дарахад ангилал бүр ингэж хувиарлагдана: <b>2 хоногт 1 удаа Бариа</b>, хооронд нь ээлжийн эмчилгээ. Ангилал насаар автомат: Том хүн, Хүүхэд 4-13, Усанд оруулах 0-3. Дараа нь сүлжээнээс гараар өөрчилж болно.</div>
       <div class="row" style="align-items:center;gap:8px;margin-bottom:12px;background:var(--soft);padding:9px 11px;border-radius:9px">
         <input type="checkbox" id="skipArr" ${S.msgSkipArrival!==false?'checked':''} style="width:17px;height:17px" onchange="S.msgSkipArrival=this.checked;save();toast('Хадгаллаа','ok')">
         <label for="skipArr" style="font-size:13px;font-weight:600">Ирсэн өдөр барианд оруулахгүй</label>
+      </div>
+      <div class="row" style="align-items:center;gap:8px;margin-bottom:12px;background:var(--soft);padding:9px 11px;border-radius:9px;flex-wrap:wrap">
+        <label style="font-size:13px;font-weight:600">Бариачийн өдрийн ачааллын дээд хэмжээ</label>
+        <input type="number" min="60" step="30" value="${S.msgDayCapMins!=null?S.msgDayCapMins:300}" style="width:80px" onchange="S.msgDayCapMins=parseInt(this.value)||300;save();toast('Хадгаллаа','ok')">
+        <span style="font-size:12px;color:var(--muted)">минут</span>
+        <div class="hint" style="width:100%;margin-top:4px">Энэ хэмжээнээс хэтрэх нь бол автомат хувиарлалт тухайн захиалгыг өөр өдрөөс эхлүүлж (шаардвал ирсэн өдрөөс) ачааллыг тараана. 300м = 5 цаг.</div>
       </div>
       ${msgRuleRow('adult','Том хүн','Сондгой хоногийн нэмэлт (үсний спа)')}
       ${msgRuleRow('child','Хүүхэд (4-13)','Тэгш хоногт ээлжлэх эмчилгээ')}
@@ -1340,6 +1742,8 @@ function renderSettings(){
           <td><input value="${(S.pins&&S.pins.manager)||''}" inputmode="numeric" placeholder="жиш: 5550" style="width:120px" onchange="S.pins.manager=this.value.trim()"></td></tr>
         <tr><td style="font-weight:600">Бариач<div style="font-size:11px;color:var(--muted);font-weight:400">Зөвхөн Бариа таб</div></td>
           <td><input value="${(S.pins&&S.pins.therapist)||''}" inputmode="numeric" placeholder="жиш: 7890" style="width:120px" onchange="S.pins.therapist=this.value.trim()"></td></tr>
+        <tr><td style="font-weight:600">Оператор<div style="font-size:11px;color:var(--muted);font-weight:400">Зөвхөн Календарь+Захиалга</div></td>
+          <td><input value="${(S.pins&&S.pins.operator)||''}" inputmode="numeric" placeholder="жиш: 3344" style="width:120px" onchange="S.pins.operator=this.value.trim()"></td></tr>
       </tbody></table>
       <button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="savePins()">Хадгалах</button>
       <div class="hint" style="margin-top:8px">⚠️ Код тавьсны дараа бүх төхөөрөмж дээр нэг удаа асууна. Өөрийн кодоо мартаж болохгүй.</div>
@@ -1355,11 +1759,114 @@ function renderSettings(){
     </div>
 
     <div class="card set-sec">
+      <h3>🔗 Операторын линк</h3>
+      <div class="hint" style="margin-bottom:10px">Энэ хаягийг захиалгын операторт явуулна. Нээхэд <b>зөвхөн Календарь + Захиалга</b> харагдана — Агуулах, Хоол, Бариа, Тайлан, Тохиргоо харагдахгүй.</div>
+      <div class="row" style="gap:6px">
+        <input id="operatorLink" readonly value="${(typeof location!=='undefined'?location.origin+location.pathname:'')}?operator" style="flex:1;font-size:12px;font-family:monospace">
+        <button class="btn btn-primary btn-sm" onclick="copyOperatorLink()">Хуулах</button>
+      </div>
+    </div>
+
+    <div class="card set-sec">
       <h3>🗑 Өгөгдөл</h3>
       <div class="hint" style="margin-bottom:10px">Бүх захиалга, тохиргоог устгаж анхны байдалд шилжүүлнэ.</div>
       <button class="btn btn-berry btn-sm" onclick="resetAll()">Бүх өгөгдөл цэвэрлэх</button>
     </div>`;
   document.getElementById('setBody').innerHTML=body;
+  renderMealSlotsSettings();
+  renderStaffSettings();
+  renderRoomAssets();
+}
+/* ---- Өрөөний эд хөрөнгө ---- */
+let raRoom=1;
+const RA_COND={good:'Бүтэн',worn:'Хуучирсан',broken:'Эвдэрсэн'};
+function renderRoomAssets(){
+  const box=document.getElementById('roomAssetsBox'); if(!box)return;
+  const roomTabs=[];
+  for(let n=1;n<=9;n++){
+    const items=(S.roomAssets[n]||[]);
+    const val=items.reduce((s,it)=>s+(it.price||0)*(it.qty||1),0);
+    roomTabs.push(`<button class="ra-tab ${raRoom===n?'active':''}" onclick="raRoom=${n};renderRoomAssets()">Өрөө ${n}${items.length?`<span class="ra-cnt">${items.length}</span>`:''}</button>`);
+  }
+  const items=(S.roomAssets[raRoom]||[]);
+  const total=items.reduce((s,it)=>s+(it.price||0)*(it.qty||1),0);
+  const rows=items.length?items.map((it,i)=>`<tr>
+    <td><input value="${it.name||''}" placeholder="нэр" style="width:100%;min-width:110px" onchange="S.roomAssets[${raRoom}][${i}].name=this.value;save()"></td>
+    <td><input type="number" min="0" value="${it.qty||1}" style="width:56px" onchange="S.roomAssets[${raRoom}][${i}].qty=parseInt(this.value)||1;save();renderRoomAssets()"></td>
+    <td><select onchange="S.roomAssets[${raRoom}][${i}].cond=this.value;save()">${Object.entries(RA_COND).map(([k,v])=>`<option value="${k}" ${it.cond===k?'selected':''}>${v}</option>`).join('')}</select></td>
+    <td><input type="number" min="0" value="${it.price||''}" placeholder="₮" style="width:90px" onchange="S.roomAssets[${raRoom}][${i}].price=parseInt(this.value)||0;save();renderRoomAssets()"></td>
+    <td><button class="btn-icon" onclick="delRoomAsset(${i})">✕</button></td>
+  </tr>`).join(''):'<tr><td colspan="5" class="hint" style="padding:10px 0">Эд хөрөнгө бүртгээгүй.</td></tr>';
+  box.innerHTML=`<div class="ra-tabs">${roomTabs.join('')}</div>
+    <div style="overflow-x:auto;margin-top:12px"><table class="mini-tbl">
+      <thead><tr><th>Нэр</th><th>Тоо</th><th>Байдал</th><th>Үнэ (нэгж)</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <div class="row" style="justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="addRoomAsset()">+ Эд хөрөнгө нэмэх</button>
+      <div style="font-size:13px">Өрөө ${raRoom} нийт: <b style="color:var(--berry);font-size:15px">${money(total)}</b></div>
+    </div>
+    <div style="margin-top:8px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px">
+      Бүх өрөөний нийт хөрөнгө: <b>${money(roomAssetsTotal())}</b>
+    </div>`;
+}
+function roomAssetsTotal(){
+  let t=0;
+  for(let n=1;n<=9;n++)(S.roomAssets[n]||[]).forEach(it=>t+=(it.price||0)*(it.qty||1));
+  return t;
+}
+function addRoomAsset(){
+  S.roomAssets[raRoom]=S.roomAssets[raRoom]||[];
+  S.roomAssets[raRoom].push({name:'',qty:1,cond:'good',price:0});
+  save();renderRoomAssets();
+}
+function delRoomAsset(i){
+  S.roomAssets[raRoom].splice(i,1);save();renderRoomAssets();
+}
+function renderStaffSettings(){
+  const box=document.getElementById('staffBox'); if(!box)return;
+  box.innerHTML=`<table class="mini-tbl"><tbody>${
+    (S.staff||[]).map((s,i)=>`<tr>
+      <td><input value="${s.name}" style="width:180px" onchange="S.staff[${i}].name=this.value;save()"></td>
+      <td style="font-size:12px;color:var(--muted)">${s.role||''}</td>
+      <td><input value="${s.role||''}" placeholder="үүрэг (заавал биш)" style="width:130px;font-size:12px" onchange="S.staff[${i}].role=this.value;save()"></td>
+      <td><button class="btn-icon" title="Устгах" onclick="delStaff('${s.id}')">✕</button></td>
+    </tr>`).join('')
+  }</tbody></table>
+  <div class="row" style="gap:6px;margin-top:8px">
+    <input id="staff_new" placeholder="Шинэ ажилтны нэр" style="flex:1;min-width:150px">
+    <button class="btn btn-primary btn-sm" onclick="addStaff()">+ Ажилтан нэмэх</button>
+  </div>`;
+}
+function addStaff(){
+  const name=(document.getElementById('staff_new').value||'').trim();
+  if(!name){toast('Нэр оруулна уу','err');return;}
+  S.staff=S.staff||[];
+  S.staff.push({id:uid('stf'),name,role:''});
+  save();renderStaffSettings();
+}
+function delStaff(id){
+  S.staff=S.staff.filter(s=>s.id!==id);save();renderStaffSettings();
+}
+function renderMealSlotsSettings(){
+  const box=document.getElementById('mealSlotsBox'); if(!box)return;
+  box.innerHTML=`<table class="mini-tbl"><thead><tr><th>Хоол</th><th>Эхлэх</th><th>Дуусах</th><th></th></tr></thead><tbody>${
+    (S.mealSlots||[]).map((sl,i)=>`<tr>
+      <td><input value="${sl.name}" style="width:130px" onchange="S.mealSlots[${i}].name=this.value;save()"></td>
+      <td><input type="time" value="${sl.start}" onchange="S.mealSlots[${i}].start=this.value;save();renderMeals()"></td>
+      <td><input type="time" value="${sl.end}" onchange="S.mealSlots[${i}].end=this.value;save();renderMeals()"></td>
+      <td><button class="btn-icon" title="Устгах" onclick="delMealSlot(${i})">✕</button></td>
+    </tr>`).join('')
+  }</tbody></table>
+  <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="addMealSlot()">+ Хоолны цаг нэмэх</button>`;
+}
+function addMealSlot(){
+  S.mealSlots=S.mealSlots||[];
+  S.mealSlots.push({id:uid('slot'),name:'Шинэ хоол',start:'12:00',end:'12:30'});
+  save();renderMealSlotsSettings();renderMeals();
+}
+function delMealSlot(i){
+  S.mealSlots.splice(i,1);save();renderMealSlotsSettings();renderMeals();
 }
 function savePricing(){S.pricing.baseOO=+document.getElementById('s_oo').value||0;S.pricing.baseNoOO=+document.getElementById('s_nooo').value||0;S.pricing.singleAdd=+document.getElementById('s_single').value||0;S.prepay.percent=+document.getElementById('s_prep').value||50;save();toast('Хадгаллаа','ok');renderAll();}
 function addRoomCfg(){const nums=S.rooms.map(r=>r.num);let n=1;while(nums.includes(n))n++;S.rooms.push({num:n,oo:false,beds:2,price:125000});renderSettings();}
@@ -1423,7 +1930,7 @@ function openSvcNorms(sid){
         ${mats.map(m=>`<option value="${m.id}" ${m.id===n.productId?'selected':''}>${m.name} (${m.unit||'ш'})</option>`).join('')}
       </select>
       <input type="number" step="0.01" min="0" style="width:80px" value="${n.qty||0}" onchange="S.massageServices.find(x=>x.id==='${sid}').norms[${i}].qty=parseFloat(this.value)||0">
-      <span style="font-size:12px;color:var(--muted);min-width:26px">${p?p.unit||'ш':''}</span>
+      <span style="font-size:12px;color:var(--muted);min-width:26px">${p?(p.recipeUnit||p.unit||'ш'):''}</span>
       <button class="btn-icon" onclick="S.massageServices.find(x=>x.id==='${sid}').norms.splice(${i},1);openSvcNorms('${sid}')">✕</button>
     </div>`;
   }).join('');
@@ -1504,12 +2011,12 @@ function roomPeople(r,date){
   for(let i=0;i<adults;i++) out.push({key:'a'+i,cat:'adult',age:null,label:'Том хүн'+(adults>1?' '+(i+1):'')});
   (r.children||[]).forEach((k,i)=>{
     const a=k.age||0, cat=catOfAge(a);
-    out.push({key:'c'+i,cat,age:a,label:(cat==='adult'?'Том хүн ':'Хүүхэд ')+a+'н'});
+    out.push({key:'c'+i,cat,age:a,months:k.months||0,label:(cat==='adult'?'Том хүн ':'Хүүхэд ')+kidAgeLabel(k)});
   });
   (r.joiners||[]).forEach((j,i)=>{
     if(!(date && j.fromDate && date>=j.fromDate)) return;
     if(j.kind==='adult') out.push({key:'j'+i,cat:'adult',age:null,label:'Том хүн (нэмэгдсэн)'});
-    else { const a=j.age||0, cat=catOfAge(a); out.push({key:'j'+i,cat,age:a,label:'Хүүхэд '+a+'н (нэмэгдсэн)'}); }
+    else { const a=j.age||0, cat=catOfAge(a); out.push({key:'j'+i,cat,age:a,months:j.months||0,label:'Хүүхэд '+kidAgeLabel(j)+' (нэмэгдсэн)'}); }
   });
   out.sort((x,y)=>(CATORDER[x.cat]-CATORDER[y.cat])||(x.key<y.key?-1:1));
   return out;
@@ -1554,52 +2061,144 @@ function setAutoCell(bk,d,rn,key,svc){
   if(cur&&cur.done)return; // хийсэн бол хэвээр
   bk.msgPlan[d][rn][key]={svc,done:false,billed:false,time:cur?cur.time:''};
 }
-/* Автомат хувиарлалт — хүн тус бүрээр, ачаалал тэнцвэржүүлнэ.
-   · Бариа 2 хоногт 1 удаа · ирсэн өдөр орохгүй
-   · Нэг ангилалд 2+ хүн байвал ээлжлүүлж (нэг өдөр нэг хүн) ачааллыг тарааж болвол тараана */
-function autoPlanBooking(bk){
-  ensurePlan(bk);
-  const skip=(S.msgSkipArrival!==false)?1:0;
-  bk.rooms.forEach(r=>{
-    const ci=rCheckIn(bk,r), n=rNights(bk,r);
-    const days=[]; for(let i=0;i<n;i++) days.push(addDays(ci,i));
-    const start=Math.min(skip,Math.max(0,n-1));
-    // Бүх өдрийн хүмүүсийн нэгдэл
-    const all=[]; days.forEach(d=>roomPeople(r,d).forEach(p=>{ if(!all.find(x=>x.key===p.key)) all.push(p); }));
-    const catIdx={adult:0,child:0,water:0};
-    const ctr={child:0,water:0};
-    all.forEach(p=>{
-      const idx=catIdx[p.cat]++;
-      const pDays=days.filter((d,i)=> i>=start && roomPeople(r,d).some(x=>x.key===p.key));
-      // Ээлжлүүлэх нь тоог алдагдуулахгүй бол ээлжлүүлнэ (тэгш өдөртэй үед л боломжтой)
-      const offset=(pDays.length%2===0)?(idx%2):0;
-      const cfg=msgCfg(p.cat);
-      const bariaSvc=cfg.baria||'ms_baria';
-      const bset=new Set();
-      pDays.forEach((d,k)=>{ if(k>=offset && (k-offset)%2===0) bset.add(d); });
-      // Хуваарь бичих
-      days.forEach(d=>{
-        if(!pDays.includes(d)){ setAutoCell(bk,d,r.num,p.key,'rest'); return; }
-        if(bset.has(d)){ setAutoCell(bk,d,r.num,p.key,bariaSvc); return; }
-        if(p.cat==='adult'){ setAutoCell(bk,d,r.num,p.key,'rest'); return; }
-        const rot=cfg.rotate||[];
-        if(!rot.length){ setAutoCell(bk,d,r.num,p.key,'rest'); return; }
-        let svc=rot[ctr[p.cat]%rot.length]; ctr[p.cat]++;
-        if(p.cat==='water'&&cfg.summerFrom&&svc===cfg.summerFrom&&isSummer(d)) svc=cfg.summerTo||svc;
-        setAutoCell(bk,d,r.num,p.key,svc);
-      });
-      // Том хүн: сондгой хоногтой бол +1 үсний спа (сүүлийн амралтын өдөрт)
-      if(p.cat==='adult' && n%2===1 && cfg.bonus){
-        let bonusDay=null;
-        pDays.forEach(d=>{ const c=bk.msgPlan[d]?.[r.num]?.[p.key]; if(c&&c.svc==='rest'&&!c.done) bonusDay=d; });
-        if(bonusDay) setAutoCell(bk,bonusDay,r.num,p.key,cfg.bonus);
+/* Ачаалал тэнцвэржүүлсэн автомат хувиарлалт.
+   Зарчим: айлын доторх зааврын дараалал хэвээр. Зөвхөн бариачийн өдрийн ачаалал
+   хэтэрсэн үед л тухайн ЗАХИАЛГЫГ бүхэлд нь өөр өдрөөс эхлүүлж (шаардвал ирсэн өдрөөс) тэнцвэржүүлнэ. */
+function svcLoadMins(svcId,person){
+  const s=svcById(svcId); if(!s||svcId==='rest') return 0;
+  if(s.therapist===false) return 0;      // бариач оролцохгүй → зэрэгцүүлж болно
+  return svcMinsFor(svcId,person);
+}
+function dayCapMins(){ return (S.msgDayCapMins!=null?S.msgDayCapMins:300); }
+function loadMapFrom(bookings,onlyDone){
+  const load={};
+  bookings.forEach(bk=>{
+    (bk.rooms||[]).forEach(r=>{
+      const ci=rCheckIn(bk,r),n=rNights(bk,r);
+      for(let i=0;i<n;i++){
+        const d=addDays(ci,i);
+        roomPeople(r,d).forEach(p=>{
+          const c=bk.msgPlan?.[d]?.[r.num]?.[p.key];
+          if(!c||c.svc==='rest')return;
+          if(onlyDone&&!c.done)return;
+          load[d]=(load[d]||0)+svcLoadMins(c.svc,p);
+        });
       }
     });
   });
+  return load;
+}
+function buildTasks(bk){
+  const tasks=[];
+  (bk.rooms||[]).forEach(r=>{
+    const ci=rCheckIn(bk,r),n=rNights(bk,r);
+    const days=[];for(let i=0;i<n;i++)days.push(addDays(ci,i));
+    const all=[];days.forEach(d=>roomPeople(r,d).forEach(p=>{if(!all.find(x=>x.key===p.key))all.push(p);}));
+    all.forEach(p=>{
+      const pDays=days.filter(d=>roomPeople(r,d).some(x=>x.key===p.key));
+      tasks.push({r,p,days,pDays,n});
+    });
+  });
+  return tasks;
+}
+function selForOffset(pDays,o,required){
+  if(o<0)return null;
+  const sel=[];for(let k=o;k<pDays.length;k+=2)sel.push(pDays[k]);
+  return sel.length===required?sel:null;
+}
+// Тухайн захиалгыг өгөгдсөн эхлэл (base) ба ээлжлүүлэлтээр хувиарлах төлөвлөгөө
+function bookingLayout(bk,base,useStag){
+  const tasks=buildTasks(bk);
+  const catIdx={};
+  const out=[];
+  const add={};
+  tasks.forEach(t=>{
+    const ck=t.r.num+':'+t.p.cat;
+    const idx=(catIdx[ck]=(catIdx[ck]||0)+1)-1;
+    const L=t.pDays.length, required=Math.floor(L/2);
+    let stag=useStag?(idx%2):0;
+    let sel=selForOffset(t.pDays,base+stag,required);
+    if(!sel){stag=0;sel=selForOffset(t.pDays,base,required);}
+    if(!sel)sel=selForOffset(t.pDays,1,required)||selForOffset(t.pDays,0,required)||[];
+    const bmin=bariaMins(t.p.age);
+    sel.forEach(d=>{add[d]=(add[d]||0)+bmin;});
+    out.push({t,sel});
+  });
+  return {rows:out,add};
+}
+// Захиалгыг байрлуулж, ачааллыг шинэчилнэ
+function placeBooking(bk,load){
+  const skipPref=(S.msgSkipArrival!==false);
+  const cap=dayCapMins();
+  const bases=skipPref?[1,0,2]:[0,1,2];
+  const cands=[];
+  bases.forEach(b=>{[true,false].forEach(st=>cands.push({base:b,stag:st}));});
+  let best=null;
+  cands.forEach((cd,pi)=>{
+    const lay=bookingLayout(bk,cd.base,cd.stag);
+    let overflow=0,peak=0;
+    Object.keys(lay.add).forEach(d=>{
+      const v=(load[d]||0)+lay.add[d];
+      if(v>cap)overflow+=v-cap;
+      if(v>peak)peak=v;
+    });
+    const c={overflow,pi,peak,base:cd.base,lay};
+    if(!best||c.overflow<best.overflow
+      ||(c.overflow===best.overflow&&c.pi<best.pi)) best=c;
+  });
+  const base=best.base;
+  const skipDay={};
+  best.lay.rows.forEach(({t})=>{ if(skipPref&&base>=1) skipDay[t.r.num+':'+t.p.key]=t.pDays[0]; });
+  const ctr={};
+  best.lay.rows.forEach(({t,sel})=>{
+    const bset=new Set(sel);
+    const cfg=msgCfg(t.p.cat);
+    const bariaSvc=cfg.baria||'ms_baria';
+    const ck=t.r.num+':'+t.p.cat;
+    if(ctr[ck]==null)ctr[ck]=0;
+    const skd=skipDay[t.r.num+':'+t.p.key];
+    t.days.forEach(d=>{
+      if(!t.pDays.includes(d)){setAutoCell(bk,d,t.r.num,t.p.key,'rest');return;}
+      if(bset.has(d)){setAutoCell(bk,d,t.r.num,t.p.key,bariaSvc);load[d]=(load[d]||0)+svcLoadMins(bariaSvc,t.p);return;}
+      if(d===skd){setAutoCell(bk,d,t.r.num,t.p.key,'rest');return;}   // ирсэн өдөр чөлөөтэй
+      if(t.p.cat==='adult'){setAutoCell(bk,d,t.r.num,t.p.key,'rest');return;}
+      const rot=cfg.rotate||[];
+      if(!rot.length){setAutoCell(bk,d,t.r.num,t.p.key,'rest');return;}
+      let svc=rot[ctr[ck]%rot.length];ctr[ck]++;
+      if(t.p.cat==='water'&&cfg.summerFrom&&svc===cfg.summerFrom&&isSummer(d))svc=cfg.summerTo||svc;
+      setAutoCell(bk,d,t.r.num,t.p.key,svc);
+      load[d]=(load[d]||0)+svcLoadMins(svc,t.p);
+    });
+    // Том хүн: сондгой хоногтой бол +1 үсний спа (ачаалал багатай амралтын өдөрт)
+    if(t.p.cat==='adult'&&t.n%2===1&&cfg.bonus){
+      let bd=null,bc=Infinity;
+      t.pDays.forEach(d=>{
+        if(d===skd)return;
+        const c=bk.msgPlan[d]?.[t.r.num]?.[t.p.key];
+        if(!c||c.svc!=='rest'||c.done)return;
+        const l=load[d]||0; if(l<bc){bc=l;bd=d;}
+      });
+      if(bd){setAutoCell(bk,bd,t.r.num,t.p.key,cfg.bonus);load[bd]=(load[bd]||0)+svcLoadMins(cfg.bonus,t.p);}
+    }
+  });
+}
+// Нэг захиалга — бусдын ачааллыг харгалзана
+function autoPlanBooking(bk){
+  ensurePlan(bk);
+  const others=S.bookings.filter(b=>b.status!=='cancelled'&&b.id!==bk.id);
+  const load=loadMapFrom(others,false);
+  const own=loadMapFrom([bk],true);
+  Object.keys(own).forEach(d=>{load[d]=(load[d]||0)+own[d];});
+  placeBooking(bk,load);
 }
 function ensureAllPlans(){S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>ensurePlan(bk));}
+// Бүгдийг дахин — ачааллыг бүх захиалга дээр тэгшитгэнэ
 function autoPlanAll(){
-  S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>autoPlanBooking(bk));
+  const active=S.bookings.filter(b=>b.status!=='cancelled');
+  active.forEach(bk=>ensurePlan(bk));
+  const load=loadMapFrom(active,true); // зөвхөн хийчихсэн нь суурь
+  // Богино амралттайг эхэлж (сонголт багатай)
+  active.slice().sort((a,b)=>a.nights-b.nights).forEach(bk=>placeBooking(bk,load));
   save();renderAll();toast('Автомат төлөвлөгөө үүслээ ✓','ok');
 }
 function confirmAutoPlan(){
@@ -1611,10 +2210,13 @@ function confirmAutoPlan(){
 }
 // Тухайн өдөр эзэлсэн өрөөнүүд
 function roomsOccupiedOn(date){
-  const out=[];
+  const out=[];const seen=new Set();
   S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>{
     const nums=effectiveRoomsForDate(bk,date);
-    nums.forEach(n=>{const room=bk.rooms.find(r=>+r.num===+n);if(room)out.push({roomNum:+n,bk,room});});
+    nums.forEach(n=>{
+      const k=bk.id+':'+(+n); if(seen.has(k))return; seen.add(k);   // нэг захиалгын нэг өрөө нэг л удаа
+      const room=bk.rooms.find(r=>+r.num===+n);if(room)out.push({roomNum:+n,bk,room});
+    });
   });
   return out.sort((a,b)=>a.roomNum-b.roomNum);
 }
@@ -1670,18 +2272,19 @@ const DAYSTATUS=[['normal','Хэвийн'],['off','Бариач амарсан']
 
 function dayStats(date){
   ensureAllPlans();
-  let adult=0,child=0,water=0,total=0,done=0,mins=0,freeMins=0;
+  const st={adult:0,child:0,water:0,adultAll:0,childAll:0,waterAll:0,total:0,done:0,mins:0,freeMins:0};
   roomsOccupiedOn(date).forEach(({bk,room,roomNum})=>{
     const cells=bk.msgPlan[date]?.[roomNum];if(!cells)return;
     roomPeople(room,date).forEach(p=>{
-      if(p.cat==='adult')adult++;else if(p.cat==='child')child++;else water++;
+      st[p.cat+'All']++;                       // тухайн өдөр буудалж байгаа
       const c=cells[p.key];if(!c||c.svc==='rest')return;
-      total++; if(c.done)done++;
+      st[p.cat]++;                             // өнөөдөр үйлчилгээ хийгдэх
+      st.total++; if(c.done)st.done++;
       const svc=svcById(c.svc);const m=svcMinsFor(c.svc,p);
-      if(svc&&svc.therapist===false) freeMins+=m; else mins+=m;
+      if(svc&&svc.therapist===false) st.freeMins+=m; else st.mins+=m;
     });
   });
-  return {adult,child,water,total,done,mins,freeMins};
+  return st;
 }
 function planUndoneCount(){
   const today=todayStr();let n=0;
@@ -1744,9 +2347,9 @@ function renderMassageSummary(){
   const st=dayStatusOf(msgDate);
   box.innerHTML=`
     <div class="msum">
-      <div class="card"><div class="v">${st2.adult}</div><div class="l">Том хүн</div></div>
-      <div class="card"><div class="v">${st2.child}</div><div class="l">Хүүхэд (4-13)</div></div>
-      <div class="card"><div class="v">${st2.water}</div><div class="l">Усанд оруулах (0-3)</div></div>
+      <div class="card"><div class="v">${st2.adult}<span class="of">/${st2.adultAll}</span></div><div class="l">Том хүн · өнөөдөр</div></div>
+      <div class="card"><div class="v">${st2.child}<span class="of">/${st2.childAll}</span></div><div class="l">Хүүхэд 4-13 · өнөөдөр</div></div>
+      <div class="card"><div class="v">${st2.water}<span class="of">/${st2.waterAll}</span></div><div class="l">Усанд орох 0-3 · өнөөдөр</div></div>
       <div class="card"><div class="v">${st2.done}/${st2.total}</div><div class="l">Үйлчилгээ (хийсэн/нийт)</div></div>
       <div class="card time"><div class="v">${hh}ц ${mm}м</div><div class="l">Бариачийн цаг${st2.freeMins?' (+'+st2.freeMins+'м зэрэгцүүлэн)':''}</div></div>
     </div>
@@ -1855,59 +2458,315 @@ function stockStatus(p){
 }
 
 /* ---- Inventory management ---- */
-const PGROUPS=[['goods','Зарах бараа (хөргөгч)'],['food','Хоолны материал'],['house','Ахуйн хэрэглээ'],['build','Барилгын материал'],['massage','Барианы бараа'],['service','Нэмэлт үйлчилгээ']];
+const PGROUPS=[['goods','Зарах бараа (хөргөгч)'],['food','Хүнсний агуулах'],['house','Ахуйн агуулах'],['build','Барилгын материал'],['asset','Үндсэн хөрөнгө'],['massage','Барианы бараа'],['service','Нэмэлт үйлчилгээ']];
+// Аль бүлэг аль табад харагдах вэ
+const SALE_GROUPS=['goods','service'];               // 🛒 Худалдан авалт
+const STOCK_GROUPS=['food','house','build','asset','massage']; // 📦 Агуулах
+// Дэд ангилал (бүлэг доторх)
+const SUBCATS={
+  food:['Мах, махан бүтээгдэхүүн','Гурил, будаа','Жимс, нарийн ногоо','Бүдүүн ногоо','Амтлагч, өндөг','Бейкери','Сүү, цагаан идээ','Бусад хүнс'],
+  house:['Гал тогооны ахуй','Цэвэрлэгээний ахуй','Бусад ахуй'],
+  build:['Барилгын материал'],
+  asset:['Тавилга','Тоног төхөөрөмж','Бусад хөрөнгө'],
+  massage:['Барианы бараа']
+};
+function subcatsFor(group){ return SUBCATS[group]||[]; }
+// Хоолны ангилал
+const MEAL_CATS=[['soup','🍲 Шөл'],['main','🍛 Үндсэн хоол'],['salad','🥗 Хачир, салат'],['tea','☕ Цай']];
+function mealCatLabel(c){ const f=MEAL_CATS.find(x=>x[0]===c); return f?f[1]:'Ангилалгүй'; }
 function pGroupLabel(g){const f=PGROUPS.find(x=>x[0]===(g||'goods'));return f?f[1]:g;}
-function productForm(p){
-  const g=p?(p.group||'goods'):'goods';
+function productForm(p,defGroup){
+  const g=p?(p.group||'goods'):(defGroup||'goods');
+  const isSale=SALE_GROUPS.includes(g);
+  const isAsset=g==='asset';
   return `<div class="form-grid">
     <div style="grid-column:1/-1"><label class="field">Бүлэг *</label>
-      <select id="p_group">
+      <select id="p_group" onchange="reopenProductForm(this.value)">
         ${PGROUPS.map(x=>`<option value="${x[0]}" ${g===x[0]?'selected':''}>${x[1]}</option>`).join('')}
       </select></div>
-    <div style="grid-column:1/-1"><label class="field">Барааны нэр *</label><input id="p_name" value="${p?p.name:''}" placeholder="ж: Ус 0.5л / Тансаг цэвэрлэгээ"></div>
-    <div><label class="field">Ангилал</label><input id="p_cat" value="${p?p.category||'':''}" placeholder="ж: Ундаа"></div>
-    <div><label class="field">Нэгж</label><input id="p_unit" value="${p?p.unit||'ш':'ш'}"></div>
-    <div><label class="field">Өртөг (₮)</label><input id="p_cost" type="number" min="0" value="${p?p.cost:''}"></div>
-    <div><label class="field">Зарах үнэ (₮) *</label><input id="p_price" type="number" min="0" value="${p?p.price:''}"></div>
-    <div><label class="field">Үлдэгдэл *</label><input id="p_stock" type="number" min="0" value="${p?p.stock:''}"></div>
-    <div><label class="field">Доод хязгаар</label><input id="p_min" type="number" min="0" value="${p?(p.minStock??5):5}"></div>
+    <div style="grid-column:1/-1"><label class="field">Барааны нэр *</label><input id="p_name" value="${p?p.name:''}" placeholder="ж: Ус 0.5л / Гурил / Ор"></div>
+    ${isSale
+      ? `<div><label class="field">Ангилал</label><input id="p_cat" value="${p?p.category||'':''}" placeholder="ж: Ундаа"></div>`
+      : `<div><label class="field">Ангилал (дэд бүлэг)</label>
+          <select id="p_cat">
+            <option value="">— сонгох —</option>
+            ${subcatsFor(g).map(sc=>`<option value="${sc}" ${p&&p.category===sc?'selected':''}>${sc}</option>`).join('')}
+          </select></div>`}
+    <div><label class="field">Хадгалах нэгж</label><input id="p_unit" value="${p?p.unit||'ш':'ш'}" placeholder="кг / л / ш"><div class="hint" style="font-size:10.5px">Агуулахад ингэж хардаг</div></div>
+    <div><label class="field">Өртөг (₮ / ${p?p.unit||'нэгж':'нэгж'})</label><input id="p_cost" type="number" min="0" value="${p?p.cost:''}"></div>
+    ${isSale
+      ? `<div><label class="field">Зарах үнэ (₮) *</label><input id="p_price" type="number" min="0" value="${p?p.price:''}"></div>`
+      : `<input id="p_price" type="hidden" value="${p?p.price||0:0}">
+         <div><label class="field">Орцын нэгж</label><input id="p_runit" value="${p?p.recipeUnit||'':''}" placeholder="гр / мл (хоосон=ижил)"><div class="hint" style="font-size:10.5px">Хоолны жорд ингэж бичдэг</div></div>
+         <div style="grid-column:1/-1"><label class="field">Хөрвүүлэлт: 1 ${p?p.unit||'нэгж':'нэгж'} = ? орцын нэгж</label><input id="p_conv" type="number" min="0" step="any" value="${p?(p.convFactor||''):''}" placeholder="ж: кг→гр бол 1000"><div class="hint" style="font-size:10.5px">Хоосон бол автоматаар (кг=1000гр, л=1000мл), ижил нэгж бол 1</div></div>`}
+    <div><label class="field">${isAsset?'Тоо ширхэг':'Үлдэгдэл'} *</label><input id="p_stock" type="number" min="0" step="any" value="${p?p.stock:''}"></div>
+    ${isAsset
+      ? `<input id="p_min" type="hidden" value="0">`
+      : `<div><label class="field">Доод хязгаар</label><input id="p_min" type="number" min="0" step="any" value="${p?(p.minStock??5):5}"><div class="hint" style="font-size:10.5px">Үүнээс бага бол "дуусаж байна"</div></div>`}
   </div>`;
 }
-function openProductModal(id){
+let _pmEditId=null;
+function reopenProductForm(g){
+  const cur={name:val('p_name'),cat:val('p_cat'),unit:val('p_unit'),cost:val('p_cost'),price:val('p_price'),stock:val('p_stock'),norm:val('p_norm'),min:val('p_min'),runit:val('p_runit'),conv:val('p_conv')};
+  const tmp={group:g,name:cur.name,category:cur.cat,unit:cur.unit,cost:+cur.cost||0,price:+cur.price||0,stock:+cur.stock||0,norm:+cur.norm||0,minStock:+cur.min||0,recipeUnit:cur.runit,convFactor:+cur.conv||0};
+  document.getElementById('modalBody').innerHTML=productForm(tmp,g);
+}
+function val(id){const e=document.getElementById(id);return e?e.value:'';}
+function openProductModal(id,defGroup){
   const p=id?S.products.find(x=>x.id===id):null;
-  openModal(p?'Бараа засах':'Шинэ бараа', productForm(p),
+  openModal(p?'Бараа засах':'Шинэ бараа', productForm(p,defGroup),
     `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
      <button class="btn btn-primary" onclick="saveProduct('${id||''}')">Хадгалах</button>`);
 }
 function logMove(productId,qty,type,opts){
   opts=opts||{};
   const p=S.products.find(x=>x.id===productId);
-  S.stockMoves.push({id:uid('mv'),productId,qty,type,date:opts.date||todayStr(),who:opts.who||'',note:opts.note||'',
+  S.stockMoves.push({id:uid('mv'),productId,qty,type,date:opts.date||todayStr(),who:opts.who||'',note:opts.note||'',market:opts.market||'',slot:opts.slot||'',
     name:opts.name||(p?p.name:''),unitPrice:opts.unitPrice!=null?opts.unitPrice:(p?p.price:0),ts:new Date().toISOString()});
+}
+// Хадгалах нэгж ↔ орцын нэгж хөрвүүлэлт
+const AUTO_CONV={'кг':{'гр':1000,'г':1000},'kg':{'g':1000,'гр':1000},'л':{'мл':1000},'l':{'ml':1000}};
+function convFactorOf(p){
+  if(p.convFactor&&p.convFactor>0) return p.convFactor;
+  const su=(p.unit||'').toLowerCase().trim();
+  const ru=(p.recipeUnit||'').toLowerCase().trim();
+  if(!ru||ru===su) return 1;
+  if(AUTO_CONV[su]&&AUTO_CONV[su][ru]) return AUTO_CONV[su][ru];
+  return 1;
+}
+// Орцын нэгжээр илэрхийлсэн хэмжээг хадгалах нэгж рүү (жиш. 200гр → 0.2кг)
+function recipeToStock(p,recipeQty){
+  const f=convFactorOf(p);
+  return f>0?recipeQty/f:recipeQty;
 }
 function saveProduct(id){
   const name=document.getElementById('p_name').value.trim();
-  const price=+document.getElementById('p_price').value;
+  const group=document.getElementById('p_group').value;
+  const isSale=SALE_GROUPS.includes(group);
+  const price=+document.getElementById('p_price').value||0;
   if(!name){toast('Барааны нэр оруулна уу','err');return;}
-  if(!price||price<0){toast('Зарах үнэ оруулна уу','err');return;}
-  const data={group:document.getElementById('p_group').value,name,category:document.getElementById('p_cat').value.trim()||'Бусад',unit:document.getElementById('p_unit').value.trim()||'ш',
-    cost:+document.getElementById('p_cost').value||0,price,stock:+document.getElementById('p_stock').value||0,minStock:+document.getElementById('p_min').value||0};
+  if(isSale&&(!price||price<0)){toast('Зарах үнэ оруулна уу','err');return;}
+  const normEl=document.getElementById('p_norm');
+  const runitEl=document.getElementById('p_runit');
+  const convEl=document.getElementById('p_conv');
+  const existing=id?S.products.find(x=>x.id===id):null;
+  const data={group,name,category:document.getElementById('p_cat').value.trim()||'Бусад',unit:document.getElementById('p_unit').value.trim()||'ш',
+    cost:+document.getElementById('p_cost').value||0,price,stock:+document.getElementById('p_stock').value||0,minStock:+document.getElementById('p_min').value||0,
+    norm:normEl?(+normEl.value||0):(existing?existing.norm||0:0),
+    recipeUnit:runitEl?runitEl.value.trim():(existing?existing.recipeUnit||'':''),
+    convFactor:convEl?(+convEl.value||0):(existing?existing.convFactor||0:0)};
   if(id){Object.assign(S.products.find(x=>x.id===id),data);toast('Шинэчлэгдлээ','ok');}
   else{const np={id:uid('p'),...data};S.products.push(np);if(np.stock>0)logMove(np.id,np.stock,'init',{note:'Эхний үлдэгдэл'});toast('Нэмэгдлээ','ok');}
   save();closeModal();renderAll();
 }
+/* ---- Захын үнийн жагсаалт ---- */
+function marketById(id){return (S.markets||[]).find(m=>m.id===id);}
+function getMarketPrice(productId,marketId){
+  return (S.marketPrices[productId]&&S.marketPrices[productId][marketId])||null;
+}
+function setMarketPrice(productId,marketId,price){
+  S.marketPrices[productId]=S.marketPrices[productId]||{};
+  if(price>0) S.marketPrices[productId][marketId]=price;
+  else delete S.marketPrices[productId][marketId];
+}
+function openMarketPrices(){renderMarketPrices();}
+function renderMarketPrices(){
+  const markets=S.markets||[];
+  const foodItems=S.products.filter(p=>STOCK_GROUPS.includes(p.group||'goods'));
+  const head=`<div class="row" style="gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+    <input id="mk_new" placeholder="Шинэ захын нэр (ж: Барс зах)" style="flex:1;min-width:160px">
+    <button class="btn btn-primary btn-sm" onclick="addMarket()">+ Зах нэмэх</button>
+  </div>`;
+  if(!markets.length){
+    openModal('🏪 Захын үнэ',head+'<div class="hint" style="padding:10px 0">Эхлээд зах нэмнэ үү. Дараа нь бараа бүрд зах болгоны үнэ оруулна.</div>','<button class="btn btn-primary" onclick="closeModal()">Хаах</button>');
+    return;
+  }
+  if(!foodItems.length){
+    openModal('🏪 Захын үнэ',head+'<div class="hint" style="padding:10px 0">Эхлээд Агуулахад бараа нэмнэ үү.</div>','<button class="btn btn-primary" onclick="closeModal()">Хаах</button>');
+    return;
+  }
+  const mkHeader=markets.map(mk=>`<th>${mk.name} <button class="btn-icon" style="padding:0 3px;font-size:10px" title="Зах устгах" onclick="delMarket('${mk.id}')">✕</button></th>`).join('');
+  const rows=foodItems.map(p=>{
+    const cells=markets.map(mk=>{
+      const price=getMarketPrice(p.id,mk.id)||'';
+      return `<td><input type="number" min="0" step="any" value="${price}" placeholder="—" style="width:80px;padding:4px 6px;font-size:12px" onchange="setMarketPrice('${p.id}','${mk.id}',parseFloat(this.value)||0);save()"></td>`;
+    }).join('');
+    const prices=markets.map(mk=>({mk:mk.name,pr:getMarketPrice(p.id,mk.id)})).filter(x=>x.pr>0);
+    const cheapest=prices.length?prices.reduce((a,b)=>a.pr<b.pr?a:b):null;
+    return `<tr><td><b>${p.name}</b><div style="font-size:10.5px;color:var(--muted)">${p.unit}${cheapest?' · хямд: '+cheapest.mk+' '+money(cheapest.pr):''}</div></td>${cells}</tr>`;
+  }).join('');
+  openModal('🏪 Захын үнэ',
+    head+`<div style="overflow-x:auto"><table class="mini-tbl"><thead><tr><th>Бараа</th>${mkHeader}</tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="hint" style="margin-top:10px">Үнэ өөрчлөгдвөл шууд засаж болно. Нөөц нэмэхэд захаа сонговол тэр захын үнэ автоматаар орно.</div>`,
+    '<button class="btn btn-primary" onclick="closeModal()">Хаах</button>');
+}
+function addMarket(){
+  const name=(document.getElementById('mk_new').value||'').trim();
+  if(!name){toast('Захын нэр оруулна уу','err');return;}
+  S.markets=S.markets||[];
+  S.markets.push({id:uid('mk'),name});
+  save();renderMarketPrices();
+}
+function delMarket(id){
+  S.markets=S.markets.filter(m=>m.id!==id);
+  Object.keys(S.marketPrices).forEach(pid=>{if(S.marketPrices[pid])delete S.marketPrices[pid][id];});
+  save();renderMarketPrices();
+}
+/* ---- Тухайн өдрийн эцсийн үлдэгдэл ---- */
+// Өнөөгийн үлдэгдлээс хойшхи хөдөлгөөнийг ухраан тооцоолно
+function stockOnDate(productId,date){
+  const p=S.products.find(x=>x.id===productId);
+  if(!p) return 0;
+  // date-ээс ХОЙШ (date-ийн дараах өдрүүд) хийгдсэн хөдөлгөөнийг одоогийн үлдэгдлээс хасна
+  let bal=p.stock;
+  S.stockMoves.filter(m=>m.productId===productId&&(m.date||'')>date).forEach(m=>{
+    bal-=m.qty; // ирээдүйн хөдөлгөөнийг арилгаж, тухайн өдрийн эцэс рүү ухраана
+  });
+  return bal;
+}
+let stockHistDay=null;
+function openStockHistory(){
+  if(!stockHistDay) stockHistDay=todayStr();
+  renderStockHistory();
+}
+function renderStockHistory(){
+  const items=S.products.filter(p=>STOCK_GROUPS.includes(p.group||'goods'));
+  const slots=S.mealSlots||[];
+  const rows=items.map(p=>{
+    const bal=stockOnDate(p.id,stockHistDay);
+    const now=p.stock;
+    // Тухайн өдрийн хэрэглээ цагаар (хоол) + бусад
+    const dayMoves=S.stockMoves.filter(m=>m.productId===p.id&&m.date===stockHistDay&&m.qty<0);
+    const bySlot={};
+    let otherUse=0;
+    dayMoves.forEach(m=>{
+      if(m.type==='kitchen'&&m.slot){ bySlot[m.slot]=(bySlot[m.slot]||0)+Math.abs(m.qty); }
+      else { otherUse+=Math.abs(m.qty); }
+    });
+    const slotCells=slots.map(sl=>{
+      const q=bySlot[sl.id]||0;
+      return `<td style="text-align:center;font-size:12px;${q?'color:var(--berry);font-weight:600':'color:#c3cad3'}">${q?Math.round(q*100)/100:'·'}</td>`;
+    }).join('');
+    const hasUse=Object.keys(bySlot).length||otherUse;
+    return `<tr>
+      <td><b>${p.name}</b><div style="font-size:10.5px;color:var(--muted)">${p.unit}</div></td>
+      <td style="text-align:center"><b>${Math.round(bal*100)/100}</b></td>
+      ${slotCells}
+      <td style="text-align:center;font-size:12px;${otherUse?'color:var(--navy)':'color:#c3cad3'}">${otherUse?Math.round(otherUse*100)/100:'·'}</td>
+      <td style="text-align:center;font-size:12px;color:var(--muted)">${now}</td>
+    </tr>`;
+  }).join('');
+  const slotHeaders=slots.map(sl=>`<th style="text-align:center;font-size:10.5px">${sl.name.split(' ')[0]}</th>`).join('');
+  openModal('📅 Өдрийн үлдэгдэл ба хэрэглээ',
+    `<div class="row" style="gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+       <label class="field" style="margin:0">Өдөр:</label>
+       <input type="date" value="${stockHistDay}" max="${todayStr()}" onchange="stockHistDay=this.value;renderStockHistory()" style="width:auto">
+       <button class="btn-icon" onclick="stockHistDay=addDays(stockHistDay,-1);renderStockHistory()">‹</button>
+       <button class="btn-icon" onclick="stockHistDay=addDays(stockHistDay,1);renderStockHistory()">›</button>
+     </div>
+     <div class="hint" style="margin-bottom:10px">Тухайн өдрийн эцсийн үлдэгдэл ба хэрэглээ — цаг бүрээр задалсан. «Бусад» = бариа, дотоод, тохируулга.</div>
+     ${items.length?`<div style="overflow-x:auto"><table class="ptbl">
+       <thead><tr><th>Бараа</th><th style="text-align:center">Эцэст</th>${slotHeaders}<th style="text-align:center">Бусад</th><th style="text-align:center">Одоо</th></tr></thead>
+       <tbody>${rows}</tbody></table></div>`:'<div class="hint" style="padding:10px 0">Агуулахын бараа алга.</div>'}`,
+    `<button class="btn btn-primary" onclick="closeModal()">Хаах</button>`);
+}
+/* ---- Үлдэгдэл шууд тоолж оруулах (шинээр эхлэх / хэзээ ч) ---- */
+let setStockDraft=null;
+function openSetStock(){
+  const items=S.products.filter(p=>STOCK_GROUPS.includes(p.group||'goods'));
+  if(!items.length){toast('Эхлээд бараа нэмнэ үү','err');return;}
+  setStockDraft={vals:{},date:todayStr()};
+  items.forEach(p=>setStockDraft.vals[p.id]=p.stock);
+  renderSetStock();
+}
+function renderSetStock(){
+  const items=S.products.filter(p=>STOCK_GROUPS.includes(p.group||'goods'));
+  // Бүлгээр эрэмбэлнэ
+  const byGroup={};
+  items.forEach(p=>{const g=p.group||'goods';(byGroup[g]=byGroup[g]||[]).push(p);});
+  let rows='';
+  STOCK_GROUPS.forEach(g=>{
+    if(!byGroup[g])return;
+    rows+=`<tr><td colspan="3" style="background:var(--soft);font-weight:700;font-size:12px;color:var(--navy);padding:6px 8px">${STOCK_ICONS[g]||''} ${pGroupLabel(g)}</td></tr>`;
+    byGroup[g].forEach(p=>{
+      rows+=`<tr>
+        <td><b>${p.name}</b></td>
+        <td style="color:var(--muted);font-size:12px">систем: ${p.stock} ${p.unit}</td>
+        <td><input type="number" min="0" step="any" value="${setStockDraft.vals[p.id]}" style="width:90px;padding:5px 7px" onchange="setStockDraft.vals['${p.id}']=parseFloat(this.value)||0"> <span style="font-size:11px;color:var(--muted)">${p.unit}</span></td>
+      </tr>`;
+    });
+  });
+  openModal('📝 Үлдэгдэл тоолж оруулах',
+    `<div class="hint" style="margin-bottom:10px">Бодит үлдэгдлээ тоолоод шууд бичнэ. Энэ нь <b>худалдан авалт биш</b> — зөвхөн одоогийн бодит тоог тохируулна. Шинээр эхлэхэд, эсвэл хэзээ ч тоолоод ашиглаж болно.</div>
+     <div class="row" style="gap:8px;align-items:center;margin-bottom:12px">
+       <label class="field" style="margin:0">Тоолсон огноо:</label>
+       <input type="date" value="${setStockDraft.date}" max="${todayStr()}" onchange="setStockDraft.date=this.value" style="width:auto">
+     </div>
+     <div style="overflow-x:auto"><table class="ptbl"><thead><tr><th>Бараа</th><th>Одоо</th><th>Бодит тоо</th></tr></thead><tbody>${rows}</tbody></table></div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="confirmSetStock()">Хадгалах</button>`);
+}
+function confirmSetStock(){
+  const items=S.products.filter(p=>STOCK_GROUPS.includes(p.group||'goods'));
+  const date=setStockDraft.date||todayStr();
+  let changed=0;
+  items.forEach(p=>{
+    const nv=setStockDraft.vals[p.id];
+    if(nv==null||nv===p.stock)return;
+    const diff=nv-p.stock;
+    p.stock=nv;
+    logMove(p.id,diff,'adjust',{date,note:'Тоолж оруулсан үлдэгдэл'});
+    changed++;
+  });
+  setStockDraft=null;save();closeModal();renderAll();
+  toast(changed?changed+' барааны үлдэгдэл шинэчлэгдлээ ✓':'Өөрчлөлт алга','ok');
+}
 function restockProduct(id){
   const p=S.products.find(x=>x.id===id);
-  openModal('Нөхөн дүүргэх — '+p.name,
-    `<label class="field">Нэмэх тоо хэмжээ</label><input id="r_add" type="number" min="1" placeholder="0"><div class="hint">Одоогийн үлдэгдэл: ${p.stock} ${p.unit}</div>`,
+  const isFood=(p.group||'')==='food';
+  const markets=S.markets||[];
+  openModal('📥 Нөөц нэмэх — '+p.name,
+    `<div class="hint" style="margin-bottom:12px">Одоогийн үлдэгдэл: <b>${p.stock} ${p.unit}</b></div>
+     <div class="form-grid">
+       <div><label class="field">Нэмэх хэмжээ (${p.unit}) *</label><input id="r_add" type="number" min="0" step="any" placeholder="0"></div>
+       <div><label class="field">Ирсэн огноо</label><input id="r_date" type="date" value="${todayStr()}"></div>
+       ${markets.length?`<div><label class="field">Зах</label>
+         <select id="r_market" onchange="onRestockMarket('${id}')">
+           <option value="">— сонгох —</option>
+           ${markets.map(mk=>`<option value="${mk.id}">${mk.name}</option>`).join('')}
+         </select></div>`:'<input id="r_market" type="hidden">'}
+       <div><label class="field">Нэгжийн өртөг (₮)</label><input id="r_cost" type="number" min="0" value="${p.cost||''}" placeholder="0"><div class="hint" style="font-size:10.5px">${markets.length?'Зах сонгоход автоматаар орно':'Хоосон бол хуучин өртөг хэвээр'}</div></div>
+       ${isFood?`<div><label class="field">Дуусах хугацаа</label><input id="r_exp" type="date"></div>`:'<input id="r_exp" type="hidden">'}
+       <div style="grid-column:1/-1"><label class="field">Тэмдэглэл</label><input id="r_note" placeholder="ж: нэмэлт мэдээлэл"></div>
+     </div>`,
     `<button class="btn btn-ghost" onclick="closeModal()">Болих</button><button class="btn btn-green" onclick="confirmRestockProduct('${id}')">Нэмэх</button>`);
+}
+function onRestockMarket(productId){
+  const mkId=document.getElementById('r_market').value;
+  if(!mkId)return;
+  const price=getMarketPrice(productId,mkId);
+  if(price>0){document.getElementById('r_cost').value=price;}
 }
 function confirmRestockProduct(id){
   const add=+document.getElementById('r_add').value;
   if(!add||add<=0){toast('Тоо хэмжээ оруулна уу','err');return;}
-  S.products.find(x=>x.id===id).stock+=add;
-  logMove(id,add,'restock',{note:'Нөхөн дүүргэлт'});
-  save();closeModal();renderAll();toast('Үлдэгдэл нэмэгдлээ','ok');
+  const p=S.products.find(x=>x.id===id);
+  const date=document.getElementById('r_date').value||todayStr();
+  const cost=+document.getElementById('r_cost').value||0;
+  const exp=document.getElementById('r_exp').value||'';
+  const note=document.getElementById('r_note').value.trim();
+  const mkEl=document.getElementById('r_market');
+  const mkId=mkEl?mkEl.value:'';
+  const mk=mkId?marketById(mkId):null;
+  p.stock+=add;
+  if(cost>0){ p.cost=cost; if(mkId) setMarketPrice(id,mkId,cost); } // захын үнийг ч шинэчилнэ
+  if(exp){ p.expiry=exp; }
+  const parts=[];
+  if(mk)parts.push(mk.name);
+  if(note)parts.push(note);
+  parts.push('Нөөц нэмсэн'+(exp?' (дуусах '+exp+')':''));
+  logMove(id,add,'restock',{date,unitPrice:cost||p.cost,market:mkId||'',note:parts.join(' · ')});
+  save();closeModal();renderAll();toast('Нөөц нэмэгдлээ ✓ ('+date+')','ok');
 }
 function deleteProduct(id){
   const p=S.products.find(x=>x.id===id);
@@ -2069,17 +2928,23 @@ function renderStockTakeInfo(){
   </div>`;
 }
 let stDraft=null;
-function openStockTake(){
-  if(!S.products.length){toast('Бараа бүртгэгдээгүй байна','err');return;}
+function stockScopeGroups(scope){ return scope==='sale'?SALE_GROUPS:scope==='stock'?STOCK_GROUPS:PGROUPS.map(x=>x[0]); }
+function openStockTake(scope){
+  scope=scope||'all';
+  const groups=stockScopeGroups(scope);
+  const items=S.products.filter(p=>groups.includes(p.group||'goods')&&(p.group||'goods')!=='service');
+  if(!items.length){toast('Тоолох бараа алга','err');return;}
   const lt=lastStockTake();
-  const from=lt?lt.date:null;
-  stDraft={from,physical:{}};
-  S.products.forEach(p=>stDraft.physical[p.id]=p.stock); // анхдагч = систем дэх үлдэгдэл
+  stDraft={from:lt?lt.date:null,physical:{},scope};
+  items.forEach(p=>stDraft.physical[p.id]=p.stock);
   renderStockTake();
 }
+function stockTakeItems(){
+  const groups=stockScopeGroups(stDraft.scope);
+  return S.products.filter(p=>groups.includes(p.group||'goods')&&(p.group||'goods')!=='service');
+}
 function renderStockTake(){
-  const lt=lastStockTake();
-  const rows=S.products.map(p=>{
+  const rows=stockTakeItems().map(p=>{
     const sum=moveSummary(p.id,stDraft.from);
     const phys=stDraft.physical[p.id];
     const diff=phys-p.stock;
@@ -2090,11 +2955,12 @@ function renderStockTake(){
       <td style="color:#1c6ea4">−${sum.internal}</td>
       <td style="color:var(--navy)">−${sum.used}</td>
       <td><b>${p.stock}</b></td>
-      <td><input type="number" min="0" style="width:80px;padding:5px 7px" value="${phys}" onchange="stDraft.physical['${p.id}']=parseInt(this.value)||0;renderStockTake()"></td>
+      <td><input type="number" min="0" step="any" style="width:80px;padding:5px 7px" value="${phys}" onchange="stDraft.physical['${p.id}']=parseFloat(this.value)||0;renderStockTake()"></td>
       <td style="font-weight:700;color:${diff===0?'var(--green)':'var(--red)'}">${diff===0?'0':(diff>0?'+':'')+diff}</td>
     </tr>`;
   }).join('');
-  openModal('🧾 Тулгалт'+(stDraft.from?' (сүүлийн тулгалт '+stDraft.from+'-с хойш)':''),
+  const scopeLbl=stDraft.scope==='sale'?'Зарах бараа':stDraft.scope==='stock'?'Агуулах':'Бүх бараа';
+  openModal('🧾 Тулгалт · '+scopeLbl+(stDraft.from?' ('+stDraft.from+'-с хойш)':''),
     `<div class="hint" style="margin-bottom:10px">Бодит үлдэгдлээ тоолж бичнэ. Зөрүү = Бодит − Систем. Зөрүү гарвал бараа бүртгэлгүй гарсан (дутсан) гэсэн үг.</div>
      <div style="overflow-x:auto"><table class="ptbl">
        <thead><tr><th>Бараа</th><th title="Нөхсөн">+Нэмсэн</th><th title="Зочинд зарсан">−Зочин</th><th title="Дотоод хэрэглээ">−Дотоод</th><th title="Бариа/Хоолны хэрэглээ">−Хэрэглээ</th><th>Систем</th><th>Бодит</th><th>Зөрүү</th></tr></thead>
@@ -2105,88 +2971,301 @@ function renderStockTake(){
 }
 function confirmStockTake(){
   const lines=[];
-  S.products.forEach(p=>{
+  stockTakeItems().forEach(p=>{
     const phys=stDraft.physical[p.id]!=null?stDraft.physical[p.id]:p.stock;
     const diff=phys-p.stock;
     lines.push({productId:p.id,name:p.name,system:p.stock,physical:phys,diff});
     if(diff!==0){ p.stock=phys; logMove(p.id,diff,'adjust',{note:'Тулгалтын зөрүү'}); }
   });
-  S.stockTakes.push({id:uid('st'),date:todayStr(),from:stDraft.from,lines,ts:new Date().toISOString()});
+  S.stockTakes.push({id:uid('st'),date:todayStr(),from:stDraft.from,scope:stDraft.scope,lines,ts:new Date().toISOString()});
   stDraft=null;save();closeModal();renderAll();toast('Тулгалт хаагдлаа ✓','ok');
 }
 
 /* ---- Барааны хөдөлгөөний түүх ---- */
 function openMoves(id){
   const p=S.products.find(x=>x.id===id);
-  const ms=S.stockMoves.filter(m=>m.productId===id).slice().reverse().slice(0,50);
-  const typeLbl={init:'Эхний үлдэгдэл',restock:'Нөхсөн',guest:'Зочин',internal:'Дотоод',massage:'Бариа',kitchen:'Хоол',adjust:'Тулгалт'};
-  const rows=ms.length?ms.map(m=>`<tr>
-      <td style="white-space:nowrap">${m.date}</td>
+  const ms=S.stockMoves.filter(m=>m.productId===id).slice().reverse();
+  const typeLbl={init:'Эхний үлдэгдэл',restock:'Нөөц',guest:'Зочин',internal:'Дотоод',massage:'Бариа',kitchen:'Хоол',adjust:'Тулгалт'};
+  const rows=ms.length?ms.map(m=>{
+    const editable=(m.type==='restock'||m.type==='init'||m.type==='adjust');
+    return `<tr>
+      <td style="white-space:nowrap">${editable?`<input type="date" value="${m.date}" style="width:130px;padding:3px 5px;font-size:11.5px" onchange="editMoveDate('${m.id}',this.value)">`:m.date}</td>
       <td>${typeLbl[m.type]||m.type}</td>
-      <td style="font-weight:700;color:${m.qty>0?'var(--green)':'var(--red)'}">${m.qty>0?'+':''}${m.qty}</td>
+      <td style="font-weight:700;color:${m.qty>0?'var(--green)':'var(--red)'}">${editable&&m.type!=='init'?`<input type="number" step="any" value="${m.qty}" style="width:70px;padding:3px 5px;font-size:11.5px" onchange="editMoveQty('${m.id}',this.value)">`:(m.qty>0?'+':'')+m.qty}</td>
       <td style="font-size:12px;color:var(--muted)">${m.who||m.note||''}</td>
-    </tr>`).join('') : '<tr><td colspan="4" class="hint" style="padding:12px">Хөдөлгөөн алга</td></tr>';
-  openModal('Хөдөлгөөн — '+p.name,
-    `<div class="hint" style="margin-bottom:8px">Одоогийн үлдэгдэл: <b>${p.stock} ${p.unit}</b></div>
-     <div style="overflow-x:auto"><table class="ptbl"><thead><tr><th>Огноо</th><th>Төрөл</th><th>Тоо</th><th>Тайлбар</th></tr></thead><tbody>${rows}</tbody></table></div>`,
+      <td>${editable?`<button class="btn-icon" title="Устгах" onclick="delMove('${m.id}','${id}')">🗑</button>`:''}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="5" class="hint" style="padding:12px">Хөдөлгөөн алга</td></tr>';
+  openModal('📜 Хөдөлгөөн — '+p.name,
+    `<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+       <div class="hint" style="margin:0">Одоогийн үлдэгдэл: <b>${p.stock} ${p.unit}</b></div>
+       <button class="btn btn-green btn-sm" onclick="openBackfillRestock('${id}')">📥 Татан авалт нөхөж бүртгэх</button>
+     </div>
+     <div class="hint" style="margin-bottom:8px;font-size:11px">Нөөц/тулгалтын огноо, тоог засаж болно. Засвар автоматаар үлдэгдэлд тусна.</div>
+     <div style="overflow-x:auto"><table class="ptbl"><thead><tr><th>Огноо</th><th>Төрөл</th><th>Тоо</th><th>Тайлбар</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`,
     `<button class="btn btn-primary" onclick="closeModal()">Хаах</button>`);
+}
+function editMoveDate(moveId,date){
+  const m=S.stockMoves.find(x=>x.id===moveId); if(!m)return;
+  m.date=date||m.date; save();
+  toast('Огноо засагдлаа','ok');
+}
+function editMoveQty(moveId,val){
+  const newQty=parseFloat(val); if(isNaN(newQty))return;
+  const m=S.stockMoves.find(x=>x.id===moveId); if(!m)return;
+  const diff=newQty-m.qty;                 // үлдэгдэлд зөрүүг тусгана
+  const p=S.products.find(x=>x.id===m.productId);
+  if(p) p.stock+=diff;
+  m.qty=newQty; save();renderAll();openMoves(m.productId);
+  toast('Тоо засагдлаа','ok');
+}
+function delMove(moveId,productId){
+  const m=S.stockMoves.find(x=>x.id===moveId); if(!m)return;
+  openModal('Устгах уу?',
+    `<p style="font-size:14px">Энэ хөдөлгөөнийг устгах уу? Үлдэгдлээс <b>${m.qty>0?'−':'+'}${Math.abs(m.qty)}</b> хасагдана/нэмэгдэнэ.</p>`,
+    `<button class="btn btn-ghost" onclick="openMoves('${productId}')">Болих</button>
+     <button class="btn btn-berry" onclick="confirmDelMove('${moveId}','${productId}')">Устгах</button>`);
+}
+function confirmDelMove(moveId,productId){
+  const m=S.stockMoves.find(x=>x.id===moveId); if(!m)return;
+  const p=S.products.find(x=>x.id===m.productId);
+  if(p) p.stock-=m.qty;                    // хөдөлгөөнийг буцаана
+  S.stockMoves=S.stockMoves.filter(x=>x.id!==moveId);
+  save();renderAll();openMoves(productId);toast('Устгагдлаа');
+}
+// Өнгөрсөн огноогоор нөөц нөхөж бүртгэх
+function openBackfillRestock(id){
+  const p=S.products.find(x=>x.id===id);
+  const markets=S.markets||[];
+  openModal('📥 Татан авалт нөхөж бүртгэх — '+p.name,
+    `<div class="hint" style="margin-bottom:12px">Мартаж бүртгээгүй татан авалтыг он сар зааж нөхөж оруулна. Үлдэгдэлд нэмэгдэнэ.</div>
+     <div class="form-grid">
+       <div><label class="field">Хэмжээ (${p.unit}) *</label><input id="bf_add" type="number" min="0" step="any" placeholder="0"></div>
+       <div><label class="field">Он сар өдөр *</label><input id="bf_date" type="date" value="${todayStr()}"></div>
+       ${markets.length?`<div><label class="field">Зах</label><select id="bf_market" onchange="onBackfillMarket('${id}')"><option value="">— сонгох —</option>${markets.map(mk=>`<option value="${mk.id}">${mk.name}</option>`).join('')}</select></div>`:'<input id="bf_market" type="hidden">'}
+       <div><label class="field">Нэгжийн өртөг (₮)</label><input id="bf_cost" type="number" min="0" value="${p.cost||''}"></div>
+       <div style="grid-column:1/-1"><label class="field">Тэмдэглэл</label><input id="bf_note" placeholder="ж: нөхөж бүртгэсэн"></div>
+     </div>`,
+    `<button class="btn btn-ghost" onclick="openMoves('${id}')">Буцах</button>
+     <button class="btn btn-green" onclick="confirmBackfill('${id}')">Нөхөж бүртгэх</button>`);
+}
+function onBackfillMarket(productId){
+  const mkId=document.getElementById('bf_market').value;
+  if(!mkId)return;
+  const price=getMarketPrice(productId,mkId);
+  if(price>0)document.getElementById('bf_cost').value=price;
+}
+function confirmBackfill(id){
+  const add=+document.getElementById('bf_add').value;
+  if(!add||add<=0){toast('Хэмжээ оруулна уу','err');return;}
+  const p=S.products.find(x=>x.id===id);
+  const date=document.getElementById('bf_date').value||todayStr();
+  const cost=+document.getElementById('bf_cost').value||0;
+  const mkEl=document.getElementById('bf_market');
+  const mkId=mkEl?mkEl.value:'';
+  const mk=mkId?marketById(mkId):null;
+  const note=document.getElementById('bf_note').value.trim();
+  p.stock+=add;
+  if(cost>0&&mkId) setMarketPrice(id,mkId,cost);
+  const parts=[]; if(mk)parts.push(mk.name); if(note)parts.push(note); parts.push('Нөхөж бүртгэсэн');
+  logMove(id,add,'restock',{date,unitPrice:cost||p.cost,market:mkId||'',note:parts.join(' · ')});
+  save();closeModal();renderAll();openMoves(id);toast('Нөхөж бүртгэлээ ✓ ('+date+')','ok');
 }
 
 let invGroupFilt='all';
+let stockGroupFilt='all';
 let stockDay=null;
 function renderInventory(){
   const q=(document.getElementById('invSearch').value||'').toLowerCase();
   const list=S.products.filter(p=>{
-    if(invGroupFilt!=='all'&&(p.group||'goods')!==invGroupFilt)return false;
+    const g=p.group||'goods';
+    if(!SALE_GROUPS.includes(g))return false;                    // зөвхөн зарах бараа/үйлчилгээ
+    if(invGroupFilt!=='all'&&g!==invGroupFilt)return false;
     return p.name.toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q);
   });
   const body=document.getElementById('invBody');
-  if(!list.length){body.innerHTML=`<tr><td colspan="8" class="hint" style="padding:14px">Бараа бүртгэгдээгүй байна.</td></tr>`;return;}
-  body.innerHTML=list.map(p=>{
-    const s=stockStatus(p);
-    const grp=(p.group||'goods')==='service'?'<span class="pill service">Үйлчилгээ</span>':`<span class="pill goods">${pGroupLabel(p.group)}</span>`;
-    return `<tr>
-      <td><b>${p.name}</b><div style="font-size:11px;color:var(--muted)">${p.unit}</div></td>
-      <td>${grp}</td>
-      <td>${p.category}</td><td>${money(p.cost)}</td><td>${money(p.price)}</td><td><b>${p.stock}</b></td>
-      <td><span class="pill ${s.cls}">${s.txt}</span></td>
-      <td><div class="row" style="gap:5px"><button class="btn-icon" title="Нөхөх" onclick="restockProduct('${p.id}')">➕</button>
-        <button class="btn-icon" title="Хөдөлгөөн харах" onclick="openMoves('${p.id}')">📜</button>
+  if(!list.length){body.innerHTML=`<div class="hint" style="padding:14px">Бараа бүртгэгдээгүй байна. «+ Шинэ бараа» дарж нэмнэ.</div>`;return;}
+  const stDot=(p)=>{const c=stockStatus(p).cls;return c==='canc'?'st-out':c==='pend'?'st-low':'st-ok';};
+  const itemHtml=(p)=>{
+    const isSvc=(p.group||'goods')==='service';
+    return `<div class="stock-item">
+      ${isSvc?'<span class="st" style="background:#8a6fb0" title="Үйлчилгээ"></span>':`<span class="st ${stDot(p)}" title="${stockStatus(p).txt}"></span>`}
+      <div class="nm" onclick="openProductModal('${p.id}')" style="cursor:pointer"><b>${p.name}</b><span class="sub"> · ${money(p.price)}</span></div>
+      ${isSvc?'<span class="qty" style="color:var(--muted);font-size:11px">үйлч.</span>':`<span class="qty">${p.stock}<span style="font-weight:400;color:var(--muted);font-size:10px"> ${p.unit}</span></span>`}
+      <div class="acts">
+        ${isSvc?'':`<button class="btn-icon" title="Нөөц нэмэх" onclick="restockProduct('${p.id}')">📥</button>
+        <button class="btn-icon" title="Хөдөлгөөн" onclick="openMoves('${p.id}')">📜</button>`}
         <button class="btn-icon" title="Засах" onclick="openProductModal('${p.id}')">✎</button>
-        <button class="btn-icon" title="Устгах" onclick="deleteProduct('${p.id}')">🗑</button></div></td>
-    </tr>`;
-  }).join('');
+        <button class="btn-icon" title="Устгах" onclick="deleteProduct('${p.id}')">🗑</button>
+      </div>
+    </div>`;
+  };
+  // Бүлгээр (Зарах бараа / Үйлчилгээ) карт болгоно
+  const grouped={};
+  list.forEach(p=>{const g=p.group||'goods';(grouped[g]=grouped[g]||[]).push(p);});
+  const labels={goods:'🛒 Зарах бараа',service:'✨ Нэмэлт үйлчилгээ'};
+  body.innerHTML='<div class="stock-grid">'+SALE_GROUPS.filter(g=>grouped[g]).map(g=>{
+    return `<div class="stock-cat">
+      <div class="stock-cat-h">${labels[g]||g}<span class="cnt">${grouped[g].length}</span></div>
+      ${grouped[g].map(itemHtml).join('')}
+    </div>`;
+  }).join('')+'</div>';
   renderStockTakeInfo();
-  renderDailyStock();
+  renderQuickSell();
+  renderPurchases();
 }
-function renderDailyStock(){
-  if(!stockDay) stockDay=todayStr();
-  const d=parseD(stockDay);
-  const lbl=document.getElementById('stockDayLbl'); if(lbl) lbl.textContent=stockDay+' ('+WK[d.getDay()]+')';
-  const box=document.getElementById('dailyStockBox'); if(!box) return;
-  if(!S.products.length){box.innerHTML='';return;}
-  const rows=S.products.map(p=>{
-    const closing = p.stock - S.stockMoves.filter(m=>m.productId===p.id && m.date>stockDay).reduce((s,m)=>s+m.qty,0);
-    const dayMv=S.stockMoves.filter(m=>m.productId===p.id && m.date===stockDay);
-    const dayNet=dayMv.reduce((s,m)=>s+m.qty,0);
-    const opening=closing-dayNet;
-    let inQ=0,guest=0,internal=0,adjust=0,used=0;
-    dayMv.forEach(m=>{ if(m.type==='restock'||m.type==='init')inQ+=m.qty; else if(m.type==='guest')guest+=-m.qty; else if(m.type==='internal')internal+=-m.qty; else if(m.type==='massage'||m.type==='kitchen')used+=-m.qty; else if(m.type==='adjust')adjust+=m.qty; });
-    return {p,opening,inQ,guest,internal,adjust,used,closing,has:dayMv.length>0};
+/* ---- Хурдан худалдан авалт бүртгэх ---- */
+let qsDraft=null;
+let purchDay=null;
+function saleTargets(date){
+  // Тухайн өдрийн захиалгатай өрөөнүүд + бүх өрөө + ажилчид
+  date=date||todayStr();
+  const roomTargets=[];
+  for(let n=1;n<=9;n++){
+    // Тэр өдөр тухайн өрөөнд захиалга байгаа эсэх
+    const bk=S.bookings.find(b=>b.status!=='cancelled'&&effectiveRoomsForDate(b,date).map(x=>+x).includes(n));
+    roomTargets.push({type:'room',num:n,bookingId:bk?bk.id:null,label:'Өрөө '+n+(bk?' · '+(bk.name||bk.phone||''):' (сул)')});
+  }
+  const staffTargets=(S.staff||[]).map(s=>({type:'staff',staffId:s.id,label:'👷 '+s.name}));
+  return {roomTargets,staffTargets};
+}
+function renderQuickSell(){
+  const box=document.getElementById('quickSellBox'); if(!box)return;
+  const goods=S.products.filter(p=>SALE_GROUPS.includes(p.group||'goods'));
+  if(!goods.length){box.innerHTML='<div class="hint">Эхлээд зарах бараа нэмнэ үү («+ Шинэ бараа»).</div>';return;}
+  if(!qsDraft) qsDraft={items:[{productId:'',qty:1}],target:'',date:todayStr()};
+  const {roomTargets,staffTargets}=saleTargets(qsDraft.date);
+  const itemRows=qsDraft.items.map((it,i)=>{
+    const p=S.products.find(x=>x.id===it.productId);
+    const lineTotal=p?(p.price||0)*(it.qty||0):0;
+    return `<div class="row" style="gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap">
+      <select style="flex:1;min-width:150px" onchange="qsDraft.items[${i}].productId=this.value;renderQuickSell()">
+        <option value="">— бараа сонгох —</option>
+        ${goods.map(g=>`<option value="${g.id}" ${g.id===it.productId?'selected':''}>${g.name} · ${money(g.price)} (${g.stock}${g.unit})</option>`).join('')}
+      </select>
+      <input type="number" min="0" step="any" style="width:70px" value="${it.qty}" onchange="qsDraft.items[${i}].qty=parseFloat(this.value)||0;renderQuickSell()">
+      <span style="min-width:80px;text-align:right;font-weight:700;color:var(--navy)">${money(lineTotal)}</span>
+      ${qsDraft.items.length>1?`<button class="btn-icon" onclick="qsDraft.items.splice(${i},1);renderQuickSell()">✕</button>`:'<span style="width:24px"></span>'}
+    </div>`;
+  }).join('');
+  const total=qsDraft.items.reduce((s,it)=>{const p=S.products.find(x=>x.id===it.productId);return s+(p?(p.price||0)*(it.qty||0):0);},0);
+  box.innerHTML=`${itemRows}
+    <button class="btn btn-ghost btn-sm" style="margin-bottom:12px" onclick="qsDraft.items.push({productId:'',qty:1});renderQuickSell()">+ Бараа нэмэх</button>
+    <div class="row" style="gap:10px;align-items:flex-end;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px">
+      <div style="flex:1;min-width:180px">
+        <label class="field">Хэн авсан *</label>
+        <select id="qs_target" onchange="qsDraft.target=this.value">
+          <option value="">— сонгох —</option>
+          <optgroup label="Өрөө (зочин)">
+            ${roomTargets.map(t=>`<option value="${t.type}:${t.num}:${t.bookingId||''}" ${qsDraft.target===t.type+':'+t.num+':'+(t.bookingId||'')?'selected':''} ${!t.bookingId?'style="color:#aaa"':''}>${t.label}</option>`).join('')}
+          </optgroup>
+          ${staffTargets.length?`<optgroup label="Ажилчид">
+            ${staffTargets.map(t=>`<option value="${t.type}:${t.staffId}" ${qsDraft.target===t.type+':'+t.staffId?'selected':''}>${t.label}</option>`).join('')}
+          </optgroup>`:''}
+        </select>
+      </div>
+      <div style="width:150px">
+        <label class="field">Огноо</label>
+        <input type="date" id="qs_date" value="${qsDraft.date}" onchange="qsDraft.date=this.value;renderQuickSell()">
+      </div>
+      <div style="text-align:right;min-width:120px">
+        <div style="font-size:11px;color:var(--muted)">Нийт дүн</div>
+        <div style="font-size:20px;font-weight:800;color:var(--berry)">${money(total)}</div>
+      </div>
+      <button class="btn btn-primary" onclick="confirmPurchase()">Бүртгэх</button>
+    </div>
+    <div class="hint" style="margin-top:8px;font-size:11px">Зочин → тухайн захиалгын үлдэгдэл төлбөрт нэмэгдэнэ. Ажилтан → цалингаас (төлбөр чеклэнэ).</div>`;
+}
+function confirmPurchase(){
+  const items=qsDraft.items.filter(it=>it.productId&&it.qty>0);
+  if(!items.length){toast('Бараа сонгоно уу','err');return;}
+  if(!qsDraft.target){toast('Хэн авсныг сонгоно уу','err');return;}
+  const [type,idA,idB]=qsDraft.target.split(':');
+  const date=qsDraft.date||todayStr();
+  let total=0;
+  const lines=items.map(it=>{
+    const p=S.products.find(x=>x.id===it.productId);
+    const price=p.price||0;
+    total+=price*it.qty;
+    return {productId:p.id,name:p.name,qty:it.qty,price,unit:p.unit};
   });
-  const anyMove=rows.some(r=>r.has);
-  box.innerHTML=`<table class="ptbl"><thead><tr><th>Бараа</th><th>Эхэн</th><th>+Нэмсэн</th><th>−Зочин</th><th>−Дотоод</th><th>−Хэрэглээ</th><th>±Тохир.</th><th>Эцэс</th></tr></thead><tbody>${
-    rows.map(r=>`<tr style="${r.has?'':'opacity:.45'}">
-      <td><b>${r.p.name}</b></td>
-      <td>${r.opening}</td>
-      <td style="color:var(--green)">${r.inQ?'+'+r.inQ:'—'}</td>
-      <td style="color:var(--berry)">${r.guest?'−'+r.guest:'—'}</td>
-      <td style="color:#1c6ea4">${r.internal?'−'+r.internal:'—'}</td>
-      <td style="color:var(--navy)">${r.used?'−'+r.used:'—'}</td>
-      <td style="color:${r.adjust?'var(--red)':'inherit'}">${r.adjust?(r.adjust>0?'+':'')+r.adjust:'—'}</td>
-      <td><b>${r.closing}</b></td>
-    </tr>`).join('')
-  }</tbody></table>${anyMove?'':'<div class="hint" style="padding:8px 4px">Энэ өдөр хөдөлгөөн гараагүй байна.</div>'}`;
+  // Агуулахаас хас
+  items.forEach(it=>{
+    const p=S.products.find(x=>x.id===it.productId);
+    p.stock-=it.qty;
+    logMove(p.id,-it.qty,'guest',{date,who:type==='room'?'Өрөө '+idA:'Ажилтан',note:'Худалдан авалт'});
+  });
+  const purch={id:uid('pur'),date,total,lines,targetType:type};
+  if(type==='room'){
+    purch.roomNum=+idA; purch.bookingId=idB||null;
+    // Захиалгын төлбөрт нэмэх (extras)
+    if(idB){
+      const bk=S.bookings.find(b=>b.id===idB);
+      if(bk){ bk.extras=bk.extras||[]; lines.forEach(l=>bk.extras.push({name:l.name+' ×'+l.qty,price:l.price*l.qty,qty:1,fromPurchase:purch.id})); }
+    }
+  }else{
+    purch.staffId=idA; purch.paid=false;   // ажилтан — цалингаас, төлбөр хүлээгдэж буй
+  }
+  S.purchases=S.purchases||[];
+  S.purchases.push(purch);
+  qsDraft={items:[{productId:'',qty:1}],target:'',date};
+  save();renderAll();toast('Худалдан авалт бүртгэгдлээ ✓ '+money(total),'ok');
+}
+function renderPurchases(){
+  if(!purchDay) purchDay=todayStr();
+  const d=parseD(purchDay);
+  const lbl=document.getElementById('purchDayLbl'); if(lbl) lbl.textContent=purchDay+' ('+WK[d.getDay()]+')';
+  const box=document.getElementById('purchDayBox'); if(!box)return;
+  const dayPurch=(S.purchases||[]).filter(p=>p.date===purchDay);
+  if(!dayPurch.length){box.innerHTML='<div class="hint" style="padding:8px 2px">Энэ өдөр худалдан авалт алга.</div>';return;}
+  const total=dayPurch.reduce((s,p)=>s+p.total,0);
+  box.innerHTML=`<div style="overflow-x:auto"><table class="ptbl">
+    <thead><tr><th>Хэн</th><th>Бараа</th><th>Дүн</th><th>Төлөв</th><th></th></tr></thead>
+    <tbody>${dayPurch.map(p=>{
+      let who='',stat='';
+      if(p.targetType==='room'){
+        who='Өрөө '+p.roomNum; stat=p.bookingId?'<span class="pill" style="background:#e3edf7;color:#1c6ea4">Төлбөрт нэмсэн</span>':'<span class="pill" style="background:#f3f3f3;color:#888">Сул өрөө</span>';
+      }else{
+        const st=(S.staff||[]).find(s=>s.id===p.staffId); who='👷 '+(st?st.name:'Ажилтан');
+        stat=p.paid?'<span class="pill ok">Төлсөн</span>':'<span class="pill" style="background:#fde8ec;color:var(--berry)">Төлөөгүй</span>';
+      }
+      const goodsList=p.lines.map(l=>l.name+' ×'+l.qty).join(', ');
+      const payBtn=p.targetType==='staff'?`<button class="btn-icon" title="${p.paid?'Төлөөгүй болгох':'Төлсөн болгох'}" onclick="togglePurchPaid('${p.id}')">${p.paid?'↩':'✓'}</button>`:'';
+      return `<tr>
+        <td><b>${who}</b></td>
+        <td style="font-size:12px">${goodsList}</td>
+        <td><b>${money(p.total)}</b></td>
+        <td>${stat}</td>
+        <td><div class="row" style="gap:4px">${payBtn}<button class="btn-icon" title="Устгах" onclick="delPurchase('${p.id}')">🗑</button></div></td>
+      </tr>`;
+    }).join('')}</tbody>
+    <tfoot><tr style="border-top:2px solid var(--line)"><td colspan="2" style="font-weight:700">Өдрийн нийт</td><td colspan="3" style="font-weight:800;color:var(--berry)">${money(total)}</td></tr></tfoot>
+  </table></div>`;
+}
+function togglePurchPaid(id){
+  const p=S.purchases.find(x=>x.id===id); if(!p)return;
+  p.paid=!p.paid;save();renderPurchases();toast(p.paid?'Төлсөн гэж тэмдэглэв':'Төлөөгүй болгов','ok');
+}
+function delPurchase(id){
+  const p=S.purchases.find(x=>x.id===id); if(!p)return;
+  openModal('Устгах уу?',`<p style="font-size:14px">Энэ худалдан авалтыг устгах уу? Агуулах сэргэж, төлбөрөөс хасагдана.</p>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-berry" onclick="confirmDelPurchase('${id}')">Устгах</button>`);
+}
+function confirmDelPurchase(id){
+  const p=S.purchases.find(x=>x.id===id); if(!p)return;
+  // Агуулах сэргээх
+  p.lines.forEach(l=>{
+    const prod=S.products.find(x=>x.id===l.productId);
+    if(prod) prod.stock+=l.qty;
+  });
+  // Захиалгын extras-с хасах
+  if(p.bookingId){
+    const bk=S.bookings.find(b=>b.id===p.bookingId);
+    if(bk&&bk.extras) bk.extras=bk.extras.filter(e=>e.fromPurchase!==p.id);
+  }
+  S.purchases=S.purchases.filter(x=>x.id!==id);
+  save();renderAll();closeModal();toast('Устгагдлаа');
 }
 document.getElementById('invGroupFilt').querySelectorAll('button').forEach(b=>{
   b.onclick=()=>{
@@ -2194,6 +3273,447 @@ document.getElementById('invGroupFilt').querySelectorAll('button').forEach(b=>{
     b.classList.add('active');invGroupFilt=b.dataset.g;renderInventory();
   };
 });
+
+/* ============================================================ АГУУЛАХ */
+const STOCK_ICONS={food:'🍲',house:'🧹',build:'🧱',asset:'🏛',massage:'💆'};
+function renderStock(){
+  const q=(document.getElementById('stockSearch').value||'').toLowerCase();
+  const list=S.products.filter(p=>{
+    const g=p.group||'goods';
+    if(!STOCK_GROUPS.includes(g))return false;
+    if(stockGroupFilt!=='all'&&g!==stockGroupFilt)return false;
+    return p.name.toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q);
+  });
+  // Бүлгээр нэгтгэсэн товч дүн
+  const sumBox=document.getElementById('stockSummary');
+  if(sumBox){
+    const groups=STOCK_GROUPS.filter(g=>S.products.some(p=>(p.group||'goods')===g));
+    sumBox.innerHTML='<div class="msum">'+groups.map(g=>{
+      const items=S.products.filter(p=>(p.group||'goods')===g);
+      const low=items.filter(p=>{const c=stockStatus(p).cls;return c==='canc'||c==='pend';}).length;
+      const val=items.reduce((s,p)=>s+(p.stock*(p.cost||0)),0);
+      return `<div class="card" style="cursor:pointer;text-align:center" onclick="setStockFilt('${g}')">
+        <div class="v" style="font-size:18px">${items.length}</div>
+        <div class="l">${STOCK_ICONS[g]||''} ${pGroupLabel(g)}</div>
+        ${low?`<div style="font-size:10.5px;color:var(--red);margin-top:3px;font-weight:700">${low} бага/дууссан</div>`:''}
+      </div>`;
+    }).join('')+'</div>';
+  }
+  const body=document.getElementById('stockBody');
+  if(!list.length){body.innerHTML=`<div class="hint" style="padding:14px">Бараа алга. «+ Шинэ бараа» дарж нэмнэ.</div>`;return;}
+  const stDot=(p)=>{const c=stockStatus(p).cls;return c==='canc'?'st-out':c==='pend'?'st-low':'st-ok';};
+  const itemHtml=(p)=>{
+    const g=p.group||'goods';
+    const used=Math.abs(S.stockMoves.filter(m=>m.productId===p.id&&(m.type==='massage'||m.type==='kitchen'||m.type==='internal')).reduce((a,m)=>a+Math.min(0,m.qty),0));
+    let exp='';
+    if(p.expiry){
+      const daysLeft=daysBetween(todayStr(),p.expiry);
+      if(daysLeft<0)exp=' <span style="color:#c0392b">⚠️</span>';
+      else if(daysLeft<=7)exp=` <span style="color:#c98a2e">⏰${daysLeft}</span>`;
+    }
+    return `<div class="stock-item">
+      <span class="st ${stDot(p)}" title="${stockStatus(p).txt}"></span>
+      <div class="nm" onclick="openProductModal('${p.id}')" style="cursor:pointer"><b>${p.name}</b>${exp}${used?`<span class="sub"> · хэрэглээ −${used}</span>`:''}</div>
+      <span class="qty">${p.stock}<span style="font-weight:400;color:var(--muted);font-size:10px"> ${p.unit}</span></span>
+      <div class="acts">
+        <button class="btn-icon" title="Нөөц нэмэх" onclick="restockProduct('${p.id}')">📥</button>
+        <button class="btn-icon" title="Хөдөлгөөн" onclick="openMoves('${p.id}')">📜</button>
+        <button class="btn-icon" title="Засах" onclick="openProductModal('${p.id}')">✎</button>
+        <button class="btn-icon" title="Устгах" onclick="deleteProduct('${p.id}')">🗑</button>
+      </div>
+    </div>`;
+  };
+  if(stockGroupFilt!=='all'){
+    // Дэд ангилал бүр = нэг карт (багана)
+    const subs=subcatsFor(stockGroupFilt);
+    const grouped={};
+    list.forEach(p=>{const c=p.category||'Ангилалгүй';(grouped[c]=grouped[c]||[]).push(p);});
+    const order=[...subs,...Object.keys(grouped).filter(c=>!subs.includes(c))];
+    body.innerHTML='<div class="stock-grid">'+order.filter(c=>grouped[c]).map(c=>{
+      return `<div class="stock-cat">
+        <div class="stock-cat-h">${c}<span class="cnt">${grouped[c].length}</span></div>
+        ${grouped[c].map(itemHtml).join('')}
+      </div>`;
+    }).join('')+'</div>';
+  }else{
+    // Бүгд = бүлэг бүр нэг карт
+    const grouped={};
+    list.forEach(p=>{const g=p.group||'goods';(grouped[g]=grouped[g]||[]).push(p);});
+    body.innerHTML='<div class="stock-grid">'+STOCK_GROUPS.filter(g=>grouped[g]).map(g=>{
+      return `<div class="stock-cat">
+        <div class="stock-cat-h">${STOCK_ICONS[g]||''} ${pGroupLabel(g)}<span class="cnt">${grouped[g].length}</span></div>
+        ${grouped[g].map(itemHtml).join('')}
+      </div>`;
+    }).join('')+'</div>';
+  }
+}
+function setStockFilt(g){
+  stockGroupFilt=g;
+  document.getElementById('stockGroupFilt').querySelectorAll('button').forEach(x=>x.classList.toggle('active',x.dataset.g===g));
+  renderStock();
+}
+document.getElementById('stockGroupFilt').querySelectorAll('button').forEach(b=>{
+  b.onclick=()=>setStockFilt(b.dataset.g);
+});
+
+
+/* ============================================================ ХООЛ */
+let mealDay=null, mealDraft=null;
+function slotById(id){return (S.mealSlots||[]).find(s=>s.id===id);}
+// Захиалга тухайн өдрийн тухайн цагийн хоололд хамрагдах эсэх
+function bookingAtSlot(bk,date,slot){
+  const ci=bk.checkIn, out=addDays(bk.checkIn,bk.nights); // out = гарах өдөр (сүүлийн шөнийн дараах)
+  const arr=bk.arriveTime||'12:00', lv=bk.leaveTime||'11:00';
+  const sStart=slot.start||'', sEnd=slot.end||slot.start||'';
+  if(date===ci){
+    // Ирсэн өдөр: хоол дуусах цаг ирэх цагаас хойш байвал орно
+    return sEnd>=arr;
+  }
+  if(date===out){
+    // Гарах өдөр: хоол эхлэх цаг гарах цагаас өмнө байвал орно (өглөөний цай г.м)
+    return sStart<=lv;
+  }
+  // Дундах шөнүүд (ci < date < out): бүх хоололд орно
+  return date>ci && date<out;
+}
+// Тухайн өдрийн тухайн цагийн зочдын хоолны бүлгээр тоо
+function slotCounts(date,slotId){
+  const slot=slotById(slotId); if(!slot) return {adult:0,norm:0,bantan:0,nofood:0};
+  let adult=0,norm=0,bantan=0,nofood=0;
+  const seen=new Set();
+  S.bookings.filter(b=>b.status!=='cancelled').forEach(bk=>{
+    if(!bookingAtSlot(bk,date,slot))return;
+    const out=addDays(bk.checkIn,bk.nights);
+    // Гарах өдөр бол сүүлийн шөнийн өрөөг ашиглана (effectiveRoomsForDate хоосон буцаадаг)
+    let nums;
+    if(date===out) nums=effectiveRoomsForDate(bk,addDays(out,-1));
+    else nums=effectiveRoomsForDate(bk,date);
+    nums.forEach(n=>{
+      const sk=bk.id+':'+(+n); if(seen.has(sk))return; seen.add(sk);
+      const r=bk.rooms.find(x=>+x.num===+n);if(!r)return;
+      const occ=roomOccupancyOn(r,date===out?addDays(out,-1):date);
+      adult+=occ.adults;
+      occ.children.forEach(k=>{
+        if(k.adultPriced){ adult++; return; }
+        const g=tierFoodGroup(k.tierId||'t_norm');
+        if(g==='bor')bantan++; else if(g==='nofood')nofood++; else norm++;
+      });
+    });
+  });
+  return {adult,norm,bantan,nofood};
+}
+// Хамгийн олон хүнтэй цагаар өдрийн нийт (тоймд)
+function foodGroupCounts(date){
+  // Дунд өдөр = бүх хүн; ирэх/гарах өдөр = хамгийн дүүрэн цаг
+  let best={adult:0,norm:0,bantan:0,nofood:0},bestSum=-1;
+  (S.mealSlots||[]).forEach(sl=>{
+    const c=slotCounts(date,sl.id);
+    const sum=c.adult+c.norm+c.bantan+c.nofood;
+    if(sum>bestSum){bestSum=sum;best=c;}
+  });
+  return best;
+}
+// Хоол хийхэд шаардлагатай нийт орц (бараа бүрээр)
+function mealNeeds(meal,counts){
+  // meal.items: [{productId, adultQty, childQty, bantanQty}]
+  // Том хүн + том үнэ хүүхэд → adultQty. Энгийн хоолны хүүхэд → childQty. Бантан → bantanQty. Хоолгүй → 0.
+  const adults=counts.adult;
+  const kids=counts.norm;
+  const bantan=counts.bantan;
+  const needs=[];
+  (meal.items||[]).forEach(it=>{
+    const q=(it.adultQty||0)*adults + (it.childQty||0)*kids + (it.bantanQty||0)*bantan;
+    if(q>0) needs.push({productId:it.productId, qty:q});
+  });
+  return {needs, adults, kids, bantan};
+}
+function mealById(id){return S.meals.find(m=>m.id===id);}
+
+function renderMeals(){
+  renderMealDay();
+  renderMealList();
+}
+function renderMealDay(){
+  if(!mealDay) mealDay=todayStr();
+  const d=parseD(mealDay);
+  const lbl=document.getElementById('mealDayLbl');
+  if(lbl) lbl.textContent=mealDay+' ('+WK[d.getDay()]+')';
+  const box=document.getElementById('mealDayBox'); if(!box) return;
+  const slots=S.mealSlots||[];
+  const dayTotal=foodGroupCounts(mealDay);
+  if(dayTotal.adult+dayTotal.norm+dayTotal.bantan+dayTotal.nofood===0){
+    box.innerHTML='<div class="empty">Энэ өдөр хооллох зочин алга.</div>';return;
+  }
+  let html='';
+  slots.forEach(sl=>{
+    const auto=slotCounts(mealDay,sl.id);
+    const mpx=S.mealPlan[mealDay];
+    const ov=(mpx&&mpx.overrides&&mpx.overrides[sl.id])||null;
+    const ex=(mpx&&mpx.extra&&mpx.extra[sl.id])||null;
+    const counts=slotEaterCounts(mealDay,sl.id);   // амрагч + нэмэлт
+    const totalEaters=counts.adult+counts.norm+counts.bantan;
+    const planned=((mpx&&mpx.slots&&mpx.slots[sl.id])||[]);
+    html+=`<div class="mslot">
+      <div class="mslot-h">
+        <div><b>${sl.name}</b> <span style="font-size:11px;color:var(--muted)">${sl.start}–${sl.end}</span></div>
+        <div class="mslot-cnt">
+          <span title="Том хүн">${counts.adult}<small>том</small></span>
+          <span title="Хүүхэд">${counts.norm}<small>хүүх</small></span>
+          ${counts.bantan?`<span title="Бантан">${counts.bantan}<small>бант</small></span>`:''}
+          ${ov?'<span class="pill" style="background:#f0e0c8;color:#8a5a1a;font-size:9px">гар</span>':''}
+          ${ex?'<span class="pill" style="background:#f5d5e0;color:#8a1a45;font-size:9px" title="Гадны хүн нэмсэн">+гадны</span>':''}
+          <button class="btn-icon" title="Тоог гараар засах" onclick="editSlotCount('${sl.id}')">✎</button>
+          ${(ov||ex)?`<button class="btn-icon" title="Автомат руу буцаах" onclick="resetSlotCount('${sl.id}')">↺</button>`:''}
+        </div>
+      </div>`;
+    if(totalEaters===0){
+      html+='<div class="hint" style="padding:6px 2px">Энэ цагт хооллох хүнгүй.</div>';
+    }else{
+      planned.forEach(pl=>{
+        const meal=mealById(pl.mealId); if(!meal)return;
+        const {needs}=mealNeeds(meal,counts);
+        html+=`<div class="mslot-meal ${pl.cooked?'cooked':''}">
+          <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+            <div><b>${meal.name}</b> <span style="font-size:10px;color:var(--muted)">${mealCatLabel(meal.category)}</span> ${pl.cooked?'<span class="pill ok">Хийсэн</span>':''}</div>
+            <div class="row" style="gap:5px">
+              ${pl.cooked
+                ? `<button class="btn btn-ghost btn-sm" onclick="uncookMeal('${mealDay}','${sl.id}','${pl.mealId}')">↩ Буцаах</button>`
+                : `<button class="btn btn-green btn-sm" onclick="cookMeal('${mealDay}','${sl.id}','${pl.mealId}')">✓ Хийсэн</button>`}
+              <button class="btn-icon" onclick="removeMealFromSlot('${mealDay}','${sl.id}','${pl.mealId}')">✕</button>
+            </div>
+          </div>
+          <div style="margin-top:6px;font-size:11.5px;color:var(--muted)">
+            ${needs.map(nd=>{const p=S.products.find(x=>x.id===nd.productId);if(!p)return '';
+              const stockNeed=recipeToStock(p,nd.qty);
+              const short=p.stock<stockNeed;
+              return `<span style="display:inline-block;margin-right:10px;${short?'color:var(--red);font-weight:700':''}">${p.name}: ${nd.qty}${p.recipeUnit||p.unit}${short?' ⚠️('+p.stock+p.unit+')':''}</span>`;
+            }).join('')||'<span style="opacity:.6">орцгүй</span>'}
+          </div>
+        </div>`;
+      });
+      const avail=S.meals.filter(m=>!planned.find(p=>p.mealId===m.id));
+      if(avail.length){
+        const availGrouped={};
+        avail.forEach(m=>{const c=m.category||'main';(availGrouped[c]=availGrouped[c]||[]).push(m);});
+        html+=`<div class="row" style="gap:6px;margin-top:6px">
+          <select id="pick_${sl.id}" style="min-width:150px;font-size:12px">
+            <option value="">+ Хоол нэмэх…</option>
+            ${MEAL_CATS.filter(c=>availGrouped[c[0]]).map(c=>`<optgroup label="${c[1]}">${availGrouped[c[0]].map(m=>`<option value="${m.id}">${m.name}</option>`).join('')}</optgroup>`).join('')}
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="addMealToSlot('${sl.id}')">Нэмэх</button>
+        </div>`;
+      }
+    }
+    html+='</div>';
+  });
+  box.innerHTML=html;
+}
+function ensureMealDay(date){
+  S.mealPlan[date]=S.mealPlan[date]||{};
+  if(Array.isArray(S.mealPlan[date])) S.mealPlan[date]={slots:{},overrides:{},extra:{}}; // хуучин хэлбэрийг цэвэрлэнэ
+  S.mealPlan[date].slots=S.mealPlan[date].slots||{};
+  S.mealPlan[date].overrides=S.mealPlan[date].overrides||{};
+  S.mealPlan[date].extra=S.mealPlan[date].extra||{};
+  return S.mealPlan[date];
+}
+function addMealToSlot(slotId){
+  const id=document.getElementById('pick_'+slotId).value; if(!id)return;
+  const mp=ensureMealDay(mealDay);
+  mp.slots[slotId]=mp.slots[slotId]||[];
+  if(!mp.slots[slotId].find(p=>p.mealId===id)) mp.slots[slotId].push({mealId:id,cooked:false});
+  save();renderMeals();
+}
+function removeMealFromSlot(date,slotId,mealId){
+  const mp=ensureMealDay(date);
+  const pl=(mp.slots[slotId]||[]).find(p=>p.mealId===mealId);
+  if(pl&&pl.cooked){toast('Эхлээд «Буцаах» дарж агуулахыг сэргээнэ үү','err');return;}
+  mp.slots[slotId]=(mp.slots[slotId]||[]).filter(p=>p.mealId!==mealId);
+  save();renderMeals();
+}
+function slotEaterCounts(date,slotId){
+  const mp=S.mealPlan[date];
+  const base=(mp&&mp.overrides&&mp.overrides[slotId])?mp.overrides[slotId]:slotCounts(date,slotId);
+  // Нэмэлт (гадны) хүн — автомат тоон дээр нэмэгдэнэ
+  const ex=(mp&&mp.extra&&mp.extra[slotId])||null;
+  if(ex){
+    return {adult:(base.adult||0)+(ex.adult||0),norm:(base.norm||0)+(ex.norm||0),bantan:(base.bantan||0)+(ex.bantan||0),nofood:base.nofood||0};
+  }
+  return base;
+}
+function cookMeal(date,slotId,mealId){
+  const meal=mealById(mealId); if(!meal)return;
+  const mp=ensureMealDay(date);
+  const pl=(mp.slots[slotId]||[]).find(p=>p.mealId===mealId); if(!pl||pl.cooked)return;
+  const counts=slotEaterCounts(date,slotId);
+  const {needs}=mealNeeds(meal,counts);
+  needs.forEach(nd=>{
+    const p=S.products.find(x=>x.id===nd.productId); if(!p)return;
+    const stockQty=recipeToStock(p,nd.qty);   // гр → кг хөрвүүлнэ
+    p.stock-=stockQty;
+    logMove(p.id,-stockQty,'kitchen',{who:meal.name,slot:slotId,date,note:'Хоол ('+(slotById(slotId)?slotById(slotId).name:slotId)+') · '+nd.qty+(p.recipeUnit||p.unit)});
+  });
+  pl.cooked=true; pl.cookedAt=new Date().toISOString();
+  save();renderAll();toast('Агуулахаас хасагдлаа ✓','ok');
+}
+function uncookMeal(date,slotId,mealId){
+  const meal=mealById(mealId); if(!meal)return;
+  const mp=ensureMealDay(date);
+  const pl=(mp.slots[slotId]||[]).find(p=>p.mealId===mealId); if(!pl||!pl.cooked)return;
+  const counts=slotEaterCounts(date,slotId);
+  const {needs}=mealNeeds(meal,counts);
+  needs.forEach(nd=>{
+    const p=S.products.find(x=>x.id===nd.productId); if(!p)return;
+    const stockQty=recipeToStock(p,nd.qty);
+    p.stock+=stockQty;
+    logMove(p.id,stockQty,'kitchen',{who:meal.name,slot:slotId,date,note:'Хоол буцаалт ('+(slotById(slotId)?slotById(slotId).name:slotId)+')'});
+  });
+  pl.cooked=false;
+  save();renderAll();toast('Агуулах сэргээгдлээ','ok');
+}
+function editSlotCount(slotId){
+  const mp=S.mealPlan[mealDay];
+  const auto=slotCounts(mealDay,slotId);
+  const ov=(mp&&mp.overrides&&mp.overrides[slotId])||null;
+  const ex=(mp&&mp.extra&&mp.extra[slotId])||{adult:0,norm:0,bantan:0};
+  const c=ov||auto;
+  openModal('Хоолны тоо — '+slotById(slotId).name,
+    `<div class="hint" style="margin-bottom:12px">Автомат тоо = амрагчид. Хоцорч ирсэн/эрт гарсан бол <b>амрагчийн тоог</b> засна. Гадны хүн (амрагч биш) хооллосон бол <b>нэмэлт хүнд</b> бичнэ.</div>
+     <div style="font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:6px">Амрагчид ${ov?'(гараар засав)':'(автомат)'}</div>
+     <div class="form-grid">
+       <div><label class="field">Том хүн</label><input id="sc_adult" type="number" min="0" value="${c.adult}"></div>
+       <div><label class="field">Хүүхэд</label><input id="sc_norm" type="number" min="0" value="${c.norm}"></div>
+       <div><label class="field">Бантан</label><input id="sc_bantan" type="number" min="0" value="${c.bantan}"></div>
+     </div>
+     <div style="font-size:12.5px;font-weight:700;color:var(--berry);margin:14px 0 6px">➕ Нэмэлт (гадны) хүн</div>
+     <div class="form-grid">
+       <div><label class="field">Том хүн</label><input id="ex_adult" type="number" min="0" value="${ex.adult||0}"></div>
+       <div><label class="field">Хүүхэд</label><input id="ex_norm" type="number" min="0" value="${ex.norm||0}"></div>
+       <div><label class="field">Бантан</label><input id="ex_bantan" type="number" min="0" value="${ex.bantan||0}"></div>
+     </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="saveSlotCount('${slotId}')">Хадгалах</button>`);
+}
+function saveSlotCount(slotId){
+  const mp=ensureMealDay(mealDay);
+  const auto=slotCounts(mealDay,slotId);
+  const a={adult:+document.getElementById('sc_adult').value||0,norm:+document.getElementById('sc_norm').value||0,bantan:+document.getElementById('sc_bantan').value||0,nofood:0};
+  // Амрагчийн тоо автоматаас өөр бол л override болгоно
+  if(a.adult!==auto.adult||a.norm!==auto.norm||a.bantan!==auto.bantan){ mp.overrides[slotId]=a; }
+  else if(mp.overrides) delete mp.overrides[slotId];
+  // Нэмэлт хүн
+  const ex={adult:+document.getElementById('ex_adult').value||0,norm:+document.getElementById('ex_norm').value||0,bantan:+document.getElementById('ex_bantan').value||0};
+  mp.extra=mp.extra||{};
+  if(ex.adult||ex.norm||ex.bantan) mp.extra[slotId]=ex;
+  else if(mp.extra) delete mp.extra[slotId];
+  save();closeModal();renderMeals();toast('Тоо засагдлаа','ok');
+}
+function resetSlotCount(slotId){
+  const mp=S.mealPlan[mealDay];
+  if(mp&&mp.overrides) delete mp.overrides[slotId];
+  if(mp&&mp.extra) delete mp.extra[slotId];
+  save();renderMeals();toast('Автомат тоо руу буцлаа','ok');
+}
+function renderMealList(){
+  const box=document.getElementById('mealListBox'); if(!box) return;
+  if(!S.meals.length){box.innerHTML='<div class="hint" style="padding:14px">Хоол бүртгэгдээгүй. «+ Шинэ хоол» дарж эхлүүлнэ.</div>';return;}
+  const grouped={};
+  S.meals.forEach(m=>{const c=m.category||'main';(grouped[c]=grouped[c]||[]).push(m);});
+  const itemHtml=(m)=>{
+    const parts=(m.items||[]).map(it=>{
+      const p=S.products.find(x=>x.id===it.productId); if(!p)return null;
+      const bits=[];
+      if(it.adultQty)bits.push('Т:'+it.adultQty);
+      if(it.childQty)bits.push('Х:'+it.childQty);
+      if(it.bantanQty)bits.push('Б:'+it.bantanQty);
+      return `<span style="display:inline-block;margin-right:8px">${p.name} <span style="color:var(--muted)">(${bits.join(' ')}${p.recipeUnit||p.unit})</span></span>`;
+    }).filter(Boolean).join('');
+    return `<div class="stock-item">
+      <div class="nm" onclick="openMealModal('${m.id}')" style="cursor:pointer"><b>${m.name}</b><div class="sub" style="margin-top:2px">${parts||'орцгүй'}</div></div>
+      <div class="acts">
+        <button class="btn-icon" title="Засах" onclick="openMealModal('${m.id}')">✎</button>
+        <button class="btn-icon" title="Устгах" onclick="deleteMeal('${m.id}')">🗑</button>
+      </div>
+    </div>`;
+  };
+  box.innerHTML='<div class="stock-grid">'+MEAL_CATS.filter(c=>grouped[c[0]]).map(c=>{
+    return `<div class="stock-cat">
+      <div class="stock-cat-h">${c[1]}<span class="cnt">${grouped[c[0]].length}</span></div>
+      ${grouped[c[0]].map(itemHtml).join('')}
+    </div>`;
+  }).join('')+'</div>'
+  +'<div class="hint" style="padding:8px 4px;margin-top:8px">Орц: Т=Том хүн, Х=Хүүхэд, Б=Бантан (нэг хүнд ногдох хэмжээ). Хоолыг өдрийн аль ч цагт нэмж болно.</div>';
+}
+/* ---- Хоолны цэс засах ---- */
+function openMealModal(id){
+  const m=id?mealById(id):null;
+  mealDraft=m?JSON.parse(JSON.stringify(m)):{id:uid('meal'),name:'',category:'main',items:[]};
+  renderMealModal();
+}
+function renderMealModal(){
+  const foodProducts=S.products.filter(p=>['food','house'].includes(p.group||'goods'));
+  const body=`<div class="form-grid">
+    <div><label class="field">Хоолны нэр *</label><input id="ml_name" value="${mealDraft.name||''}" placeholder="ж: Гуляш, Цуйван, Банштай шөл"></div>
+    <div><label class="field">Ангилал *</label>
+      <select id="ml_cat">
+        ${MEAL_CATS.map(c=>`<option value="${c[0]}" ${mealDraft.category===c[0]?'selected':''}>${c[1]}</option>`).join('')}
+      </select></div>
+  </div>
+  <div style="margin-top:14px">
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
+      <label class="field" style="margin:0">Орц (нэг хүнд ногдох хэмжээ)</label>
+      <button class="btn btn-ghost btn-sm" onclick="addMealItem()">+ Орц нэмэх</button>
+    </div>
+    ${foodProducts.length?'':'<div class="hint" style="color:var(--red)">Эхлээд Агуулах табад хүнсний бараа нэмнэ үү.</div>'}
+    <div id="ml_items"></div>
+  </div>`;
+  openModal(mealDraft.name?'Хоол засах':'Шинэ хоол', body,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="saveMeal()">Хадгалах</button>`);
+  renderMealItems();
+}
+function renderMealItems(){
+  const box=document.getElementById('ml_items'); if(!box)return;
+  const foodProducts=S.products.filter(p=>['food','house'].includes(p.group||'goods'));
+  if(!mealDraft.items.length){box.innerHTML='<div class="hint" style="padding:6px 0">Орц нэмээгүй байна.</div>';return;}
+  box.innerHTML=`<div class="row" style="gap:6px;font-size:10px;color:var(--muted);font-weight:700;padding:0 2px 4px">
+      <span style="flex:1;min-width:130px">Бараа</span>
+      <span style="width:64px;text-align:center">Том хүн</span>
+      <span style="width:64px;text-align:center">Хүүхэд</span>
+      <span style="width:64px;text-align:center">Бантан</span>
+      <span style="min-width:28px"></span><span style="width:24px"></span>
+    </div>`+mealDraft.items.map((it,i)=>{
+    const p=S.products.find(x=>x.id===it.productId);
+    const unit=p?p.unit:'';
+    return `<div class="row" style="gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap">
+      <select style="flex:1;min-width:130px" onchange="mealDraft.items[${i}].productId=this.value;renderMealItems()">
+        <option value="">— бараа —</option>
+        ${foodProducts.map(fp=>`<option value="${fp.id}" ${fp.id===it.productId?'selected':''}>${fp.name}</option>`).join('')}
+      </select>
+      <input type="number" min="0" step="any" style="width:64px" value="${it.adultQty||''}" placeholder="0" title="Том хүнд" onchange="mealDraft.items[${i}].adultQty=parseFloat(this.value)||0">
+      <input type="number" min="0" step="any" style="width:64px" value="${it.childQty||''}" placeholder="0" title="Хүүхдэд (энгийн хоол)" onchange="mealDraft.items[${i}].childQty=parseFloat(this.value)||0">
+      <input type="number" min="0" step="any" style="width:64px" value="${it.bantanQty||''}" placeholder="0" title="Бантан хүүхдэд" onchange="mealDraft.items[${i}].bantanQty=parseFloat(this.value)||0">
+      <span style="font-size:11px;color:var(--muted);min-width:28px">${unit}</span>
+      <button class="btn-icon" onclick="mealDraft.items.splice(${i},1);renderMealItems()">✕</button>
+    </div>`;
+  }).join('');
+}
+function addMealItem(){mealDraft.items.push({productId:'',adultQty:0,childQty:0,bantanQty:0});renderMealItems();}
+function saveMeal(){
+  const name=document.getElementById('ml_name').value.trim();
+  if(!name){toast('Хоолны нэр оруулна уу','err');return;}
+  mealDraft.name=name;
+  mealDraft.category=document.getElementById('ml_cat').value;
+  mealDraft.items=mealDraft.items.filter(it=>it.productId&&((it.adultQty||0)>0||(it.childQty||0)>0));
+  const ex=S.meals.find(m=>m.id===mealDraft.id);
+  if(ex)Object.assign(ex,mealDraft); else S.meals.push(mealDraft);
+  save();closeModal();renderMeals();toast('Хадгалагдлаа ✓','ok');
+}
+function deleteMeal(id){
+  const m=mealById(id);if(!m)return;
+  openModal('Устгах уу?',`<p style="font-size:14px"><b>${m.name}</b> хоолыг устгах уу?</p>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-berry" onclick="S.meals=S.meals.filter(x=>x.id!=='${id}');Object.keys(S.mealPlan).forEach(d=>S.mealPlan[d]=S.mealPlan[d].filter(p=>p.mealId!=='${id}'));save();closeModal();renderMeals();toast('Устгагдлаа')">Устгах</button>`);
+}
 
 /* ============================================================ REPORT */
 function monthRange(offset){
@@ -2207,6 +3727,8 @@ function setReportRange(kind){
   let r;
   if(kind==='month') r=monthRange(0);
   else if(kind==='lastmonth') r=monthRange(-1);
+  else if(kind==='7') r={from:addDays(todayStr(),-6),to:todayStr()};
+  else if(kind==='15') r={from:addDays(todayStr(),-14),to:todayStr()};
   else r={from:'2000-01-01',to:'2099-12-31'};
   document.getElementById('rp_from').value=r.from;
   document.getElementById('rp_to').value=r.to;
@@ -2217,11 +3739,11 @@ function buildReport(from,to){
   const list=S.bookings.filter(inRange);
   const active=list.filter(b=>b.status!=='cancelled');
   const cancelled=list.filter(b=>b.status==='cancelled');
-  let grand=0,paid=0,balance=0,extrasRev=0,adultRev=0,childRev=0;
+  let grand=0,paid=0,balance=0,extrasRev=0,adultRev=0,childRev=0,refundedTotal=0;
   const roomAgg={},tierAgg={};
   active.forEach(bk=>{
     const t=bookingTotals(bk);
-    grand+=t.grand;paid+=t.paid;balance+=t.balance;extrasRev+=t.extras;
+    grand+=t.grand;paid+=t.paid;balance+=t.balance;extrasRev+=t.extras;refundedTotal+=t.refunded;
     bk.rooms.forEach(r=>{
       roomAgg[r.num]=roomAgg[r.num]||{nights:0,revenue:0,bookings:0};
       roomAgg[r.num].bookings+=1;
@@ -2248,7 +3770,25 @@ function buildReport(from,to){
   });
   let feeRev=0;
   cancelled.forEach(b=>{if(b.cancelInfo)feeRev+=b.cancelInfo.fee||0;});
-  return{count:active.length,cancelledCount:cancelled.length,grand,paid,balance,extrasRev,adultRev,childRev,feeRev,roomAgg,tierAgg};
+  return{count:active.length,cancelledCount:cancelled.length,grand,paid,balance,extrasRev,adultRev,childRev,feeRev,refundedTotal,roomAgg,tierAgg};
+}
+function renderRefundReminder(){
+  const box=document.getElementById('rpRefundReminder'); if(!box)return;
+  const needRefund=S.bookings.filter(b=>b.status!=='cancelled').map(b=>({bk:b,t:bookingTotals(b)})).filter(x=>x.t.overpaid>0);
+  if(!needRefund.length){box.innerHTML='';return;}
+  needRefund.sort((a,b)=>(a.bk.checkIn||'').localeCompare(b.bk.checkIn||''));
+  box.innerHTML=`<div class="card" style="padding:14px;margin-bottom:16px;border:1.5px solid #f0b8b8;background:#fff6f6">
+    <h3 style="font-size:14px;color:#c0392b;margin:0 0 8px">⚠️ Буцаах төлбөртэй захиалга (${needRefund.length})</h3>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${needRefund.map(({bk,t})=>`<div class="row" style="justify-content:space-between;align-items:center;padding:6px 10px;background:#fff;border-radius:8px;border:1px solid #f0d0d0">
+        <div style="font-size:13px"><b>${bk.name||bk.phone}</b> <span style="color:var(--muted)">· ${fmtD(bk.checkIn)} · ${bk.nights}хон</span></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <b style="color:#c0392b">${money(t.overpaid)}</b>
+          <button class="btn btn-berry btn-sm" onclick="openDetail('${bk.id}')">Буцаах</button>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`;
 }
 function renderReport(){
   const fromEl=document.getElementById('rp_from'),toEl=document.getElementById('rp_to');
@@ -2263,7 +3803,9 @@ function renderReport(){
     <div class="card stat"><div class="label">Том хүний орлого</div><div class="value">${money(rp.adultRev)}</div></div>
     <div class="card stat"><div class="label">Хүүхдийн орлого</div><div class="value">${money(rp.childRev)}</div></div>
     <div class="card stat"><div class="label">Нэмэлт үйлчилгээ</div><div class="value">${money(rp.extrasRev)}</div></div>
-    <div class="card stat"><div class="label">Цуцлалтын торгууль</div><div class="value blue">${money(rp.feeRev)}</div></div>`;
+    <div class="card stat"><div class="label">Цуцлалтын торгууль</div><div class="value blue">${money(rp.feeRev)}</div></div>
+    ${rp.refundedTotal?`<div class="card stat"><div class="label">↩ Буцаасан төлбөр</div><div class="value" style="color:#c0392b">${money(rp.refundedTotal)}</div></div>`:''}`;
+  renderRefundReminder();
   const roomRows=Object.entries(rp.roomAgg).sort((a,b)=>a[0]-b[0]);
   document.getElementById('rpRoomTbl').innerHTML = roomRows.length
     ? `<thead><tr><th>Өрөө</th><th>Захиалга</th><th>Хоног</th><th>Орлого</th></tr></thead><tbody>${
@@ -2276,9 +3818,120 @@ function renderReport(){
         tierRows.map(d=>`<tr><td>${d.name}</td><td>${d.count}</td><td>${d.nights}</td><td>${money(d.revenue)}</td></tr>`).join('')
       }</tbody>`
     : `<tbody><tr><td class="hint" style="padding:10px 0">Энэ хугацаанд хүүхэд бүртгэгдээгүй.</td></tr></tbody>`;
+  renderStockReport(from,to);
+  renderCostReport(from,to);
+  renderSalesReport(from,to);
+}
+function renderSalesReport(from,to){
+  const tbl=document.getElementById('rpSalesTbl'); if(!tbl)return;
+  const sales=(S.purchases||[]).filter(p=>(p.date||'')>=from&&(p.date||'')<=to);
+  // Бараагаар нэгтгэх (ангилалтай нь)
+  const byItem={};
+  let total=0,roomTotal=0,staffTotal=0,unpaid=0;
+  sales.forEach(pur=>{
+    total+=pur.total;
+    if(pur.targetType==='room')roomTotal+=pur.total;
+    else{ staffTotal+=pur.total; if(!pur.paid)unpaid+=pur.total; }
+    (pur.lines||[]).forEach(l=>{
+      const prod=S.products.find(x=>x.id===l.productId);
+      const grp=prod?(prod.group||'goods'):'goods';
+      const key=l.productId||l.name;
+      if(!byItem[key])byItem[key]={name:l.name,group:grp,qty:0,sum:0};
+      byItem[key].qty+=l.qty;
+      byItem[key].sum+=(l.price||0)*(l.qty||0);
+    });
+  });
+  // Ангиллаар бүлэглэх
+  const GRP_LBL={goods:'🛒 Зарах бараа',service:'✨ Нэмэлт үйлчилгээ'};
+  const grouped={};
+  Object.values(byItem).forEach(it=>{(grouped[it.group]=grouped[it.group]||[]).push(it);});
+  document.getElementById('rpSalesSum').textContent=money(total);
+  document.getElementById('rpSalesRoom').textContent=money(roomTotal);
+  document.getElementById('rpSalesStaff').textContent=money(staffTotal);
+  document.getElementById('rpSalesUnpaid').textContent=money(unpaid);
+  if(!sales.length){tbl.innerHTML='<tbody><tr><td class="hint" style="padding:10px 0">Энэ хугацаанд борлуулалт алга.</td></tr></tbody>';return;}
+  let html='<thead><tr><th>Бараа / Үйлчилгээ</th><th>Тоо</th><th>Дүн</th></tr></thead><tbody>';
+  ['goods','service'].forEach(g=>{
+    if(!grouped[g])return;
+    const gSum=grouped[g].reduce((s,it)=>s+it.sum,0);
+    const gQty=grouped[g].reduce((s,it)=>s+it.qty,0);
+    html+=`<tr><td colspan="3" style="background:var(--soft);font-weight:700;font-size:11.5px;color:var(--navy);padding:5px 8px">${GRP_LBL[g]||g} <span style="color:var(--muted);font-weight:400">· ${gQty}ш · ${money(gSum)}</span></td></tr>`;
+    grouped[g].sort((a,b)=>b.sum-a.sum).forEach(it=>{
+      html+=`<tr><td>${it.name}</td><td>${it.qty}</td><td><b>${money(it.sum)}</b></td></tr>`;
+    });
+  });
+  html+='</tbody>';
+  tbl.innerHTML=html;
+}
+function renderCostReport(from,to){
+  const tbl=document.getElementById('rpCostTbl'); if(!tbl)return;
+  // Хугацаанд орсон нөөц (restock) — зардал
+  const buys=S.stockMoves.filter(m=>m.type==='restock'&&(m.date||'')>=from&&(m.date||'')<=to);
+  let total=0;
+  const byMarket={},byProduct={};
+  buys.forEach(m=>{
+    const cost=(m.qty||0)*(m.unitPrice||0);
+    total+=cost;
+    const mkName=m.market?(marketById(m.market)?marketById(m.market).name:'Бусад'):'Тодорхойгүй';
+    byMarket[mkName]=(byMarket[mkName]||0)+cost;
+    const p=S.products.find(x=>x.id===m.productId);
+    const pn=p?p.name:m.name||'?';
+    byProduct[pn]=(byProduct[pn]||0)+cost;
+  });
+  const sumEl=document.getElementById('rpCostSum');
+  if(sumEl) sumEl.textContent=money(total);
+  const mkRows=Object.entries(byMarket).sort((a,b)=>b[1]-a[1]);
+  const prRows=Object.entries(byProduct).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  tbl.innerHTML=`<thead><tr><th>Зах</th><th>Зардал</th></tr></thead><tbody>${
+    mkRows.length?mkRows.map(([mk,c])=>`<tr><td>${mk}</td><td><b>${money(c)}</b></td></tr>`).join(''):'<tr><td class="hint" colspan="2" style="padding:10px 0">Энэ хугацаанд худалдан авалт алга.</td></tr>'
+  }</tbody>`;
+  const prTbl=document.getElementById('rpCostProdTbl');
+  if(prTbl){
+    prTbl.innerHTML=`<thead><tr><th>Бараа</th><th>Зардал</th></tr></thead><tbody>${
+      prRows.length?prRows.map(([pn,c])=>`<tr><td>${pn}</td><td><b>${money(c)}</b></td></tr>`).join(''):'<tr><td class="hint" colspan="2" style="padding:10px 0">—</td></tr>'
+    }</tbody>`;
+  }
+}
+const MOVE_LABELS={init:'Эхлэл',restock:'Нөөц',guest:'Зочин',internal:'Дотоод',massage:'Бариа',kitchen:'Хоол',adjust:'Тохируулга'};
+function renderStockReport(from,to){
+  const tbl=document.getElementById('rpStockTbl'); if(!tbl)return;
+  const grp=(document.getElementById('rpStockGroup')||{}).value||'all';
+  // Хугацаанд хамрах хөдөлгөөнүүд
+  const moves=S.stockMoves.filter(m=>{
+    const d=m.date||''; if(d<from||d>to)return false;
+    const p=S.products.find(x=>x.id===m.productId); if(!p)return false;
+    const g=p.group||'goods';
+    if(grp==='all'){ if(!STOCK_GROUPS.includes(g))return false; }
+    else if(g!==grp)return false;
+    return true;
+  });
+  // Бараагаар нэгтгэх
+  const agg={};
+  moves.forEach(m=>{
+    const p=S.products.find(x=>x.id===m.productId); if(!p)return;
+    if(!agg[m.productId])agg[m.productId]={name:p.name,unit:p.unit,inQty:0,inCnt:0,outQty:0,outCnt:0,byType:{}};
+    const a=agg[m.productId];
+    if(m.qty>0){a.inQty+=m.qty;a.inCnt++;}
+    else if(m.qty<0){a.outQty+=Math.abs(m.qty);a.outCnt++;}
+    const t=m.type||'adjust';
+    a.byType[t]=(a.byType[t]||0)+Math.abs(m.qty);
+  });
+  const rows=Object.values(agg).sort((a,b)=>b.outQty-a.outQty);
+  if(!rows.length){tbl.innerHTML='<tbody><tr><td class="hint" style="padding:10px 0">Энэ хугацаанд хөдөлгөөн алга.</td></tr></tbody>';return;}
+  tbl.innerHTML=`<thead><tr><th>Бараа</th><th>Орлого</th><th>Зарлага</th><th>Задаргаа</th></tr></thead><tbody>${
+    rows.map(r=>{
+      const breakdown=Object.entries(r.byType).map(([t,q])=>`${MOVE_LABELS[t]||t}: ${q}${r.unit}`).join(' · ');
+      return `<tr>
+        <td><b>${r.name}</b></td>
+        <td style="color:var(--green)">${r.inCnt?r.inCnt+' удаа · '+r.inQty+r.unit:'—'}</td>
+        <td style="color:var(--berry)">${r.outCnt?r.outCnt+' удаа · '+r.outQty+r.unit:'—'}</td>
+        <td style="font-size:11px;color:var(--muted)">${breakdown}</td>
+      </tr>`;
+    }).join('')
+  }</tbody>`;
 }
 
-function renderAll(){renderReminders();renderCalendar();renderList();renderMassage();renderInventory();renderSettings();renderReport();}
+function renderAll(){renderReminders();renderCalendar();renderList();renderMassage();renderInventory();renderStock();renderMeals();renderSettings();renderReport();}
 /* ============================================================ ☁️ СИНК (Firebase) */
 const SYNC_KEY='gt_sync_cfg_v1';
 const DEFAULT_SYNC={databaseURL:'https://gurvan-tooroi-default-rtdb.firebaseio.com',path:'gt_system',enabled:true};
@@ -2362,7 +4015,7 @@ function syncPush(force){
   },force?0:600);
 }
 function savePins(){
-  S.pins=S.pins||{manager:'',therapist:''};
+  S.pins=S.pins||{manager:'',therapist:'',operator:''};
   // Одоогийн төхөөрөмжөө шинэ кодоор нээлттэй байлгана (өөрөө түгжигдэхээс сэргийлнэ)
   const role=currentRole();
   if(S.pins[role]) setUnlocked(role,S.pins[role]);
@@ -2370,6 +4023,12 @@ function savePins(){
 }
 function copyBariaLink(){
   const el=document.getElementById('bariaLink');if(!el)return;
+  const v=el.value;
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(v).then(()=>toast('Хууллаа ✓','ok'),()=>toast('Хуулж чадсангүй','err'));}
+  else{try{el.select();document.execCommand('copy');toast('Хууллаа ✓','ok');}catch(e){toast('Хуулж чадсангүй','err');}}
+}
+function copyOperatorLink(){
+  const el=document.getElementById('operatorLink');if(!el)return;
   const v=el.value;
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(v).then(()=>toast('Хууллаа ✓','ok'),()=>toast('Хуулж чадсангүй','err'));}
   else{try{el.select();document.execCommand('copy');toast('Хууллаа ✓','ok');}catch(e){toast('Хуулж чадсангүй','err');}}
@@ -2403,15 +4062,30 @@ function saveSyncSetup(){
 /* ---- Хандах эрх: ?baria → зөвхөн Бариа таб · PIN түгжээ ---- */
 function currentRole(){
   const q=(location.search||'')+(location.hash||'');
-  return /[?&#]baria\b/i.test(q) ? 'therapist' : 'manager';
+  if(/[?&#]baria\b/i.test(q)) return 'therapist';
+  if(/[?&#]operator\b/i.test(q)) return 'operator';
+  return 'manager';
 }
-const APP_VER='1.7';
+const APP_VER='5.0';
 function applyRole(){
-  if(currentRole()!=='therapist')return false;
-  document.querySelectorAll('nav.tabs button').forEach(b=>{ if(b.dataset.tab!=='massage') b.style.display='none'; else b.classList.add('active'); });
-  document.querySelectorAll('main .panel').forEach(p=>{ p.classList.toggle('active', p.id==='massage'); });
-  const sub=document.querySelector('.brand .sub'); if(sub) sub.innerHTML='Барианы систем <span style="opacity:.6;font-size:11px">· v'+APP_VER+'</span>';
-  return true;
+  const role=currentRole();
+  if(role==='therapist'){
+    document.querySelectorAll('nav.tabs button').forEach(b=>{ if(b.dataset.tab!=='massage') b.style.display='none'; else b.classList.add('active'); });
+    document.querySelectorAll('main .panel').forEach(p=>{ p.classList.toggle('active', p.id==='massage'); });
+    const sub=document.querySelector('.brand .sub'); if(sub) sub.innerHTML='Барианы систем <span style="opacity:.6;font-size:11px">· v'+APP_VER+'</span>';
+    return true;
+  }
+  if(role==='operator'){
+    const allowed=['cal','list'];
+    document.querySelectorAll('nav.tabs button').forEach(b=>{
+      if(!allowed.includes(b.dataset.tab)) b.style.display='none';
+      else b.classList.toggle('active', b.dataset.tab==='cal');
+    });
+    document.querySelectorAll('main .panel').forEach(p=>{ p.classList.toggle('active', p.id==='cal'); });
+    const sub=document.querySelector('.brand .sub'); if(sub) sub.innerHTML='Захиалгын систем <span style="opacity:.6;font-size:11px">· v'+APP_VER+'</span>';
+    return true;
+  }
+  return false;
 }
 const UNLOCK_KEY='gt_unlock_v1';
 function unlockedPin(role){try{const o=JSON.parse(localStorage.getItem(UNLOCK_KEY)||'{}');return o[role]||'';}catch(e){return '';}}
@@ -2428,7 +4102,7 @@ function showGate(mode){
   el.innerHTML=`<div style="background:#fff;border-radius:16px;padding:26px 24px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3)">
     <div style="font-size:30px;margin-bottom:6px">🔒</div>
     <div style="font-weight:800;color:#1e3a5f;font-size:17px">Гурван Тоорой</div>
-    <div style="font-size:12.5px;color:#7a8492;margin-top:2px;margin-bottom:16px">${role==='therapist'?'Барианы систем':'Удирдлагын систем'}</div>
+    <div style="font-size:12.5px;color:#7a8492;margin-top:2px;margin-bottom:16px">${role==='therapist'?'Барианы систем':role==='operator'?'Захиалгын систем':'Удирдлагын систем'}</div>
     <input id="gatePin" type="password" inputmode="numeric" placeholder="Код" style="width:100%;text-align:center;font-size:19px;letter-spacing:5px;padding:11px;border:1px solid #dfe4ea;border-radius:10px">
     <div id="gateErr" style="color:#c0392b;font-size:12.5px;height:16px;margin-top:6px"></div>
     <button onclick="tryUnlock()" style="width:100%;margin-top:6px;padding:11px;border:0;border-radius:10px;background:#1e3a5f;color:#fff;font-weight:700;font-size:14px;cursor:pointer">Нэвтрэх</button>
