@@ -205,6 +205,28 @@
   .ptbl2 td.mc .par{display:block;font-size:9.5px;color:var(--clay,#b06a3f);opacity:.8}
   .ptbl2 .cb{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:1px}
   .ptbl2 .cb.adult{background:#4a6fa5}.ptbl2 .cb.child{background:#b23a5d}.ptbl2 .cb.water{background:#3d8ea3}
+  .cb.adult{background:#4a6fa5}.cb.child{background:#b23a5d}.cb.water{background:#3d8ea3}
+  .cb{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:1px}
+  /* Барианы гар утасны карт харагдац */
+  .msg-mobile-only{display:none}
+  .msg-room-card{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden;background:#fff}
+  .msg-room-card.offday{opacity:.55}
+  .msg-room-h{background:var(--soft);padding:7px 11px;font-size:13px;display:flex;align-items:center;gap:8px}
+  .msg-room-h .sm{color:var(--muted);font-weight:500;font-size:12px}
+  .msg-card{padding:9px 11px;border-top:1px solid var(--line)}
+  .msg-card.done{background:#eaf5ee}
+  .msg-card-row1{display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:6px}
+  .msg-mins{margin-left:auto;font-size:11px;color:var(--muted)}
+  .msg-card-row2{display:flex;gap:6px;align-items:center}
+  .msg-card-row2 select{flex:1;min-width:0}
+  .msg-card-row2 .cst{width:84px;flex-shrink:0}
+  .msg-done-toggle{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;padding:7px;border-radius:8px;background:var(--soft);font-size:12.5px;font-weight:600;color:var(--muted)}
+  .msg-done-toggle.on{background:#d7ecdd;color:#2f7a45}
+  .msg-done-toggle input{width:16px;height:16px}
+  @media(max-width:720px){
+    .msg-desktop-only{display:none}
+    .msg-mobile-only{display:block}
+  }
   .ptbl2 select{width:100%;min-width:120px;padding:5px 6px;font-size:12px}
   .ptbl2 .dchk{width:17px;height:17px;cursor:pointer;accent-color:var(--green)}
   .ptbl2 .cst{width:104px;min-width:104px;padding:3px 5px;font-size:11px}
@@ -288,7 +310,14 @@
     .msum{grid-template-columns:repeat(2,1fr)!important}
     /* Хүснэгт хэвтээ гүйлгэх боломжтой хэвээр (nowrap) */
     .card{padding:12px}
-    table.cal{font-size:12px}
+    table.cal{font-size:11px}
+    table.cal .rlabel{min-width:28px;padding:5px 4px;font-size:12px;text-align:center}
+    table.cal .rlabel .beds-info{display:none}
+    table.cal thead th.corner{min-width:28px;padding-left:4px;text-align:center}
+    table.cal thead th{min-width:30px;padding:4px 1px;font-size:10.5px}
+    table.cal tbody td.cell{min-width:30px}
+    table.cal tfoot td.sumlab{min-width:36px;max-width:48px;padding:4px 3px;font-size:9.5px;white-space:normal;line-height:1.2}
+    table.cal .rlabel{white-space:normal;line-height:1.15}
     /* Массажны grid, мини календарь */
     .mc-day{min-height:38px}
   }
@@ -1634,7 +1663,8 @@ function renderCalendar(){
   const first=new Date(y,m-1,1),dim=new Date(y,m,0).getDate();
   document.getElementById('calMonth').textContent=y+' оны '+m+'-р сар';
   const today=todayStr();
-  let head='<thead><tr><th class="corner">Өрөө</th>';
+  const isMobileView = (typeof window!=='undefined' && window.innerWidth && window.innerWidth<=720);
+  let head=`<thead><tr><th class="corner">${isMobileView?'№':'Өрөө'}</th>`;
   for(let d=1;d<=dim;d++){const dow=new Date(y,m-1,d).getDay();const we=dow===0||dow===6;
     head+=`<th class="${we?'we':''}">${d}<div style="font-size:9px;font-weight:500">${WK[dow]}</div></th>`;}
   head+='</tr></thead>';
@@ -1643,7 +1673,8 @@ function renderCalendar(){
   S.rooms.forEach(room=>{
     const grp=room.oo?'00-той':'00-гүй';
     if(grp!==lastGrp){bodyH+=`<tr><td class="grp" colspan="${dim+1}">${grp} өрөө</td></tr>`;lastGrp=grp;}
-    bodyH+=`<tr><td class="rlabel ${room.oo?'oo-lab':'nooo-lab'}">№${room.num} <span style="color:var(--muted);font-weight:500">(${room.beds} ор)</span></td>`;
+    const roomLabel = isMobileView ? room.num : `№${room.num} <span class="beds-info" style="color:var(--muted);font-weight:500">(${room.beds} ор)</span>`;
+    bodyH+=`<tr><td class="rlabel ${room.oo?'oo-lab':'nooo-lab'}">${roomLabel}</td>`;
     for(let d=1;d<=dim;d++){
       const day=y+'-'+pad(m)+'-'+pad(d);
       const bk=bookingAt(room.num,day);
@@ -1672,11 +1703,11 @@ function renderCalendar(){
   };
   const any=vals=>vals.some(v=>v>0);
   let foot='<tfoot>';
-  foot+=rowHtml('Том хүн',cnts.map(c=>c.a),'','#4a6fa5');
-  const vNorm=cnts.map(c=>c.norm); if(any(vNorm)) foot+=rowHtml('Энгийн хоол',vNorm,'','#b23a5d');
-  const vBor=cnts.map(c=>c.bantan); if(any(vBor)) foot+=rowHtml('Бор хоол (бантан)',vBor,'','#c98a2e');
-  const vNo=cnts.map(c=>c.nofood); if(any(vNo)) foot+=rowHtml('Хоолгүй (0-6 сар)',vNo,'','#9aa3ad');
-  foot+=rowHtml('Нийт хүн',cnts.map(c=>c.a+c.c),'tot');
+  foot+=rowHtml(isMobileView?'Том':'Том хүн',cnts.map(c=>c.a),'','#4a6fa5');
+  const vNorm=cnts.map(c=>c.norm); if(any(vNorm)) foot+=rowHtml(isMobileView?'Энг.':'Энгийн хоол',vNorm,'','#b23a5d');
+  const vBor=cnts.map(c=>c.bantan); if(any(vBor)) foot+=rowHtml(isMobileView?'Бор':'Бор хоол (бантан)',vBor,'','#c98a2e');
+  const vNo=cnts.map(c=>c.nofood); if(any(vNo)) foot+=rowHtml(isMobileView?'0-6с':'Хоолгүй (0-6 сар)',vNo,'','#9aa3ad');
+  foot+=rowHtml(isMobileView?'Нийт':'Нийт хүн',cnts.map(c=>c.a+c.c),'tot');
   foot+='</tfoot>';
   const tbl=document.getElementById('calTable');
   tbl.innerHTML=head+bodyH+foot;
@@ -2549,9 +2580,11 @@ function renderMassageGrid(){
   if(!rooms.length){box.innerHTML='<div class="empty">Энэ өдөр буудаллаж буй зочин алга.</div>';return;}
   rooms.forEach(({bk})=>ensurePlan(bk));
   let rowsH='';
+  let cardsH='';
   rooms.forEach(({roomNum,bk,room})=>{
     const people=roomPeople(room,msgDate);
     const cells=bk.msgPlan[msgDate][roomNum]||{};
+    let roomCards='';
     people.forEach((p,pi)=>{
       const c=cells[p.key]||{svc:'rest',done:false};
       const m=c.svc!=='rest'?svcMinsFor(c.svc,p):0;
@@ -2565,11 +2598,31 @@ function renderMassageGrid(){
         <td>${c.svc!=='rest'?`<input type="time" class="cst" value="${c.time||''}" onchange="setCellTime('${bk.id}','${msgDate}',${roomNum},'${p.key}',this.value)">`:''}</td>
         <td style="text-align:center">${c.svc!=='rest'?`<input type="checkbox" class="dchk" ${c.done?'checked':''} title="Хийсэн" onchange="togglePersonDone('${bk.id}','${msgDate}',${roomNum},'${p.key}',this.checked)">`:''}</td>
       </tr>`;
+      // Гар утасны карт
+      roomCards+=`<div class="msg-card ${c.done?'done':''}">
+        <div class="msg-card-row1">
+          <span class="cb ${p.cat}"></span><b>${p.label}</b>
+          ${c.svc!=='rest'?`<span class="msg-mins">${m?m+'м':''}${free?' · зэрэг':''}</span>`:''}
+        </div>
+        <div class="msg-card-row2">
+          <select ${c.done?'disabled':''} onchange="setPersonCell('${bk.id}','${msgDate}',${roomNum},'${p.key}',this.value)">${svcSelectOpts(c.svc)}</select>
+          ${c.svc!=='rest'?`<input type="time" class="cst" value="${c.time||''}" onchange="setCellTime('${bk.id}','${msgDate}',${roomNum},'${p.key}',this.value)">`:''}
+        </div>
+        ${c.svc!=='rest'?`<label class="msg-done-toggle ${c.done?'on':''}">
+          <input type="checkbox" ${c.done?'checked':''} onchange="togglePersonDone('${bk.id}','${msgDate}',${roomNum},'${p.key}',this.checked)">
+          ${c.done?'✓ Хийсэн':'Хийгээгүй'}
+        </label>`:''}
+      </div>`;
     });
+    cardsH+=`<div class="msg-room-card ${off?'offday':''}">
+      <div class="msg-room-h"><b>№${roomNum}</b><span class="sm">${bk.name||bk.phone}</span></div>
+      ${roomCards}
+    </div>`;
   });
-  box.innerHTML=`<div style="overflow-x:auto"><table class="ptbl2">
+  box.innerHTML=`<div class="msg-desktop-only" style="overflow-x:auto"><table class="ptbl2">
     <thead><tr><th>Өрөө</th><th>Хэн</th><th>Үйлчилгээ</th><th>Хугацаа</th><th>Цаг</th><th>Хийсэн</th></tr></thead>
-    <tbody>${rowsH}</tbody></table></div>`;
+    <tbody>${rowsH}</tbody></table></div>
+    <div class="msg-mobile-only">${cardsH}</div>`;
 }
 // Мини календарь
 let msgCalYM=null;
@@ -4345,7 +4398,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='5.6';
+const APP_VER='5.7';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
