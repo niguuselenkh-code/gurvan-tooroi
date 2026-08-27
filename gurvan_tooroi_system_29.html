@@ -959,7 +959,10 @@ function stayBreakdown(bk){
 function bookingTotals(bk){
   const sb=stayBreakdown(bk);
   const pn=sb.pn;
-  const stay=sb.total;
+  const stayBase=sb.total;
+  const discountPct=bk.discountPct||0;
+  const discountAmt=Math.round(stayBase*discountPct/100);
+  const stay=stayBase-discountAmt;
   const extras=(bk.extras||[]).reduce((s,e)=>s+(e.price||0)*(e.qty||1),0);
   const fee=bk.cancelInfo?bk.cancelInfo.fee:0;
   const prepaid=(bk.prepay&&bk.prepay.received)?(bk.prepay.amount||0):0;
@@ -973,7 +976,7 @@ function bookingTotals(bk){
   const balance=grand-netPaid;          // үлдэгдэл (буцаалтыг тооцсон)
   const overpaid=balance<0?-balance:0;  // илүү төлөлт
   const fullyPaid = bk.status!=='cancelled' && netPaid>0 && balance<=0;
-  return{pn,nightly:sb.nightly,breakdown:sb,stay,extras,fee,grand,prepaid,finalPaid,refunded,paid,netPaid,balance,overpaid,fullyPaid};
+  return{pn,nightly:sb.nightly,breakdown:sb,stayBase,discountPct,discountAmt,stay,extras,fee,grand,prepaid,finalPaid,refunded,paid,netPaid,balance,overpaid,fullyPaid};
 }
 function prepaySuggest(bk){const sb=stayBreakdown(bk);return Math.round(sb.total*(S.prepay.percent/100));}
 
@@ -999,7 +1002,7 @@ function bookingAt(num,day){
 
 /* ============================================================ DRAFT / FORM */
 function blankRoom(){return{num:S.rooms[0].num,adults:1,children:[],custom:0};}
-function newDraft(){return{rooms:[blankRoom()],checkIn:todayStr(),nights:2,arrive:'12:00',leave:'11:00',phone:'',name:'',note:'',nightOverrides:[]};}
+function newDraft(){return{rooms:[blankRoom()],checkIn:todayStr(),nights:2,arrive:'12:00',leave:'11:00',phone:'',name:'',note:'',nightOverrides:[],discountPct:0};}
 function autoTier(ri,ki){const k=draft.rooms[ri].children[ki];const a=k.age;
   if(a<1){ k.tierId = (k.months||0)>=6 ? 't_bor' : 't_inf'; }   // 0-6 сар хоолгүй · 6 сар-1 нас бантан
   else if(a<=3)k.tierId='t_norm';else if(a<=8)k.tierId='t_68';else if(a<=13)k.tierId='t_913';else{k.adultPriced=true;}}
@@ -1039,7 +1042,7 @@ function editBooking(id){
     editId=id;
     draft={rooms:JSON.parse(JSON.stringify(bk.rooms)),checkIn:bk.checkIn,nights:bk.nights,
       arrive:bk.arriveTime||'12:00',leave:bk.leaveTime||'11:00',phone:bk.phone,name:bk.name||'',note:bk.note||'',
-      nightOverrides:JSON.parse(JSON.stringify(bk.nightOverrides||[]))};
+      nightOverrides:JSON.parse(JSON.stringify(bk.nightOverrides||[])),discountPct:bk.discountPct||0};
     syncNightOverrides();
     startDraftAutosave();
     renderBookingModal();
@@ -1051,6 +1054,8 @@ function tierOpts(sel){return S.tiers.map(t=>`<option value="${t.id}" ${t.id===s
 function renderBookingModal(){
   syncNightOverrides();
   const totals=bookingTotalsFromDraft();
+  draft.discountPct=draft.discountPct||0;
+  const discountedTotal=Math.round(totals.total*(1-draft.discountPct/100));
   const singleRoomDraft = draft.rooms.length===1;
   let roomsH='';
   draft.rooms.forEach((r,ri)=>{
@@ -1151,9 +1156,12 @@ function renderBookingModal(){
       <div class="card" style="padding:10px 12px">${perRoomRows}</div>
     </div>`}
     <div style="margin-top:12px"><label class="field">Тэмдэглэл</label><input id="d_note" value="${draft.note||''}" onchange="draft.note=this.value"></div>
+    <div style="margin-top:12px"><label class="field">Хямдрал (%)</label><input type="number" min="0" max="100" step="any" placeholder="0" value="${draft.discountPct||''}" onchange="draft.discountPct=parseFloat(this.value)||0;renderBookingModal()"><div class="hint" style="font-size:10.5px">Байрлалын үнээс хасна. Нэмэлт бараа, торгуульд нөлөөлөхгүй.</div></div>
     <div class="card" style="padding:14px;margin-top:14px">
-      <div class="sumtot"><span>Нийт төлбөр</span><span>${money(totals.total)}</span></div>
-      <div class="sumline" style="margin-top:6px;color:var(--berry);font-weight:700"><span>Урьдчилгаа санал (${S.prepay.percent}%)</span><span>${money(Math.round(totals.total*S.prepay.percent/100))}</span></div>
+      ${draft.discountPct>0?`<div class="sumline"><span>Байрлалын үнэ</span><span>${money(totals.total)}</span></div>
+      <div class="sumline" style="color:var(--berry)"><span>Хямдрал (${draft.discountPct}%)</span><span>−${money(Math.round(totals.total*draft.discountPct/100))}</span></div>`:''}
+      <div class="sumtot"><span>Нийт төлбөр</span><span>${money(discountedTotal)}</span></div>
+      <div class="sumline" style="margin-top:6px;color:var(--berry);font-weight:700"><span>Урьдчилгаа санал (${S.prepay.percent}%)</span><span>${money(Math.round(discountedTotal*S.prepay.percent/100))}</span></div>
     </div>`;
   openModal(editId?'Захиалга засах':'Шинэ захиалга',body,
     `<button class="btn btn-ghost" onclick="cancelDraft()">Болих</button>
@@ -1212,6 +1220,7 @@ function saveBooking(){
     checkIn:draft.checkIn,nights:draft.nights,arriveTime:draft.arrive||'12:00',leaveTime:draft.leave||'11:00',
     note:(draft.note||'').trim(),rooms,
     nightOverrides:JSON.parse(JSON.stringify(draft.nightOverrides||[])),
+    discountPct:draft.discountPct||0,
     status:ex?ex.status:'pending',
     prepay:ex?ex.prepay:{amount:0,accountId:S.accounts[0]?.id||'',date:'',received:false},
     payments:ex?(ex.payments||[]):[],
@@ -1227,6 +1236,19 @@ function saveBooking(){
 }
 
 /* ============================================================ DETAIL / ACTIONS */
+function editDiscount(id){
+  const bk=S.bookings.find(b=>b.id===id); if(!bk)return;
+  openModal('Хямдрал тохируулах',
+    `<div class="hint" style="margin-bottom:10px">Байрлалын үнээс хасах хувь. Нэмэлт бараа, торгуульд нөлөөлөхгүй.</div>
+     <label class="field">Хямдрал (%)</label><input id="disc_pct" type="number" min="0" max="100" step="any" value="${bk.discountPct||''}" placeholder="0">`,
+    `<button class="btn btn-ghost" onclick="openDetail('${id}')">Болих</button>
+     <button class="btn btn-primary" onclick="saveDiscount('${id}')">Хадгалах</button>`);
+}
+function saveDiscount(id){
+  const bk=S.bookings.find(b=>b.id===id); if(!bk)return;
+  bk.discountPct=parseFloat(document.getElementById('disc_pct').value)||0;
+  save();closeModal();renderAll();openDetail(id);toast('Хямдрал хадгалагдлаа ✓','ok');
+}
 function openDetail(id){
   const bk=S.bookings.find(b=>b.id===id);if(!bk)return;
   const t=bookingTotals(bk);const out=addDays(bk.checkIn,bk.nights);
@@ -1255,6 +1277,8 @@ function openDetail(id){
         return `<div class="sumline"><span>№${r.num} (${room?.oo?'00-той':'00-гүй'}) · ${r.adults} том${kids.length?', '+kids.length+' хүүхэд: '+ages:''}</span><span>${money(pr.total)}/эхний хон</span></div>
         <input placeholder="Нэмэлт тайлбар (жиш: харшилтай, тусгай хүсэлт...)" value="${r.note||''}" style="margin:4px 0 8px;font-size:12.5px;padding:6px 9px" onchange="setRoomNote('${id}',${ri},this.value)">`;}).join('')}
       <div style="margin:4px 0">
+        ${t.discountPct>0?`<div class="sumline"><span>Байрлалын үнэ (хямдралгүй)</span><span>${money(t.stayBase)}</span></div>
+        <div class="sumline" style="color:var(--berry)"><span>Хямдрал (${t.discountPct}%) <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Засах" onclick="editDiscount('${id}')">✎</button></span><span>−${money(t.discountAmt)}</span></div>`:`<div class="sumline" style="font-size:11.5px;color:var(--muted)"><span>Хямдралгүй <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Хямдрал нэмэх" onclick="editDiscount('${id}')">✎ хямдрал нэмэх</button></span><span></span></div>`}
         <div class="sumline" style="font-weight:600;color:var(--navy)"><span>Байрны төлбөр (${bk.rooms.length>1?bk.rooms.length+' өрөө':bk.nights+' хон'})</span><span>${money(t.stay)}</span></div>
         ${bk.rooms.length===1 ? t.nightly.map((n,i)=>{
           const date=addDays(bk.checkIn,i);
@@ -4321,7 +4345,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='5.5';
+const APP_VER='5.6';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
