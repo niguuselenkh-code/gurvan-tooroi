@@ -459,6 +459,24 @@
       <div id="mealDayBox"></div>
     </div>
 
+    <div class="card" style="padding:16px;margin-bottom:18px">
+      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <h3 style="font-size:15px;color:var(--navy);margin:0">💰 Хүнсний сарын тооцоо</h3>
+        <div class="row" style="gap:6px;flex-wrap:wrap">
+          <input type="date" id="mc_from" style="width:auto" onchange="renderMealCost()">
+          <input type="date" id="mc_to" style="width:auto" onchange="renderMealCost()">
+          <button class="btn btn-ghost btn-sm" onclick="setMealCostRange('month')">Энэ сар</button>
+          <button class="btn btn-ghost btn-sm" onclick="setMealCostRange('lastmonth')">Өнгөрсөн сар</button>
+        </div>
+      </div>
+      <div class="msum" style="margin-bottom:12px">
+        <div class="card"><div class="v" id="mc_in" style="color:var(--green)">0₮</div><div class="l">Татан авалт</div></div>
+        <div class="card"><div class="v" id="mc_out" style="color:var(--berry)">0₮</div><div class="l">Хэрэглэсэн</div></div>
+        <div class="card"><div class="v" id="mc_rem">0₮</div><div class="l">Үлдэгдэл (үнээр)</div></div>
+      </div>
+      <div style="overflow-x:auto"><table class="mini-tbl" id="mealCostTbl"></table></div>
+    </div>
+
     <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">🍽 Хоолны цэс</h3>
     <div class="card" style="overflow-x:auto"><div id="mealListBox"></div></div>
   </section>
@@ -527,6 +545,17 @@
         <span>Зочдод: <b id="rpSalesRoom">0₮</b></span>
         <span>Ажилчдад: <b id="rpSalesStaff">0₮</b></span>
         <span>Ажилчид төлөөгүй: <b style="color:var(--berry)" id="rpSalesUnpaid">0₮</b></span>
+      </div>
+    </div>
+    <div class="card" style="padding:16px;margin-top:16px">
+      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+        <h3 style="font-size:15px;color:var(--navy);margin:0">💆 Барианы нэмэлт орлого · Бариачийн хувь</h3>
+        <div style="font-size:12px;color:var(--muted)">Хувь: <b id="rpMsgCommPct">0</b>%</div>
+      </div>
+      <div class="hint" style="margin-bottom:10px">Сонгосон хугацаанд хийгдсэн нэмэлт төлбөртэй (billable) барианы үйлчилгээний нийт орлого, түүнээс бариачдад олгох хувь.</div>
+      <div class="msum">
+        <div class="card"><div class="v" style="color:var(--navy)" id="rpMsgRevenue">0₮</div><div class="l">Нэмэлт барианы орлого</div></div>
+        <div class="card"><div class="v" style="color:var(--berry)" id="rpMsgCommission">0₮</div><div class="l">Бариачийн хувь</div></div>
       </div>
     </div>
   </section>
@@ -615,6 +644,7 @@ function defaults(){return{
   markets:[],
   marketPrices:{},
   staff:[],
+  massageCommissionPercent:0,
   purchases:[],
   roomAssets:{},
   mealSlots:[
@@ -626,6 +656,84 @@ function defaults(){return{
 };}
 
 let S=null, draft=null, editId=null, listFilter='all', calYM=null;
+/* ---- Захиалгын драфт автомат хадгалалт (утас дуудлага, апп далдлагдах үед мэдээлэл алдагдахаас сэргийлнэ) ---- */
+const DRAFT_KEY='gt_draft_backup_v1';
+let draftAutosaveTimer=null;
+function persistDraftBackup(){
+  if(!draft) return;
+  try{localStorage.setItem(DRAFT_KEY, JSON.stringify({draft,editId,ts:Date.now()}));}catch(e){}
+}
+function clearDraftBackup(){
+  try{localStorage.removeItem(DRAFT_KEY);}catch(e){}
+}
+function startDraftAutosave(){
+  if(draftAutosaveTimer) return;
+  draftAutosaveTimer=setInterval(()=>{ if(draft) persistDraftBackup(); },2500);
+}
+function stopDraftAutosave(){
+  if(draftAutosaveTimer){clearInterval(draftAutosaveTimer);draftAutosaveTimer=null;}
+}
+// Апп далд руу орох мөчид (утас дуудлага ирэх г.м) шууд хадгална
+document.addEventListener('visibilitychange',()=>{ if(document.hidden && draft) persistDraftBackup(); });
+function checkDraftRecovery(){
+  let data=null;
+  try{ const raw=localStorage.getItem(DRAFT_KEY); if(raw) data=JSON.parse(raw); }catch(e){}
+  if(!data||!data.draft) return;
+  // 48 цагаас хуучин бол хэрэггүй гэж үзээд цэвэрлэнэ
+  if(Date.now()-(data.ts||0) > 48*3600*1000){ clearDraftBackup(); return; }
+  const d=data.draft;
+  const who=d.name||d.phone||'(нэргүй)';
+  openModal('📋 Дуусаагүй захиалга олдлоо',
+    `<div class="hint" style="margin-bottom:10px">Өмнө бичиж байсан захиалга дуусаагүй үлдсэн байна (жиш. дуудлага ирж тасалдсан). Үргэлжлүүлэх үү?</div>
+     <div class="rcard" style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--soft)">
+       <b>${who}</b> · ${d.checkIn||''} · ${d.nights||'?'} хон
+     </div>`,
+    `<button class="btn btn-ghost" onclick="discardDraftRecovery()">Хаях</button>
+     <button class="btn btn-primary" onclick="restoreDraftRecovery()">Үргэлжлүүлэх</button>`);
+  window._pendingRecovery=data;
+}
+function restoreDraftRecovery(){
+  const data=window._pendingRecovery; if(!data)return;
+  draft=data.draft; editId=data.editId||null;
+  syncNightOverrides();
+  startDraftAutosave();
+  renderBookingModal();
+}
+function discardDraftRecovery(){
+  clearDraftBackup(); closeModal();
+}
+// Шинэ/засах захиалга нээх бүрд өмнөх дуусаагүй драфт байгаа эсэхийг шалгаж,
+// байвал асуулгүйгээр дарж бичихээс сэргийлнэ (санамсаргүй modal хаагдсан тохиолдол)
+function hasStaleDraftBackup(){
+  try{
+    const raw=localStorage.getItem(DRAFT_KEY);
+    if(!raw) return null;
+    const data=JSON.parse(raw);
+    if(!data||!data.draft) return null;
+    if(Date.now()-(data.ts||0) > 48*3600*1000){ clearDraftBackup(); return null; }
+    return data;
+  }catch(e){ return null; }
+}
+function guardDraftLoss(nextAction){
+  const stale=hasStaleDraftBackup();
+  if(!stale){ nextAction(); return; }
+  window._pendingRecovery=stale;
+  window._pendingNextAction=nextAction;
+  const d=stale.draft;
+  const who=d.name||d.phone||'(нэргүй)';
+  openModal('📋 Дуусаагүй захиалга олдлоо',
+    `<div class="hint" style="margin-bottom:10px">Өмнө бичиж байсан захиалга дуусаагүй хэвээр байна (жиш. гэнэт хаагдсан, дуудлага ирсэн). Сэргээх үү, эсвэл орхиод шинээр эхлэх үү?</div>
+     <div class="rcard" style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--soft)">
+       <b>${who}</b> · ${d.checkIn||''} · ${d.nights||'?'} хон
+     </div>`,
+    `<button class="btn btn-ghost" onclick="discardStaleAndProceed()">Орхиод шинээр</button>
+     <button class="btn btn-primary" onclick="restoreDraftRecovery()">Сэргээх</button>`);
+}
+function discardStaleAndProceed(){
+  clearDraftBackup(); closeModal();
+  const fn=window._pendingNextAction; window._pendingNextAction=null;
+  if(fn) fn();
+}
 let msgDate=null, msgDraft=null, msgEditId=null;
 
 function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):defaults();}catch(e){S=defaults();}
@@ -648,6 +756,7 @@ function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):defaults
   S.staff=S.staff||[];
   S.purchases=S.purchases||[];
   S.roomAssets=S.roomAssets||{};
+  S.massageCommissionPercent=S.massageCommissionPercent||0;
   S.mealSlots=S.mealSlots||[
     {id:'breakfast',name:'Өглөөний цай',start:'08:30',end:'09:30'},
     {id:'lunch',name:'Өдрийн хоол',start:'13:00',end:'13:30'},
@@ -917,18 +1026,24 @@ function syncNightOverrides(){
 }
 
 function openBookingModal(pref){
-  draft = pref ? Object.assign(newDraft(), pref) : newDraft();
-  syncNightOverrides();
-  renderBookingModal();
+  guardDraftLoss(()=>{
+    draft = pref ? Object.assign(newDraft(), pref) : newDraft();
+    syncNightOverrides();
+    startDraftAutosave();
+    renderBookingModal();
+  });
 }
 function editBooking(id){
   const bk=S.bookings.find(b=>b.id===id);if(!bk)return;
-  editId=id;
-  draft={rooms:JSON.parse(JSON.stringify(bk.rooms)),checkIn:bk.checkIn,nights:bk.nights,
-    arrive:bk.arriveTime||'12:00',leave:bk.leaveTime||'11:00',phone:bk.phone,name:bk.name||'',note:bk.note||'',
-    nightOverrides:JSON.parse(JSON.stringify(bk.nightOverrides||[]))};
-  syncNightOverrides();
-  renderBookingModal();
+  guardDraftLoss(()=>{
+    editId=id;
+    draft={rooms:JSON.parse(JSON.stringify(bk.rooms)),checkIn:bk.checkIn,nights:bk.nights,
+      arrive:bk.arriveTime||'12:00',leave:bk.leaveTime||'11:00',phone:bk.phone,name:bk.name||'',note:bk.note||'',
+      nightOverrides:JSON.parse(JSON.stringify(bk.nightOverrides||[]))};
+    syncNightOverrides();
+    startDraftAutosave();
+    renderBookingModal();
+  });
 }
 function roomOpts(sel){return S.rooms.map(r=>`<option value="${r.num}" ${r.num==sel?'selected':''}>№${r.num} · ${r.oo?'00-той':'00-гүй'} · ${r.beds} ор · хүн тус бүр ${money(r.price!=null?r.price:0)}</option>`).join('');}
 function tierOpts(sel){return S.tiers.map(t=>`<option value="${t.id}" ${t.id===sel?'selected':''}>${t.name} · ${money(t.price)}</option>`).join('');}
@@ -1060,7 +1175,7 @@ function addJoiner(ri){
 function delJoiner(ri,ji){draft.rooms[ri].joiners.splice(ji,1);renderBookingModal();}
 function autoJoinerTier(ri,ji){const j=draft.rooms[ri].joiners[ji];const a=j.age;
   if(a<1)j.tierId='t_inf';else if(a<=3)j.tierId='t_norm';else if(a<=8)j.tierId='t_68';else if(a<=13)j.tierId='t_913';else{j.adultPriced=true;}}
-function cancelDraft(){editId=null;draft=null;closeModal();}
+function cancelDraft(){stopDraftAutosave();clearDraftBackup();editId=null;draft=null;closeModal();}
 function checkPhoneHistory(phone){
   const box=document.getElementById('phoneHist'); if(!box)return;
   phone=(phone||'').trim();
@@ -1107,6 +1222,7 @@ function saveBooking(){
   };
   if(editId){const i=S.bookings.findIndex(b=>b.id===editId);S.bookings[i]=bk;}else S.bookings.push(bk);
   if(typeof autoPlanBooking==='function'){ try{ autoPlanBooking(bk); }catch(e){} }
+  stopDraftAutosave();clearDraftBackup();
   save();editId=null;draft=null;closeModal();renderAll();toast('Хадгаллаа ✓','ok');
 }
 
@@ -1659,6 +1775,15 @@ function renderSettings(){
       <div class="hint" style="margin-bottom:8px">Талбарууд: {урьдчилгаа} {данс} {ирэхцаг} {гарахцаг} {мэдэгдэх} {цуцлалт}</div>
       <textarea id="s_tpl" style="min-height:220px">${S.template}</textarea>
       <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="saveTemplate()">Хадгалах</button>
+    </div>
+
+    <div class="card set-sec">
+      <h3>💰 Бариачийн хувь</h3>
+      <div class="hint" style="margin-bottom:10px">Нэмэлт төлбөртэй (billable) барианы үйлчилгээнээс бариачдад олгох хувь. Бүх бариачид ижил хувиар тооцогдоно.</div>
+      <div class="row" style="align-items:center;gap:8px">
+        <input type="number" min="0" max="100" id="s_msgcomm" value="${S.massageCommissionPercent||0}" style="width:90px" onchange="S.massageCommissionPercent=parseFloat(this.value)||0;save();toast('Хадгаллаа','ok')">
+        <span style="font-size:14px">%</span>
+      </div>
     </div>
 
     <div class="card set-sec">
@@ -3463,6 +3588,50 @@ function mealById(id){return S.meals.find(m=>m.id===id);}
 function renderMeals(){
   renderMealDay();
   renderMealList();
+  renderMealCost();
+}
+function setMealCostRange(kind){
+  const r=kind==='month'?monthRange(0):monthRange(-1);
+  document.getElementById('mc_from').value=r.from;
+  document.getElementById('mc_to').value=r.to;
+  renderMealCost();
+}
+function renderMealCost(){
+  const fromEl=document.getElementById('mc_from'),toEl=document.getElementById('mc_to');
+  if(!fromEl||!toEl)return;
+  if(!fromEl.value||!toEl.value){ const r=monthRange(0); fromEl.value=r.from; toEl.value=r.to; }
+  const from=fromEl.value,to=toEl.value;
+  const foodProducts=S.products.filter(p=>(p.group||'goods')==='food');
+  let totalIn=0,totalOut=0,totalRem=0;
+  const rows=[];
+  foodProducts.forEach(p=>{
+    const moves=S.stockMoves.filter(m=>m.productId===p.id&&(m.date||'')>=from&&(m.date||'')<=to);
+    let pIn=0,pOut=0;
+    moves.forEach(m=>{
+      const unitVal=m.unitPrice!=null?m.unitPrice:(p.cost||0);
+      const val=Math.abs(m.qty||0)*unitVal;
+      if(m.type==='restock'||m.type==='init') pIn+=val;
+      else if(m.type==='kitchen'&&m.qty<0) pOut+=val;
+    });
+    const bal=stockOnDate(p.id,to);
+    const rv=bal*(p.cost||0);
+    totalIn+=pIn; totalOut+=pOut; totalRem+=rv;
+    if(pIn||pOut||bal>0) rows.push({name:p.name,unit:p.unit,pIn,pOut,bal,rv});
+  });
+  document.getElementById('mc_in').textContent=money(totalIn);
+  document.getElementById('mc_out').textContent=money(totalOut);
+  document.getElementById('mc_rem').textContent=money(totalRem);
+  const tbl=document.getElementById('mealCostTbl');
+  if(!tbl)return;
+  rows.sort((a,b)=>b.pOut-a.pOut);
+  tbl.innerHTML=rows.length?`<thead><tr><th>Бараа</th><th>Татан авалт</th><th>Хэрэглэсэн</th><th>Үлдэгдэл</th></tr></thead><tbody>${
+    rows.map(r=>`<tr>
+      <td>${r.name}</td>
+      <td style="color:var(--green)">${r.pIn?money(r.pIn):'—'}</td>
+      <td style="color:var(--berry)">${r.pOut?money(r.pOut):'—'}</td>
+      <td>${r.bal} ${r.unit} <span style="color:var(--muted);font-size:11px">(${money(r.rv)})</span></td>
+    </tr>`).join('')
+  }</tbody>`:'<tbody><tr><td class="hint" style="padding:10px 0">Энэ хугацаанд хүнсний хөдөлгөөн алга.</td></tr></tbody>';
 }
 function renderMealDay(){
   if(!mealDay) mealDay=todayStr();
@@ -3581,7 +3750,7 @@ function cookMeal(date,slotId,mealId){
     const p=S.products.find(x=>x.id===nd.productId); if(!p)return;
     const stockQty=recipeToStock(p,nd.qty);   // гр → кг хөрвүүлнэ
     p.stock-=stockQty;
-    logMove(p.id,-stockQty,'kitchen',{who:meal.name,slot:slotId,date,note:'Хоол ('+(slotById(slotId)?slotById(slotId).name:slotId)+') · '+nd.qty+(p.recipeUnit||p.unit)});
+    logMove(p.id,-stockQty,'kitchen',{who:meal.name,slot:slotId,date,unitPrice:p.cost||0,note:'Хоол ('+(slotById(slotId)?slotById(slotId).name:slotId)+') · '+nd.qty+(p.recipeUnit||p.unit)});
   });
   pl.cooked=true; pl.cookedAt=new Date().toISOString();
   save();renderAll();toast('Агуулахаас хасагдлаа ✓','ok');
@@ -3596,7 +3765,7 @@ function uncookMeal(date,slotId,mealId){
     const p=S.products.find(x=>x.id===nd.productId); if(!p)return;
     const stockQty=recipeToStock(p,nd.qty);
     p.stock+=stockQty;
-    logMove(p.id,stockQty,'kitchen',{who:meal.name,slot:slotId,date,note:'Хоол буцаалт ('+(slotById(slotId)?slotById(slotId).name:slotId)+')'});
+    logMove(p.id,stockQty,'kitchen',{who:meal.name,slot:slotId,date,unitPrice:p.cost||0,note:'Хоол буцаалт ('+(slotById(slotId)?slotById(slotId).name:slotId)+')'});
   });
   pl.cooked=false;
   save();renderAll();toast('Агуулах сэргээгдлээ','ok');
@@ -3852,6 +4021,24 @@ function renderReport(){
   renderStockReport(from,to);
   renderCostReport(from,to);
   renderSalesReport(from,to);
+  renderMassageCommission(from,to);
+}
+function renderMassageCommission(from,to){
+  const pctEl=document.getElementById('rpMsgCommPct'); if(!pctEl)return;
+  const pct=S.massageCommissionPercent||0;
+  pctEl.textContent=pct;
+  let revenue=0;
+  S.bookings.forEach(bk=>{
+    (bk.extras||[]).forEach(e=>{
+      if(!e._msgKey) return;                     // зөвхөн бариагаас үүссэн нэмэлт төлбөр
+      const parts=e._msgKey.split(':');           // ['msg', bkId, date, roomNum, key]
+      const d=parts[2]||'';
+      if(d>=from && d<=to) revenue+=(e.price||0)*(e.qty||1);
+    });
+  });
+  const commission=revenue*pct/100;
+  document.getElementById('rpMsgRevenue').textContent=money(revenue);
+  document.getElementById('rpMsgCommission').textContent=money(commission);
 }
 function renderSalesReport(from,to){
   const tbl=document.getElementById('rpSalesTbl'); if(!tbl)return;
@@ -4134,7 +4321,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='5.2';
+const APP_VER='5.5';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
@@ -4215,6 +4402,8 @@ loadSyncCfg();
 if(syncCfg&&syncCfg.enabled&&syncCfg.databaseURL&&typeof firebase!=='undefined'){showGate('loading');setTimeout(()=>{if(!syncFirstSnap)applyGate();},4000);}
 syncInit();setSyncStatus(syncStatus);
 if(!(syncCfg&&syncCfg.enabled))applyGate();
+// Дуусаагүй захиалгын драфт байгаа эсэхийг (гарт нээгдсэний дараа) шалгана
+setTimeout(()=>{ try{ if(currentRole()==='manager'||currentRole()==='operator') checkDraftRecovery(); }catch(e){} },600);
 </script>
 </body>
 </html>
