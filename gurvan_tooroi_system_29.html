@@ -388,8 +388,12 @@
   <section class="panel" id="massage">
     <div class="section-head">
       <div><h2>Барианы төлөвлөгөө</h2><div class="desc">Зочин бүрийн өдрийн төлөвлөгөө. «✓ Хийсэн» тэмдэглэхэд төлбөр нэхэмжлэлд нэмэгдэнэ.</div></div>
-      <button class="btn btn-berry btn-sm" onclick="confirmAutoPlan()">🎯 Автомат төлөвлөгөө</button>
+      <div class="row" style="gap:6px">
+        <button class="btn btn-primary btn-sm" onclick="openAddExtraMassage()">➕ Нэмэлт үйлчилгээ нэмэх</button>
+        <button class="btn btn-berry btn-sm" onclick="confirmAutoPlan()">🎯 Автомат төлөвлөгөө</button>
+      </div>
     </div>
+    <div class="card" style="padding:14px;margin-bottom:18px" id="msgCommissionBox"></div>
     <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">📅 Календарь — өдөр дарж төлөвлөгөө, хийгдсэн/дутууг харна</h3>
     <div class="card" style="padding:14px;max-width:420px;margin-bottom:20px"><div id="msgMiniCal"></div></div>
     <div class="calbar">
@@ -610,7 +614,10 @@
    энэ бүтэц дээр нэмэгдэнэ (assets, kitchen г.м).
    ============================================================ */
 const KEY='gt_system_v1';
-const DEFAULT_TPL=`урьдчилгаа 50% {урьдчилгаа} шилжүүлээд баталгаажуулна.
+const DEFAULT_TPL=`Үнийн задаргаа:
+{задаргаа}
+
+урьдчилгаа 50% {урьдчилгаа} шилжүүлээд баталгаажуулна.
 Данс: {данс}
 Утга: Утасны дугаар, ирэх он сар
 
@@ -786,6 +793,10 @@ function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):defaults
   S.purchases=S.purchases||[];
   S.roomAssets=S.roomAssets||{};
   S.massageCommissionPercent=S.massageCommissionPercent||0;
+  // Хуучин хадгалсан загварт {задаргаа} байхгүй бол автоматаар нэмнэ (нэг удаа)
+  if(S.template && S.template.indexOf('{задаргаа}')===-1){
+    S.template='Үнийн задаргаа:\n{задаргаа}\n\n'+S.template;
+  }
   S.mealSlots=S.mealSlots||[
     {id:'breakfast',name:'Өглөөний цай',start:'08:30',end:'09:30'},
     {id:'lunch',name:'Өдрийн хоол',start:'13:00',end:'13:30'},
@@ -886,6 +897,17 @@ function normOv(v){
 }
 function rCheckIn(bk,r){ return r.checkIn || bk.checkIn; }
 function rNights(bk,r){ return (r.nights!=null && +r.nights>0) ? +r.nights : bk.nights; }
+// Захиалгын бодит эхлэх/дуусах огноо — өрөө сольсон (олон мөр, өөр огноотой) тохиолдлыг тооцно
+function bookingCheckinDate(bk){
+  let minIn=bk.checkIn;
+  (bk.rooms||[]).forEach(r=>{ const ci=rCheckIn(bk,r); if(ci<minIn) minIn=ci; });
+  return minIn;
+}
+function bookingCheckoutDate(bk){
+  let maxOut=addDays(bk.checkIn,bk.nights);
+  (bk.rooms||[]).forEach(r=>{ const out=addDays(rCheckIn(bk,r),rNights(bk,r)); if(out>maxOut) maxOut=out; });
+  return maxOut;
+}
 function effectiveRoomsForNight(bk,i){
   if(bk.rooms.length!==1) return bk.rooms.map(r=>+r.num);
   const ov=normOv((bk.nightOverrides||[])[i]);
@@ -1588,6 +1610,32 @@ function delBooking(id){
 function confirmDel(id){S.bookings=S.bookings.filter(b=>b.id!==id);save();closeModal();renderAll();toast('Устгагдлаа');}
 
 /* ---- message ---- */
+// Хүн тус бүрийн үнийн задаргаа (олон хоногоор нэгтгэсэн)
+function messageBreakdown(bk){
+  const acc={};
+  (bk.rooms||[]).forEach(r=>{
+    const ci=rCheckIn(bk,r), n=rNights(bk,r);
+    for(let i=0;i<n;i++){
+      const d=addDays(ci,i);
+      const rp=roomPricing(r,d);
+      (rp.lines||[]).forEach(l=>{
+        const key=l.label;
+        if(!acc[key]) acc[key]={label:l.label,total:0};
+        acc[key].total+=l.sum;
+      });
+    }
+  });
+  return Object.values(acc);
+}
+function breakdownText(bk){
+  const lines=messageBreakdown(bk);
+  if(!lines.length) return '';
+  const t=bookingTotals(bk);
+  let txt=lines.map(l=>l.label+': '+money(l.total)).join('\n');
+  if(t.discountPct>0) txt+='\nХямдрал ('+t.discountPct+'%): −'+money(t.discountAmt);
+  txt+='\nНийт: '+money(t.grand);
+  return txt;
+}
 function buildMessage(bk){
   const acc=accById(bk.prepay?.accountId)||S.accounts[0]||{name:'',num:''};
   const prep=bk.prepay?.amount||prepaySuggest(bk);
@@ -1597,7 +1645,8 @@ function buildMessage(bk){
     .replace('{ирэхцаг}',bk.arriveTime||'12:00')
     .replace('{гарахцаг}',bk.leaveTime||'11:00')
     .replace('{мэдэгдэх}',S.fees.noticeDays)
-    .replace('{цуцлалт}',money(S.fees.cancel));
+    .replace('{цуцлалт}',money(S.fees.cancel))
+    .replace('{задаргаа}',breakdownText(bk));
 }
 function showMessage(id){
   const bk=S.bookings.find(b=>b.id===id);
@@ -1616,10 +1665,10 @@ function markSent(id){const bk=S.bookings.find(b=>b.id===id);bk.msgSentAt=new Da
 function renderReminders(){
   const now=Date.now();const today=todayStr();
   const unpaid24=S.bookings.filter(b=>b.status!=='cancelled'&&b.msgSentAt&&!(b.prepay&&b.prepay.received)&&(now-new Date(b.msgSentAt))>864e5);
-  const arrivals=S.bookings.filter(b=>b.status!=='cancelled'&&b.checkIn===today);
-  const departures=S.bookings.filter(b=>b.status!=='cancelled'&&addDays(b.checkIn,b.nights)===today);
+  const arrivals=S.bookings.filter(b=>b.status!=='cancelled'&&bookingCheckinDate(b)===today);
+  const departures=S.bookings.filter(b=>b.status!=='cancelled'&&bookingCheckoutDate(b)===today);
   const pending=S.bookings.filter(b=>b.status==='pending'&&!b.msgSentAt);
-  const overdueUnpaid=S.bookings.filter(b=>b.status!=='cancelled'&&addDays(b.checkIn,b.nights)<today&&bookingTotals(b).balance>0);
+  const overdueUnpaid=S.bookings.filter(b=>b.status!=='cancelled'&&bookingCheckoutDate(b)<today&&bookingTotals(b).balance>0);
   let h='';
   if(overdueUnpaid.length)h+=`<div class="rcard warn"><div class="rt">🔴 Гарсан ч төлбөр дутуу</div><div class="rv">${overdueUnpaid.map(b=>`<a href="#" onclick="openDetail('${b.id}');return false" style="color:inherit;text-decoration:underline">${b.phone} (${money(bookingTotals(b).balance)})</a>`).join(', ')}</div></div>`;
   if(unpaid24.length)h+=`<div class="rcard warn"><div class="rt">⏰ 24 цаг өнгөрсөн — урьдчилгаа хүлээгдэж буй</div><div class="rv">${unpaid24.map(b=>b.phone).join(', ')}</div></div>`;
@@ -1827,7 +1876,7 @@ function renderSettings(){
 
     <div class="card set-sec">
       <h3>✉️ Баталгаажуулах мессежийн загвар</h3>
-      <div class="hint" style="margin-bottom:8px">Талбарууд: {урьдчилгаа} {данс} {ирэхцаг} {гарахцаг} {мэдэгдэх} {цуцлалт}</div>
+      <div class="hint" style="margin-bottom:8px">Талбарууд: {урьдчилгаа} {данс} {ирэхцаг} {гарахцаг} {мэдэгдэх} {цуцлалт} {задаргаа}<br><b>{задаргаа}</b> — хүн тус бүрийн үнийн задаргаа (жиш. «Хүүхэд 7 нас: 65,000₮», «Нийт: ...»)</div>
       <textarea id="s_tpl" style="min-height:220px">${S.template}</textarea>
       <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="saveTemplate()">Хадгалах</button>
     </div>
@@ -2676,10 +2725,91 @@ function renderMassageMiniCal(){
 }
 function msgCalStep(d){const [y,m]=msgCalYM.split('-').map(Number);const nd=new Date(y,m-1+d,1);msgCalYM=nd.getFullYear()+'-'+pad(nd.getMonth()+1);renderMassageMiniCal();}
 
+/* ---- Нэмэлт (billable) барианы үйлчилгээ бариачаас өөрөө нэмэх ---- */
+let exmDraft=null;
+function openAddExtraMassage(){
+  const svcs=(S.massageServices||[]).filter(s=>s.billable);
+  if(!svcs.length){toast('Нэмэлт төлбөртэй үйлчилгээ тохируулаагүй байна (Тохиргоо)','err');return;}
+  if(!S.therapists||!S.therapists.length){toast('Эхлээд Тохиргоонд бариачаа бүртгэнэ үү','err');return;}
+  exmDraft={date:todayStr(),roomTarget:'',svcId:svcs[0].id,therapistId:S.therapists[0].id,note:''};
+  renderAddExtraMassage();
+}
+function renderAddExtraMassage(){
+  const svcs=(S.massageServices||[]).filter(s=>s.billable);
+  const {roomTargets}=saleTargets(exmDraft.date);
+  const occupied=roomTargets.filter(t=>t.bookingId);
+  openModal('➕ Нэмэлт барианы үйлчилгээ',
+    `<div class="form-grid">
+      <div><label class="field">Огноо</label><input type="date" value="${exmDraft.date}" onchange="exmDraft.date=this.value;renderAddExtraMassage()"></div>
+      <div><label class="field">Өрөө (зочин) *</label>
+        <select id="exm_room" onchange="exmDraft.roomTarget=this.value">
+          <option value="">— сонгох —</option>
+          ${occupied.map(t=>`<option value="${t.num}:${t.bookingId}" ${exmDraft.roomTarget===t.num+':'+t.bookingId?'selected':''}>${t.label}</option>`).join('')}
+        </select></div>
+      <div><label class="field">Үйлчилгээ *</label>
+        <select id="exm_svc" onchange="exmDraft.svcId=this.value">
+          ${svcs.map(s=>`<option value="${s.id}" ${exmDraft.svcId===s.id?'selected':''}>${s.name} · ${money(s.price)}</option>`).join('')}
+        </select></div>
+      <div><label class="field">Хийсэн бариач *</label>
+        <select id="exm_th" onchange="exmDraft.therapistId=this.value">
+          ${S.therapists.map(t=>`<option value="${t.id}" ${exmDraft.therapistId===t.id?'selected':''}>${t.name}</option>`).join('')}
+        </select></div>
+      <div style="grid-column:1/-1"><label class="field">Тэмдэглэл</label><input id="exm_note" value="${exmDraft.note||''}" placeholder="ж: Аав, Ээж, том хүн 2-р ор" onchange="exmDraft.note=this.value"></div>
+    </div>
+    ${!occupied.length?'<div class="hint" style="color:var(--red);margin-top:8px">Энэ өдөр байрлаж буй зочин алга.</div>':''}`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="confirmAddExtraMassage()">Нэмэх</button>`);
+}
+function confirmAddExtraMassage(){
+  if(!exmDraft.roomTarget){toast('Өрөө сонгоно уу','err');return;}
+  const svc=(S.massageServices||[]).find(s=>s.id===exmDraft.svcId); if(!svc)return;
+  const th=thById(exmDraft.therapistId); if(!th)return;
+  const [roomNum,bookingId]=exmDraft.roomTarget.split(':');
+  const bk=S.bookings.find(b=>b.id===bookingId); if(!bk)return;
+  bk.extras=bk.extras||[];
+  const note=(document.getElementById('exm_note')?document.getElementById('exm_note').value:exmDraft.note||'').trim();
+  bk.extras.push({
+    name:svc.name+(note?' ('+note+')':''),
+    price:svc.price||0, qty:1,
+    _msgKey:'msg:'+bk.id+':'+exmDraft.date+':'+roomNum+':exm_'+uid('x'),
+    therapistId:th.id, note, svcId:svc.id
+  });
+  save();renderAll();closeModal();
+  toast('Нэмэгдлээ ✓ '+svc.name+' — '+money(svc.price)+' ('+th.name+')','ok');
+}
+/* ---- Бариачийн орлого/хувийн тайлан (Бариа таб дотор, ил тод) ---- */
+function renderMsgCommissionBox(){
+  const box=document.getElementById('msgCommissionBox'); if(!box)return;
+  if(!S.therapists||!S.therapists.length){box.innerHTML='';return;}
+  const pct=S.massageCommissionPercent||0;
+  const byTh={};
+  S.therapists.forEach(t=>byTh[t.id]={name:t.name,revenue:0});
+  S.bookings.forEach(bk=>{
+    (bk.extras||[]).forEach(e=>{
+      if(!e._msgKey||!e.therapistId) return;
+      if(byTh[e.therapistId]) byTh[e.therapistId].revenue+=(e.price||0)*(e.qty||1);
+    });
+  });
+  const rows=Object.values(byTh);
+  const totalRev=rows.reduce((s,r)=>s+r.revenue,0);
+  box.innerHTML=`<div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+      <h3 style="font-size:14px;color:var(--navy);margin:0">💰 Бариачдын нэмэлт орлого (бүх цаг)</h3>
+      <span style="font-size:11.5px;color:var(--muted)">Хувь: ${pct}%</span>
+    </div>
+    <div class="msum">
+      ${rows.map(r=>`<div class="card">
+        <div class="v" style="color:var(--navy);font-size:16px">${money(r.revenue)}</div>
+        <div class="l">${r.name} — нийт хийсэн</div>
+        <div style="margin-top:4px;font-weight:700;color:var(--berry)">${money(Math.round(r.revenue*pct/100))}<span style="font-weight:400;color:var(--muted);font-size:10.5px"> хувь</span></div>
+      </div>`).join('')}
+    </div>
+    ${totalRev===0?'<div class="hint" style="margin-top:8px">Одоогоор нэмэлт үйлчилгээ бүртгэгдээгүй.</div>':''}`;
+}
 function renderMassage(){
   renderMassageSummary();
   renderMassageGrid();
   renderMassageMiniCal();
+  renderMsgCommissionBox();
 }
 
 /* ============================================================ INVENTORY (Хөргөгчний бараа) */
@@ -4316,24 +4446,36 @@ function savePins(){
   if(S.pins[role]) setUnlocked(role,S.pins[role]);
   save();renderSettings();toast('Код хадгалагдлаа ✓','ok');
 }
-function copyBariaLink(){
-  const el=document.getElementById('bariaLink');if(!el)return;
+function copyLinkFrom(elId){
+  const el=document.getElementById(elId); if(!el) return;
   const v=el.value;
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(v).then(()=>toast('Хууллаа ✓','ok'),()=>toast('Хуулж чадсангүй','err'));}
-  else{try{el.select();document.execCommand('copy');toast('Хууллаа ✓','ok');}catch(e){toast('Хуулж чадсангүй','err');}}
+  const done=(ok)=>toast(ok?'Хууллаа ✓':'Хуулж чадсангүй',ok?'ok':'err');
+  const showManualCopy=()=>{
+    openModal('🔗 Линк',
+      `<div class="hint" style="margin-bottom:10px">Автоматаар хуулж чадсангүй. Доорх талбар дээр дарж бүгдийг сонгоод, гараар хуулна уу (удаан дарж «Copy» сонгоно).</div>
+       <input id="manualCopyLink" readonly value="${v}" style="width:100%;font-family:monospace;font-size:12px;padding:10px" onclick="this.select();this.setSelectionRange(0,9999)">`,
+      `<button class="btn btn-primary" onclick="closeModal()">Хаах</button>`);
+    setTimeout(()=>{ const m=document.getElementById('manualCopyLink'); if(m){m.focus();m.select();m.setSelectionRange(0,9999);} },50);
+  };
+  const fallbackCopy=()=>{
+    try{
+      el.removeAttribute('readonly');
+      el.focus();el.select();
+      if(el.setSelectionRange) el.setSelectionRange(0,99999); // iOS
+      const ok=document.execCommand && document.execCommand('copy');
+      el.setAttribute('readonly','readonly');
+      if(ok) done(true); else showManualCopy();
+    }catch(e){ showManualCopy(); }
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(v).then(()=>done(true), fallbackCopy);
+  } else {
+    fallbackCopy();
+  }
 }
-function copyOperatorLink(){
-  const el=document.getElementById('operatorLink');if(!el)return;
-  const v=el.value;
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(v).then(()=>toast('Хууллаа ✓','ok'),()=>toast('Хуулж чадсангүй','err'));}
-  else{try{el.select();document.execCommand('copy');toast('Хууллаа ✓','ok');}catch(e){toast('Хуулж чадсангүй','err');}}
-}
-function copyCookLink(){
-  const el=document.getElementById('cookLink');if(!el)return;
-  const v=el.value;
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(v).then(()=>toast('Хууллаа ✓','ok'),()=>toast('Хуулж чадсангүй','err'));}
-  else{try{el.select();document.execCommand('copy');toast('Хууллаа ✓','ok');}catch(e){toast('Хуулж чадсангүй','err');}}
-}
+function copyBariaLink(){ copyLinkFrom('bariaLink'); }
+function copyOperatorLink(){ copyLinkFrom('operatorLink'); }
+function copyCookLink(){ copyLinkFrom('cookLink'); }
 function openSyncSetup(){
   const c=loadSyncCfg()||{};
   const url=c.databaseURL||'https://gurvan-tooroi-default-rtdb.firebaseio.com';
@@ -4398,7 +4540,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='5.7';
+const APP_VER='6.1';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
