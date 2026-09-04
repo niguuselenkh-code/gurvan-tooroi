@@ -469,6 +469,22 @@
     </div>
     <div class="search" style="margin-bottom:12px"><input id="stockSearch" placeholder="🔍 Бараа хайх..." oninput="renderStock()"></div>
     <div id="stockSummary" style="margin-bottom:14px"></div>
+
+    <div class="card" style="padding:16px;margin-bottom:16px">
+      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+        <h3 style="font-size:15px;color:var(--navy);margin:0">📏 Норм хяналт</h3>
+        <div class="row" style="gap:6px;flex-wrap:wrap">
+          <input type="date" id="norm_from" style="width:auto" onchange="renderNormMonitor()">
+          <input type="date" id="norm_to" style="width:auto" onchange="renderNormMonitor()">
+          <button class="btn btn-ghost btn-sm" onclick="setNormRange('7')">Сүүлийн 7 хоног</button>
+          <button class="btn btn-ghost btn-sm" onclick="setNormRange('month')">Сүүлийн 1 сар</button>
+          <button class="btn btn-ghost btn-sm" onclick="setNormRange('3month')">Сүүлийн 3 сар</button>
+        </div>
+      </div>
+      <div class="hint" style="margin-bottom:10px">Хогийн уут, шил арчигч, ариутгалын бодис зэрэг нормтой барааны хэрэглээг байх ёстой хэмжээтэй харьцуулна.</div>
+      <div style="overflow-x:auto"><table class="mini-tbl" id="normMonitorTbl"></table></div>
+    </div>
+
     <div id="stockBody"></div>
   </section>
 
@@ -489,6 +505,7 @@
           <button class="btn btn-ghost btn-sm" onclick="mealDay=todayStr();renderMeals()">Өнөөдөр</button>
         </div>
       </div>
+      <div id="mealCookRow" style="margin-bottom:10px"></div>
       <div id="mealDayBox"></div>
     </div>
 
@@ -508,6 +525,12 @@
         <div class="card"><div class="v" id="mc_rem">0₮</div><div class="l">Үлдэгдэл (үнээр)</div></div>
       </div>
       <div style="overflow-x:auto"><table class="mini-tbl" id="mealCostTbl"></table></div>
+    </div>
+
+    <div class="card" style="padding:16px;margin-bottom:18px">
+      <h3 style="font-size:15px;color:var(--navy);margin:0 0 6px">🍳 Тогоочдын харьцуулалт</h3>
+      <div class="hint" style="margin-bottom:10px">Дээрх огнооны хугацаанд тогооч тус бүрийн зарцуулсан хүнсний өртөг ба тухайн өдрүүдийн зочид+хүн хоолны тоотой харьцуулна. 1 хүнд ногдох зардал бага байх нь хэмнэлттэй, өндөр байх нь илүү зарцуулж байгааг илтгэнэ.</div>
+      <div style="overflow-x:auto"><table class="mini-tbl" id="cookCompareTbl"></table></div>
     </div>
 
     <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">🍽 Хоолны цэс</h3>
@@ -681,6 +704,7 @@ function defaults(){return{
   marketPrices:{},
   staff:[],
   massageCommissionPercent:0,
+  cookShifts:[],
   purchases:[],
   roomAssets:{},
   mealSlots:[
@@ -793,6 +817,7 @@ function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):defaults
   S.purchases=S.purchases||[];
   S.roomAssets=S.roomAssets||{};
   S.massageCommissionPercent=S.massageCommissionPercent||0;
+  S.cookShifts=S.cookShifts||[];
   // Хуучин хадгалсан загварт {задаргаа} байхгүй бол автоматаар нэмнэ (нэг удаа)
   if(S.template && S.template.indexOf('{задаргаа}')===-1){
     S.template='Үнийн задаргаа:\n{задаргаа}\n\n'+S.template;
@@ -886,6 +911,7 @@ document.querySelectorAll('nav.tabs button').forEach(b=>{b.onclick=()=>{
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active');
+  if(b.dataset.tab==='cal') calScrollPending=true;
   renderAll();
 };});
 
@@ -1610,7 +1636,7 @@ function delBooking(id){
 function confirmDel(id){S.bookings=S.bookings.filter(b=>b.id!==id);save();closeModal();renderAll();toast('Устгагдлаа');}
 
 /* ---- message ---- */
-// Хүн тус бүрийн үнийн задаргаа (олон хоногоор нэгтгэсэн)
+// Хүн тус бүрийн үнийн задаргаа (тоо × үнэ × хоног = дүн)
 function messageBreakdown(bk){
   const acc={};
   (bk.rooms||[]).forEach(r=>{
@@ -1620,20 +1646,31 @@ function messageBreakdown(bk){
       const rp=roomPricing(r,d);
       (rp.lines||[]).forEach(l=>{
         const key=l.label;
-        if(!acc[key]) acc[key]={label:l.label,total:0};
+        if(!acc[key]) acc[key]={label:l.label,qty:l.qty,each:l.each,count:0,total:0};
+        acc[key].count+=1;
         acc[key].total+=l.sum;
       });
     }
   });
   return Object.values(acc);
 }
+// "N том хүн (тус бүр ...)" → "N том хүн" — үнийн тайлбарыг зайлуулж, тусад нь X×Y×Z гэж харуулна
+function stripPriceParen(label){
+  return label.replace(/\s*\((тус бүр[^)]*|ганц хүн[^)]*|тусгай[^)]*)\)\s*$/,'');
+}
 function breakdownText(bk){
   const lines=messageBreakdown(bk);
   if(!lines.length) return '';
+  const ci=bookingCheckinDate(bk), co=bookingCheckoutDate(bk);
+  const totalNights=daysBetween(ci,co);
+  let txt='Огноо: '+fmtD(ci)+' - '+fmtD(co)+' ('+totalNights+' хоног)\n\n';
+  txt+=lines.map(l=>{
+    const base=stripPriceParen(l.label);
+    return base+' × '+money(l.each)+' × '+l.count+'хоног = '+money(l.total);
+  }).join('\n');
   const t=bookingTotals(bk);
-  let txt=lines.map(l=>l.label+': '+money(l.total)).join('\n');
   if(t.discountPct>0) txt+='\nХямдрал ('+t.discountPct+'%): −'+money(t.discountAmt);
-  txt+='\nНийт: '+money(t.grand);
+  txt+='\n\nНийт: '+money(t.grand);
   return txt;
 }
 function buildMessage(bk){
@@ -1706,6 +1743,7 @@ function dayGuestCounts(date){
   });
   return {a,c,bantan,norm,nofood};
 }
+let calScrollPending=true; // Зөвхөн таб нээх/сар солиход л өнөөдөр рүү гүйлгэнэ, бусад дахин зурахад биш
 function renderCalendar(){
   if(!calYM){const d=new Date();calYM=d.getFullYear()+'-'+pad(d.getMonth()+1);}
   const [y,m]=calYM.split('-').map(Number);
@@ -1715,7 +1753,8 @@ function renderCalendar(){
   const isMobileView = (typeof window!=='undefined' && window.innerWidth && window.innerWidth<=720);
   let head=`<thead><tr><th class="corner">${isMobileView?'№':'Өрөө'}</th>`;
   for(let d=1;d<=dim;d++){const dow=new Date(y,m-1,d).getDay();const we=dow===0||dow===6;
-    head+=`<th class="${we?'we':''}">${d}<div style="font-size:9px;font-weight:500">${WK[dow]}</div></th>`;}
+    const dayStr=y+'-'+pad(m)+'-'+pad(d);
+    head+=`<th class="${we?'we':''}" data-day="${dayStr}">${d}<div style="font-size:9px;font-weight:500">${WK[dow]}</div></th>`;}
   head+='</tr></thead>';
   let bodyH='<tbody>';
   let lastGrp='';
@@ -1732,8 +1771,17 @@ function renderCalendar(){
         const isSegStart = idx===0 || !effectiveRoomsForNight(bk,idx-1).includes(+room.num);
         const bt=bookingTotals(bk);
         const refundFlag=bt.overpaid>0?'<span class="rf-flag" title="Буцаах төлбөртэй">Б</span>':'';
-        const label=isSegStart?(bk.name||bk.phone):'';
-        bodyH+=`<td class="cell" data-bk="${bk.id}" title="${bk.phone}${bk.name?' · '+bk.name:''} · ${bk.nights}хон${bt.overpaid>0?' · ⚠️буцаах '+money(bt.overpaid):''}">
+        let label='';
+        if(isSegStart){
+          const rr=bk.rooms.find(x=>+x.num===+room.num)||bk.rooms[0];
+          const occ=roomOccupancyOn(rr,day);
+          const adultsTot=occ.adults+occ.children.filter(k=>k.adultPriced).length;
+          const kidsTot=occ.children.filter(k=>!k.adultPriced).length;
+          const occLabel=adultsTot+'Т'+(kidsTot?kidsTot+'Х':'');
+          const phone3=(bk.phone||'').slice(0,3);
+          label=(phone3?phone3+' ':'')+occLabel;
+        }
+        bodyH+=`<td class="cell" data-bk="${bk.id}" title="${bk.phone} · ${bk.nights}хон${bt.overpaid>0?' · ⚠️буцаах '+money(bt.overpaid):''}">
           <div class="occ ${bt.fullyPaid?'full':bk.status==='confirmed'?'conf':'pend'} ${isSegStart?'start':''}">${isSegStart?refundFlag:''}${isSegStart?label:''}</div></td>`;
       } else {
         bodyH+=`<td class="cell" data-new="${room.num}|${day}"></td>`;
@@ -1760,6 +1808,12 @@ function renderCalendar(){
   foot+='</tfoot>';
   const tbl=document.getElementById('calTable');
   tbl.innerHTML=head+bodyH+foot;
+  // Өнөөдрийг агуулсан сар бол, зөвхөн таб нээх/сар солиход л өнөөдөр рүү автоматаар гүйлгэнэ
+  if(calScrollPending && calYM===today.slice(0,7)){
+    calScrollPending=false;
+    const todayCell=tbl.querySelector('thead th[data-day="'+today+'"]');
+    if(todayCell){ setTimeout(()=>{ try{ todayCell.scrollIntoView({inline:'center',block:'nearest'}); }catch(e){} },0); }
+  }
   tbl.querySelectorAll('td.cell').forEach(td=>{
     td.onclick=()=>{
       if(td.dataset.bk){openDetail(td.dataset.bk);}
@@ -1769,7 +1823,7 @@ function renderCalendar(){
 }
 document.getElementById('prevM').onclick=()=>{const[y,m]=calYM.split('-').map(Number);const d=new Date(y,m-2,1);calYM=d.getFullYear()+'-'+pad(d.getMonth()+1);renderCalendar();};
 document.getElementById('nextM').onclick=()=>{const[y,m]=calYM.split('-').map(Number);const d=new Date(y,m,1);calYM=d.getFullYear()+'-'+pad(d.getMonth()+1);renderCalendar();};
-document.getElementById('todayM').onclick=()=>{const d=new Date();calYM=d.getFullYear()+'-'+pad(d.getMonth()+1);renderCalendar();};
+document.getElementById('todayM').onclick=()=>{const d=new Date();calYM=d.getFullYear()+'-'+pad(d.getMonth()+1);calScrollPending=true;renderCalendar();};
 
 /* ============================================================ LIST */
 function renderList(){
@@ -2774,6 +2828,13 @@ function confirmAddExtraMassage(){
     _msgKey:'msg:'+bk.id+':'+exmDraft.date+':'+roomNum+':exm_'+uid('x'),
     therapistId:th.id, note, svcId:svc.id
   });
+  // Үйлчилгээтэй холбоотой бараа материал (жиш. тос) байвал агуулахаас автоматаар хасна
+  (svc.norms||[]).forEach(nm=>{
+    const p=S.products.find(x=>x.id===nm.productId); if(!p)return;
+    const q=nm.qty||0; if(q<=0)return;
+    p.stock-=q;
+    logMove(p.id,-q,'massage',{date:exmDraft.date,who:svc.name+' (№'+roomNum+')',note:'Нэмэлт бариа — '+th.name});
+  });
   save();renderAll();closeModal();
   toast('Нэмэгдлээ ✓ '+svc.name+' — '+money(svc.price)+' ('+th.name+')','ok');
 }
@@ -2841,6 +2902,8 @@ function productForm(p,defGroup){
   const g=p?(p.group||'goods'):(defGroup||'goods');
   const isSale=SALE_GROUPS.includes(g);
   const isAsset=g==='asset';
+  const showUsageNorm=!isSale&&!isAsset&&g!=='food'; // ахуй/бариа/барилга — хэрэглээний норм тохируулна
+  const normType=p?(p.normType||'none'):'none';
   return `<div class="form-grid">
     <div style="grid-column:1/-1"><label class="field">Бүлэг *</label>
       <select id="p_group" onchange="reopenProductForm(this.value)">
@@ -2859,18 +2922,40 @@ function productForm(p,defGroup){
     ${isSale
       ? `<div><label class="field">Зарах үнэ (₮) *</label><input id="p_price" type="number" min="0" value="${p?p.price:''}"></div>`
       : `<input id="p_price" type="hidden" value="${p?p.price||0:0}">
-         <div><label class="field">Орцын нэгж</label><input id="p_runit" value="${p?p.recipeUnit||'':''}" placeholder="гр / мл (хоосон=ижил)"><div class="hint" style="font-size:10.5px">Хоолны жорд ингэж бичдэг</div></div>
-         <div style="grid-column:1/-1"><label class="field">Хөрвүүлэлт: 1 ${p?p.unit||'нэгж':'нэгж'} = ? орцын нэгж</label><input id="p_conv" type="number" min="0" step="any" value="${p?(p.convFactor||''):''}" placeholder="ж: кг→гр бол 1000"><div class="hint" style="font-size:10.5px">Хоосон бол автоматаар (кг=1000гр, л=1000мл), ижил нэгж бол 1</div></div>`}
+         <div><label class="field">Орцын/хэрэглээний нэгж</label><input id="p_runit" value="${p?p.recipeUnit||'':''}" placeholder="гр / мл / ш (хоосон=ижил)"><div class="hint" style="font-size:10.5px">Жиш. хогийн уут: хадгалах «боодол», хэрэглэх «ширхэг»</div></div>
+         <div style="grid-column:1/-1"><label class="field">Хөрвүүлэлт: 1 ${p?p.unit||'нэгж':'нэгж'} = ? хэрэглээний нэгж</label><input id="p_conv" type="number" min="0" step="any" value="${p?(p.convFactor||''):''}" placeholder="ж: 1 боодол = 30 ширхэг"><div class="hint" style="font-size:10.5px">Хоосон бол автоматаар (кг=1000гр, л=1000мл), ижил бол 1</div></div>`}
     <div><label class="field">${isAsset?'Тоо ширхэг':'Үлдэгдэл'} *</label><input id="p_stock" type="number" min="0" step="any" value="${p?p.stock:''}"></div>
     ${isAsset
       ? `<input id="p_min" type="hidden" value="0">`
       : `<div><label class="field">Доод хязгаар</label><input id="p_min" type="number" min="0" step="any" value="${p?(p.minStock??5):5}"><div class="hint" style="font-size:10.5px">Үүнээс бага бол "дуусаж байна"</div></div>`}
-  </div>`;
+  </div>
+  ${showUsageNorm?`
+  <div class="rcard" style="border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-top:14px;background:var(--soft)">
+    <div style="font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:8px">📏 Хэрэглээний норм (заавал биш)</div>
+    <label class="field">Нормын төрөл</label>
+    <select id="p_normtype" onchange="reopenProductForm(document.getElementById('p_group').value)">
+      <option value="none" ${normType==='none'?'selected':''}>Байхгүй</option>
+      <option value="duration" ${normType==='duration'?'selected':''}>Удаан хугацаа (1 ширхэг X-Y өдөр хүрэх ёстой)</option>
+      <option value="perRoom" ${normType==='perRoom'?'selected':''}>Идэвхтэй өрөөний тоогоор (1 өрөөнд X ш/өдөр)</option>
+      <option value="fixedDaily" ${normType==='fixedDaily'?'selected':''}>Тогтмол өдөрт (X ш/өдөр, ж: гал тогооны хогийн уут)</option>
+    </select>
+    ${normType==='duration'?`
+      <div class="form-grid" style="margin-top:8px">
+        <div><label class="field">Доод хязгаар (өдөр)</label><input id="p_normmin" type="number" min="0" value="${p?(p.normMinDays||''):''}" placeholder="ж: 20"></div>
+        <div><label class="field">Дээд хязгаар (өдөр)</label><input id="p_normmax" type="number" min="0" value="${p?(p.normMaxDays||''):''}" placeholder="ж: 30"></div>
+      </div>` : ''}
+    ${normType==='perRoom'?`
+      <div style="margin-top:8px"><label class="field">1 идэвхтэй өрөөнд өдөрт (ширхэг)</label><input id="p_normperroom" type="number" min="0" step="any" value="${p?(p.normPerRoom||''):''}" placeholder="ж: 2"></div>` : ''}
+    ${normType==='fixedDaily'?`
+      <div style="margin-top:8px"><label class="field">Өдөрт тогтмол (ширхэг)</label><input id="p_normfixed" type="number" min="0" step="any" value="${p?(p.normFixedQty||''):''}" placeholder="ж: 1"></div>` : ''}
+  </div>`:''}`;
 }
 let _pmEditId=null;
 function reopenProductForm(g){
-  const cur={name:val('p_name'),cat:val('p_cat'),unit:val('p_unit'),cost:val('p_cost'),price:val('p_price'),stock:val('p_stock'),norm:val('p_norm'),min:val('p_min'),runit:val('p_runit'),conv:val('p_conv')};
-  const tmp={group:g,name:cur.name,category:cur.cat,unit:cur.unit,cost:+cur.cost||0,price:+cur.price||0,stock:+cur.stock||0,norm:+cur.norm||0,minStock:+cur.min||0,recipeUnit:cur.runit,convFactor:+cur.conv||0};
+  const cur={name:val('p_name'),cat:val('p_cat'),unit:val('p_unit'),cost:val('p_cost'),price:val('p_price'),stock:val('p_stock'),norm:val('p_norm'),min:val('p_min'),runit:val('p_runit'),conv:val('p_conv'),
+    normType:val('p_normtype')||'none',normMin:val('p_normmin'),normMax:val('p_normmax'),normPerRoom:val('p_normperroom'),normFixed:val('p_normfixed')};
+  const tmp={group:g,name:cur.name,category:cur.cat,unit:cur.unit,cost:+cur.cost||0,price:+cur.price||0,stock:+cur.stock||0,norm:+cur.norm||0,minStock:+cur.min||0,recipeUnit:cur.runit,convFactor:+cur.conv||0,
+    normType:cur.normType,normMinDays:+cur.normMin||0,normMaxDays:+cur.normMax||0,normPerRoom:+cur.normPerRoom||0,normFixedQty:+cur.normFixed||0};
   document.getElementById('modalBody').innerHTML=productForm(tmp,g);
 }
 function val(id){const e=document.getElementById(id);return e?e.value:'';}
@@ -2883,7 +2968,7 @@ function openProductModal(id,defGroup){
 function logMove(productId,qty,type,opts){
   opts=opts||{};
   const p=S.products.find(x=>x.id===productId);
-  S.stockMoves.push({id:uid('mv'),productId,qty,type,date:opts.date||todayStr(),who:opts.who||'',note:opts.note||'',market:opts.market||'',slot:opts.slot||'',
+  S.stockMoves.push({id:uid('mv'),productId,qty,type,date:opts.date||todayStr(),who:opts.who||'',note:opts.note||'',market:opts.market||'',slot:opts.slot||'',cookId:opts.cookId||'',
     name:opts.name||(p?p.name:''),unitPrice:opts.unitPrice!=null?opts.unitPrice:(p?p.price:0),ts:new Date().toISOString()});
 }
 // Хадгалах нэгж ↔ орцын нэгж хөрвүүлэлт
@@ -2911,17 +2996,124 @@ function saveProduct(id){
   const normEl=document.getElementById('p_norm');
   const runitEl=document.getElementById('p_runit');
   const convEl=document.getElementById('p_conv');
+  const normTypeEl=document.getElementById('p_normtype');
+  const normMinEl=document.getElementById('p_normmin');
+  const normMaxEl=document.getElementById('p_normmax');
+  const normPerRoomEl=document.getElementById('p_normperroom');
+  const normFixedEl=document.getElementById('p_normfixed');
   const existing=id?S.products.find(x=>x.id===id):null;
   const data={group,name,category:document.getElementById('p_cat').value.trim()||'Бусад',unit:document.getElementById('p_unit').value.trim()||'ш',
     cost:+document.getElementById('p_cost').value||0,price,stock:+document.getElementById('p_stock').value||0,minStock:+document.getElementById('p_min').value||0,
     norm:normEl?(+normEl.value||0):(existing?existing.norm||0:0),
     recipeUnit:runitEl?runitEl.value.trim():(existing?existing.recipeUnit||'':''),
-    convFactor:convEl?(+convEl.value||0):(existing?existing.convFactor||0:0)};
+    convFactor:convEl?(+convEl.value||0):(existing?existing.convFactor||0:0),
+    normType:normTypeEl?normTypeEl.value:(existing?existing.normType||'none':'none'),
+    normMinDays:normMinEl?(+normMinEl.value||0):(existing?existing.normMinDays||0:0),
+    normMaxDays:normMaxEl?(+normMaxEl.value||0):(existing?existing.normMaxDays||0:0),
+    normPerRoom:normPerRoomEl?(+normPerRoomEl.value||0):(existing?existing.normPerRoom||0:0),
+    normFixedQty:normFixedEl?(+normFixedEl.value||0):(existing?existing.normFixedQty||0:0)};
   if(id){Object.assign(S.products.find(x=>x.id===id),data);toast('Шинэчлэгдлээ','ok');}
   else{const np={id:uid('p'),...data};S.products.push(np);if(np.stock>0)logMove(np.id,np.stock,'init',{note:'Эхний үлдэгдэл'});toast('Нэмэгдлээ','ok');}
   save();closeModal();renderAll();
 }
-/* ---- Захын үнийн жагсаалт ---- */
+/* ---- Хэрэглээний норм: "Задалсан" бүртгэл (удаан хугацааны бараа) ---- */
+function openNewUnit(productId){
+  const p=S.products.find(x=>x.id===productId); if(!p)return;
+  const today=todayStr();
+  if(p.openedAt){
+    const days=daysBetween(p.openedAt,today);
+    p.usageLog=p.usageLog||[];
+    p.usageLog.push({from:p.openedAt,to:today,days});
+  }
+  p.openedAt=today;
+  if(p.stock>0){ p.stock-=1; logMove(p.id,-1,'internal',{date:today,who:'Норм хяналт',note:'Шинэ ширхэг эхлүүлсэн'}); }
+  save();renderAll();toast('Шинэ ширхэг эхэллээ ✓ ('+p.name+')','ok');
+}
+// Тухайн өдөр идэвхтэй (зочинтой) өрөөний тоо
+function activeRoomsCount(date){ return roomsOccupiedOn(date).length; }
+/* ---- 📦 Норм хяналт (Агуулах таб) ---- */
+const NORM_LABEL={duration:'Удаан хугацаа',perRoom:'Өрөөний тоогоор',fixedDaily:'Тогтмол өдөрт'};
+function setNormRange(kind){
+  let r;
+  if(kind==='7') r={from:addDays(todayStr(),-6),to:todayStr()};
+  else if(kind==='month') r=monthRange(0);
+  else if(kind==='3month'){ r={from:addDays(todayStr(),-89),to:todayStr()}; }
+  else r={from:addDays(todayStr(),-6),to:todayStr()};
+  document.getElementById('norm_from').value=r.from;
+  document.getElementById('norm_to').value=r.to;
+  renderNormMonitor();
+}
+function renderNormMonitor(){
+  const fromEl=document.getElementById('norm_from'),toEl=document.getElementById('norm_to');
+  if(!fromEl||!toEl)return;
+  if(!fromEl.value||!toEl.value){ const r={from:addDays(todayStr(),-6),to:todayStr()}; fromEl.value=r.from; toEl.value=r.to; }
+  const from=fromEl.value,to=toEl.value;
+  const tbl=document.getElementById('normMonitorTbl'); if(!tbl)return;
+  const items=S.products.filter(p=>p.normType&&p.normType!=='none');
+  if(!items.length){tbl.innerHTML='<tbody><tr><td class="hint" style="padding:10px 0">Норм тохируулсан бараа алга. Агуулахын бараа засаж, «Хэрэглээний норм» тохируулна уу.</td></tr></tbody>';return;}
+  // Хугацааны нийт өдөр, идэвхтэй өрөө-өдрийн нийлбэр
+  const start=parseD(from), end=parseD(to);
+  let daysInRange=0, roomDaysSum=0;
+  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+    const date=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    daysInRange++;
+    roomDaysSum+=activeRoomsCount(date);
+  }
+  const rows=items.map(p=>{
+    let expected=0, actual=0, statusTxt='', statusColor='var(--muted)';
+    if(p.normType==='perRoom'){
+      expected=Math.round((p.normPerRoom||0)*roomDaysSum*100)/100;
+      actual=Math.abs(S.stockMoves.filter(m=>m.productId===p.id&&m.type!=='restock'&&m.type!=='init'&&(m.date||'')>=from&&(m.date||'')<=to&&m.qty<0).reduce((s,m)=>s+m.qty,0));
+      actual=recipeUnitToActual(p,actual);
+      const diff=actual-expected;
+      statusTxt=(diff>0?'+':'')+Math.round(diff*10)/10+' зөрүү';
+      statusColor=Math.abs(diff)>expected*0.15?'#c0392b':'var(--green)';
+    } else if(p.normType==='fixedDaily'){
+      expected=Math.round((p.normFixedQty||0)*daysInRange*100)/100;
+      actual=Math.abs(S.stockMoves.filter(m=>m.productId===p.id&&m.type!=='restock'&&m.type!=='init'&&(m.date||'')>=from&&(m.date||'')<=to&&m.qty<0).reduce((s,m)=>s+m.qty,0));
+      actual=recipeUnitToActual(p,actual);
+      const diff=actual-expected;
+      statusTxt=(diff>0?'+':'')+Math.round(diff*10)/10+' зөрүү';
+      statusColor=Math.abs(diff)>Math.max(expected*0.15,1)?'#c0392b':'var(--green)';
+    } else if(p.normType==='duration'){
+      const logs=(p.usageLog||[]).filter(l=>l.to>=from&&l.to<=to);
+      if(p.openedAt&&p.openedAt<=to){
+        const openEnd=p.openedAt<to?to:p.openedAt;
+        logs.push({from:p.openedAt,to:todayStr()<to?todayStr():to,days:daysBetween(p.openedAt,todayStr()<to?todayStr():to),ongoing:true});
+      }
+      if(!logs.length){statusTxt='Мэдээлэл алга';statusColor='var(--muted)';}
+      else{
+        const avg=Math.round(logs.reduce((s,l)=>s+l.days,0)/logs.length);
+        const min=p.normMinDays||0, max=p.normMaxDays||9999;
+        statusTxt='дундаж '+avg+' өдөр'+(logs.some(l=>l.ongoing)?' (үргэлжилж буй)':'');
+        statusColor=(avg<min)?'#c0392b':(avg>max)?'#c98a2e':'var(--green)';
+        expected=null; actual=avg;
+      }
+    }
+    return {p,expected,actual,statusTxt,statusColor};
+  });
+  tbl.innerHTML=`<thead><tr><th>Бараа</th><th>Норм</th><th>Байх ёстой</th><th>Бодит</th><th>Дүгнэлт</th><th></th></tr></thead><tbody>${
+    rows.map(r=>{
+      const p=r.p;
+      const normDesc=p.normType==='duration'?(p.normMinDays||'?')+'-'+(p.normMaxDays||'?')+' өдөр/ш'
+        :p.normType==='perRoom'?p.normPerRoom+' '+(p.recipeUnit||p.unit)+'/өрөө/өдөр'
+        :p.normFixedQty+' '+(p.recipeUnit||p.unit)+'/өдөр';
+      return `<tr>
+        <td><b>${p.name}</b><div style="font-size:10px;color:var(--muted)">${NORM_LABEL[p.normType]}</div></td>
+        <td style="font-size:11.5px">${normDesc}</td>
+        <td>${r.expected!=null?Math.round(r.expected*10)/10+' '+(p.recipeUnit||p.unit):'—'}</td>
+        <td>${p.normType==='duration'?(r.actual!=null?r.actual+' өдөр':'—'):Math.round((r.actual||0)*10)/10+' '+(p.recipeUnit||p.unit)}</td>
+        <td style="font-weight:700;color:${r.statusColor}">${r.statusTxt}</td>
+        <td>${p.normType==='duration'?`<button class="btn btn-ghost btn-sm" onclick="openNewUnit('${p.id}')">🔓 Шинэ ширхэг</button>`:''}</td>
+      </tr>`;
+    }).join('')
+  }</tbody>`;
+}
+// stockMoves-ийн хасалт нь хадгалах нэгжээр (жиш. боодол биш) байдаг тул хэрэглээний нэгж рүү хөрвүүлнэ
+function recipeUnitToActual(p,stockQtyAbs){
+  const f=convFactorOf(p);
+  return f>0?stockQtyAbs*f:stockQtyAbs;
+}
 function marketById(id){return (S.markets||[]).find(m=>m.id===id);}
 function getMarketPrice(productId,marketId){
   return (S.marketPrices[productId]&&S.marketPrices[productId][marketId])||null;
@@ -3598,11 +3790,63 @@ function renderPurchases(){
         <td style="font-size:12px">${goodsList}</td>
         <td><b>${money(p.total)}</b></td>
         <td>${stat}</td>
-        <td><div class="row" style="gap:4px">${payBtn}<button class="btn-icon" title="Устгах" onclick="delPurchase('${p.id}')">🗑</button></div></td>
+        <td><div class="row" style="gap:4px">${payBtn}<button class="btn-icon" title="Засах" onclick="editPurchase('${p.id}')">✎</button><button class="btn-icon" title="Устгах" onclick="delPurchase('${p.id}')">🗑</button></div></td>
       </tr>`;
     }).join('')}</tbody>
     <tfoot><tr style="border-top:2px solid var(--line)"><td colspan="2" style="font-weight:700">Өдрийн нийт</td><td colspan="3" style="font-weight:800;color:var(--berry)">${money(total)}</td></tr></tfoot>
   </table></div>`;
+}
+let purchEditDraft=null;
+function editPurchase(id){
+  const p=S.purchases.find(x=>x.id===id); if(!p)return;
+  purchEditDraft=JSON.parse(JSON.stringify(p));
+  renderEditPurchase();
+}
+function renderEditPurchase(){
+  const rows=purchEditDraft.lines.map((l,i)=>{
+    return `<div class="row" style="gap:6px;align-items:center;margin-bottom:6px">
+      <span style="flex:1;font-size:13px">${l.name}</span>
+      <input type="number" min="0" step="any" value="${l.qty}" style="width:64px" title="Тоо" onchange="purchEditDraft.lines[${i}].qty=parseFloat(this.value)||0;renderEditPurchase()">
+      <input type="number" min="0" value="${l.price}" style="width:90px" title="Нэгжийн үнэ" onchange="purchEditDraft.lines[${i}].price=parseInt(this.value)||0;renderEditPurchase()">
+    </div>`;
+  }).join('');
+  const total=purchEditDraft.lines.reduce((s,l)=>s+(l.price||0)*(l.qty||0),0);
+  openModal('✎ Худалдан авалт засах',
+    `<div class="hint" style="margin-bottom:8px">Тоо, үнийг өөрчлөхөд агуулах болон захиалгын төлбөрт автоматаар шинэчлэгдэнэ. Хэдийд ч засаж болно.</div>
+     <label class="field">Огноо</label><input type="date" value="${purchEditDraft.date}" onchange="purchEditDraft.date=this.value" style="margin-bottom:10px">
+     <div style="font-size:11px;color:var(--muted);display:flex;gap:6px;margin-bottom:4px"><span style="flex:1">Бараа</span><span style="width:64px">Тоо</span><span style="width:90px">Үнэ</span></div>
+     ${rows}
+     <div style="text-align:right;margin-top:10px;font-weight:700;font-size:15px">Нийт: ${money(total)}</div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="confirmEditPurchase()">Хадгалах</button>`);
+}
+function confirmEditPurchase(){
+  const p=S.purchases.find(x=>x.id===purchEditDraft.id); if(!p)return;
+  // Хуучин агуулахын хасалтыг буцаана
+  p.lines.forEach(old=>{
+    const prod=S.products.find(x=>x.id===old.productId);
+    if(prod) prod.stock+=(old.qty||0);
+  });
+  // Шинэ тоогоор дахин хасна
+  purchEditDraft.lines.forEach(nl=>{
+    const prod=S.products.find(x=>x.id===nl.productId);
+    if(prod){
+      prod.stock-=(nl.qty||0);
+      logMove(prod.id,-(nl.qty||0),'guest',{date:purchEditDraft.date,who:p.targetType==='room'?'Өрөө '+p.roomNum:'Ажилтан',note:'Худалдан авалт (засвар)'});
+    }
+  });
+  p.date=purchEditDraft.date;
+  p.lines=purchEditDraft.lines;
+  p.total=p.lines.reduce((s,l)=>s+(l.price||0)*(l.qty||0),0);
+  // Захиалгын нэмэлт төлбөрийг шинэчилнэ
+  if(p.bookingId){
+    const bk=S.bookings.find(b=>b.id===p.bookingId);
+    if(bk){
+      bk.extras=(bk.extras||[]).filter(e=>e.fromPurchase!==p.id);
+      p.lines.forEach(l=>bk.extras.push({name:l.name+' ×'+l.qty,price:(l.price||0)*(l.qty||0),qty:1,fromPurchase:p.id}));
+    }
+  }
+  save();closeModal();renderAll();toast('Худалдан авалт засагдлаа ✓','ok');
 }
 function togglePurchPaid(id){
   const p=S.purchases.find(x=>x.id===id); if(!p)return;
@@ -3794,8 +4038,68 @@ function mealById(id){return S.meals.find(m=>m.id===id);}
 
 function renderMeals(){
   renderMealDay();
+  renderMealCookRow();
   renderMealList();
   renderMealCost();
+}
+function renderMealCookRow(){
+  const box=document.getElementById('mealCookRow'); if(!box)return;
+  const cooks=(S.staff||[]);
+  if(!cooks.length){box.innerHTML='<div class="hint">Тохиргоонд тогооч (ажилтан) бүртгэнэ үү.</div>';return;}
+  const mp=S.mealPlan[mealDay]||{};
+  const auto=autoCookForDate(mealDay);
+  const isOverride=!!mp.cookId;
+  const effective=isOverride?mp.cookId:auto;
+  box.innerHTML=`<div class="row" style="align-items:center;gap:8px;background:var(--soft);padding:8px 11px;border-radius:9px;flex-wrap:wrap">
+    <span style="font-size:13px;font-weight:600;color:var(--navy)">👨‍🍳 Өнөөдрийн тогооч:</span>
+    <select onchange="setMealCook(this.value)" style="width:auto">
+      <option value="">— сонгох —</option>
+      ${cooks.map(c=>`<option value="${c.id}" ${effective===c.id?'selected':''}>${c.name}</option>`).join('')}
+    </select>
+    ${!isOverride&&auto?'<span class="pill" style="background:#e3edf7;color:#1c6ea4;font-size:10.5px">автомат (ээлжээр)</span>':''}
+    ${isOverride?`<button class="btn-icon" title="Автомат руу буцаах" onclick="resetMealCook()">↺</button>`:''}
+    <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="openStartCookShift()">🔄 Шинэ ээлж эхлэх</button>
+  </div>`;
+}
+function setMealCook(cookId){
+  const mp=ensureMealDay(mealDay);
+  mp.cookId=cookId||'';
+  save();renderMealCookRow();
+}
+function resetMealCook(){
+  const mp=ensureMealDay(mealDay);
+  mp.cookId='';
+  save();renderMealCookRow();
+}
+// Тогооч 15/15 ээлжээр автоматаар үргэлжилдэг систем
+function autoCookForDate(date){
+  const shifts=(S.cookShifts||[]).filter(s=>s.startDate<=date).sort((a,b)=>b.startDate.localeCompare(a.startDate));
+  return shifts.length?shifts[0].cookId:'';
+}
+function cookForDate(date){
+  const mp=S.mealPlan[date];
+  if(mp&&mp.cookId) return mp.cookId; // тухайн өдөр гараар сонгосон бол дарж бичнэ
+  return autoCookForDate(date);
+}
+function openStartCookShift(){
+  const cooks=S.staff||[];
+  if(!cooks.length){toast('Эхлээд Тохиргоонд тогооч бүртгэнэ үү','err');return;}
+  openModal('🔄 Шинэ ээлж эхлэх',
+    `<div class="hint" style="margin-bottom:10px">Тухайн өдрөөс эхлээд, дараагийн ээлж эхлэх хүртэл автоматаар энэ тогооч онооно.</div>
+     <div class="form-grid">
+       <div><label class="field">Тогооч *</label><select id="cs_cook">${cooks.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+       <div><label class="field">Эхлэх өдөр *</label><input type="date" id="cs_date" value="${mealDay||todayStr()}"></div>
+     </div>`,
+    `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
+     <button class="btn btn-primary" onclick="confirmStartCookShift()">Эхлүүлэх</button>`);
+}
+function confirmStartCookShift(){
+  const cookId=document.getElementById('cs_cook').value;
+  const startDate=document.getElementById('cs_date').value;
+  if(!cookId||!startDate){toast('Тогооч, огноо сонгоно уу','err');return;}
+  S.cookShifts=S.cookShifts||[];
+  S.cookShifts.push({id:uid('cs'),cookId,startDate});
+  save();closeModal();renderMeals();toast('Шинэ ээлж эхэллээ ✓','ok');
 }
 function setMealCostRange(kind){
   const r=kind==='month'?monthRange(0):monthRange(-1);
@@ -3839,6 +4143,40 @@ function renderMealCost(){
       <td>${r.bal} ${r.unit} <span style="color:var(--muted);font-size:11px">(${money(r.rv)})</span></td>
     </tr>`).join('')
   }</tbody>`:'<tbody><tr><td class="hint" style="padding:10px 0">Энэ хугацаанд хүнсний хөдөлгөөн алга.</td></tr></tbody>';
+  renderCookComparison(from,to);
+}
+function renderCookComparison(from,to){
+  const tbl=document.getElementById('cookCompareTbl'); if(!tbl)return;
+  if(!S.staff||!S.staff.length){tbl.innerHTML='<tbody><tr><td class="hint" style="padding:10px 0">Тохиргоонд тогооч (ажилтан) бүртгэгдээгүй.</td></tr></tbody>';return;}
+  const byCook={}; // cookId -> {days, cost, eaters}
+  const start=parseD(from), end=parseD(to);
+  for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+    const date=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    const cookId=cookForDate(date); if(!cookId) continue;
+    if(!byCook[cookId]) byCook[cookId]={days:0,cost:0,eaters:0};
+    byCook[cookId].days++;
+    const gc=dayGuestCounts(date);
+    byCook[cookId].eaters+=(gc.a+gc.norm+gc.bantan);
+    const dayMoves=S.stockMoves.filter(m=>m.date===date&&m.type==='kitchen'&&m.qty<0);
+    dayMoves.forEach(m=>{ byCook[cookId].cost+=Math.abs(m.qty)*(m.unitPrice||0); });
+  }
+  const rows=S.staff.filter(s=>byCook[s.id]).map(s=>{
+    const d=byCook[s.id];
+    const perEater=d.eaters>0?d.cost/d.eaters:0;
+    return {name:s.name,days:d.days,cost:d.cost,eaters:d.eaters,perEater};
+  });
+  if(!rows.length){tbl.innerHTML='<tbody><tr><td class="hint" style="padding:10px 0">Энэ хугацаанд тогооч оноогоогүй өдөр байна. Хоолны өдрийн харагдацаас «Өнөөдрийн тогооч» сонгоно уу.</td></tr></tbody>';return;}
+  rows.sort((a,b)=>b.perEater-a.perEater);
+  const maxPerEater=Math.max(...rows.map(r=>r.perEater),1);
+  tbl.innerHTML=`<thead><tr><th>Тогооч</th><th>Ажилласан өдөр</th><th>Нийт зардал</th><th>Хоолны хүн (нийт)</th><th>1 хүнд ногдох</th></tr></thead><tbody>${
+    rows.map(r=>`<tr>
+      <td><b>${r.name}</b></td>
+      <td>${r.days}</td>
+      <td>${money(r.cost)}</td>
+      <td>${r.eaters}</td>
+      <td style="font-weight:700;color:${r.perEater===maxPerEater&&rows.length>1?'var(--red)':'var(--navy)'}">${money(Math.round(r.perEater))}</td>
+    </tr>`).join('')
+  }</tbody>`;
 }
 function renderMealDay(){
   if(!mealDay) mealDay=todayStr();
@@ -3953,11 +4291,12 @@ function cookMeal(date,slotId,mealId){
   const pl=(mp.slots[slotId]||[]).find(p=>p.mealId===mealId); if(!pl||pl.cooked)return;
   const counts=slotEaterCounts(date,slotId);
   const {needs}=mealNeeds(meal,counts);
+  const cookId=cookForDate(date);
   needs.forEach(nd=>{
     const p=S.products.find(x=>x.id===nd.productId); if(!p)return;
     const stockQty=recipeToStock(p,nd.qty);   // гр → кг хөрвүүлнэ
     p.stock-=stockQty;
-    logMove(p.id,-stockQty,'kitchen',{who:meal.name,slot:slotId,date,unitPrice:p.cost||0,note:'Хоол ('+(slotById(slotId)?slotById(slotId).name:slotId)+') · '+nd.qty+(p.recipeUnit||p.unit)});
+    logMove(p.id,-stockQty,'kitchen',{who:meal.name,slot:slotId,date,cookId,unitPrice:p.cost||0,note:'Хоол ('+(slotById(slotId)?slotById(slotId).name:slotId)+') · '+nd.qty+(p.recipeUnit||p.unit)});
   });
   pl.cooked=true; pl.cookedAt=new Date().toISOString();
   save();renderAll();toast('Агуулахаас хасагдлаа ✓','ok');
@@ -3968,11 +4307,12 @@ function uncookMeal(date,slotId,mealId){
   const pl=(mp.slots[slotId]||[]).find(p=>p.mealId===mealId); if(!pl||!pl.cooked)return;
   const counts=slotEaterCounts(date,slotId);
   const {needs}=mealNeeds(meal,counts);
+  const cookId=cookForDate(date);
   needs.forEach(nd=>{
     const p=S.products.find(x=>x.id===nd.productId); if(!p)return;
     const stockQty=recipeToStock(p,nd.qty);
     p.stock+=stockQty;
-    logMove(p.id,stockQty,'kitchen',{who:meal.name,slot:slotId,date,unitPrice:p.cost||0,note:'Хоол буцаалт ('+(slotById(slotId)?slotById(slotId).name:slotId)+')'});
+    logMove(p.id,stockQty,'kitchen',{who:meal.name,slot:slotId,date,cookId,unitPrice:p.cost||0,note:'Хоол буцаалт ('+(slotById(slotId)?slotById(slotId).name:slotId)+')'});
   });
   pl.cooked=false;
   save();renderAll();toast('Агуулах сэргээгдлээ','ok');
@@ -4054,6 +4394,9 @@ function renderMealList(){
 function openMealModal(id){
   const m=id?mealById(id):null;
   mealDraft=m?JSON.parse(JSON.stringify(m)):{id:uid('meal'),name:'',category:'main',items:[]};
+  mealDraft.servings=mealDraft.servings||10;
+  mealDraft.childRatio=mealDraft.childRatio!=null?mealDraft.childRatio:70;
+  mealDraft.bantanRatio=mealDraft.bantanRatio!=null?mealDraft.bantanRatio:40;
   renderMealModal();
 }
 function renderMealModal(){
@@ -4064,6 +4407,15 @@ function renderMealModal(){
       <select id="ml_cat">
         ${MEAL_CATS.map(c=>`<option value="${c[0]}" ${mealDraft.category===c[0]?'selected':''}>${c[1]}</option>`).join('')}
       </select></div>
+  </div>
+  <div class="rcard" style="border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-top:14px;background:var(--soft)">
+    <div style="font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:6px">🧮 Технологийн картаас тооцоолох</div>
+    <div class="hint" style="margin-bottom:8px;font-size:11px">Жортоо бичсэн НИЙТ хэмжээгээ (жиш. 2000гр мах, 10 хүнд) орц бүрийн «Нийт» баганад бичихэд 1 хүнд ногдох хэмжээг доор автоматаар бодно.</div>
+    <div class="row" style="gap:8px;flex-wrap:wrap;align-items:flex-end">
+      <div><label class="field" style="font-size:10.5px">Порц (хэдэн хүнд)</label><input type="number" min="1" style="width:80px" value="${mealDraft.servings}" onchange="mealDraft.servings=parseFloat(this.value)||10;renderMealItems()"></div>
+      <div><label class="field" style="font-size:10.5px">Хүүхдийн харьцаа %</label><input type="number" min="0" max="100" style="width:70px" value="${mealDraft.childRatio}" onchange="mealDraft.childRatio=parseFloat(this.value)||0;renderMealItems()"></div>
+      <div><label class="field" style="font-size:10.5px">Бантангийн харьцаа %</label><input type="number" min="0" max="100" style="width:70px" value="${mealDraft.bantanRatio}" onchange="mealDraft.bantanRatio=parseFloat(this.value)||0;renderMealItems()"></div>
+    </div>
   </div>
   <div style="margin-top:14px">
     <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -4084,6 +4436,7 @@ function renderMealItems(){
   if(!mealDraft.items.length){box.innerHTML='<div class="hint" style="padding:6px 0">Орц нэмээгүй байна.</div>';return;}
   box.innerHTML=`<div class="row" style="gap:6px;font-size:10px;color:var(--muted);font-weight:700;padding:0 2px 4px">
       <span style="flex:1;min-width:130px">Бараа</span>
+      <span style="width:64px;text-align:center" title="Технологийн картын нийт хэмжээ">Нийт</span>
       <span style="width:64px;text-align:center">Том хүн</span>
       <span style="width:64px;text-align:center">Хүүхэд</span>
       <span style="width:64px;text-align:center">Бантан</span>
@@ -4096,6 +4449,7 @@ function renderMealItems(){
         <option value="">— бараа —</option>
         ${foodProducts.map(fp=>`<option value="${fp.id}" ${fp.id===it.productId?'selected':''}>${fp.name}</option>`).join('')}
       </select>
+      <input type="number" min="0" step="any" style="width:64px" value="${it.totalQty||''}" placeholder="—" title="Нийт хэмжээ (жиш. 10 хүнд)" onchange="applyTechCard(${i},parseFloat(this.value)||0)">
       <input type="number" min="0" step="any" style="width:64px" value="${it.adultQty||''}" placeholder="0" title="Том хүнд" onchange="mealDraft.items[${i}].adultQty=parseFloat(this.value)||0">
       <input type="number" min="0" step="any" style="width:64px" value="${it.childQty||''}" placeholder="0" title="Хүүхдэд (энгийн хоол)" onchange="mealDraft.items[${i}].childQty=parseFloat(this.value)||0">
       <input type="number" min="0" step="any" style="width:64px" value="${it.bantanQty||''}" placeholder="0" title="Бантан хүүхдэд" onchange="mealDraft.items[${i}].bantanQty=parseFloat(this.value)||0">
@@ -4103,6 +4457,19 @@ function renderMealItems(){
       <button class="btn-icon" onclick="mealDraft.items.splice(${i},1);renderMealItems()">✕</button>
     </div>`;
   }).join('');
+}
+// Технологийн картын нийт хэмжээг порцын тоогоор хуваан, 1 хүнд ногдох хэмжээг автоматаар бодно
+function applyTechCard(i,total){
+  const it=mealDraft.items[i]; if(!it)return;
+  it.totalQty=total;
+  const n=mealDraft.servings||10;
+  if(total>0&&n>0){
+    const perAdult=total/n;
+    it.adultQty=Math.round(perAdult*100)/100;
+    it.childQty=Math.round(perAdult*(mealDraft.childRatio||0)/100*100)/100;
+    it.bantanQty=Math.round(perAdult*(mealDraft.bantanRatio||0)/100*100)/100;
+  }
+  renderMealItems();
 }
 function addMealItem(){mealDraft.items.push({productId:'',adultQty:0,childQty:0,bantanQty:0});renderMealItems();}
 function saveMeal(){
@@ -4356,7 +4723,7 @@ function renderStockReport(from,to){
   }</tbody>`;
 }
 
-function renderAll(){renderReminders();renderCalendar();renderList();renderMassage();renderInventory();renderStock();renderMeals();renderSettings();renderReport();}
+function renderAll(){renderReminders();renderCalendar();renderList();renderMassage();renderInventory();renderStock();renderNormMonitor();renderMeals();renderSettings();renderReport();}
 /* ============================================================ ☁️ СИНК (Firebase) */
 const SYNC_KEY='gt_sync_cfg_v1';
 const DEFAULT_SYNC={databaseURL:'https://gurvan-tooroi-default-rtdb.firebaseio.com',path:'gt_system',enabled:true};
@@ -4540,7 +4907,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='6.1';
+const APP_VER='6.7';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
