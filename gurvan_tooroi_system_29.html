@@ -966,7 +966,7 @@ function roomOccupancyOn(r,date){
   (r.joiners||[]).forEach(j=>{
     if(date && j.fromDate && date>=j.fromDate){
       if(j.kind==='adult') adults++;
-      else children.push({age:j.age,tierId:j.tierId,adultPriced:!!j.adultPriced,_joiner:true});
+      else children.push({age:j.age,tierId:j.tierId,adultPriced:!!j.adultPriced,discountPct:j.discountPct||0,_joiner:true});
     }
   });
   return {adults,children};
@@ -980,19 +980,23 @@ function roomPricing(r,date){
   const adultEquiv=adults+adultKids; // том хүн + том үнээр тооцох хүүхэд
   const perPerson=date?roomPriceOnDate(room,date):(room.price!=null?room.price:(room.oo?S.pricing.baseOO:S.pricing.baseNoOO));
   const lines=[];
+  const adultDiscPct=r.adultDiscountPct||0;
   if(r.custom>0){
-    if(adultEquiv>0) lines.push({label:adultEquiv+' том хүн (тусгай нийт үнэ)', each:r.custom, qty:1});
+    if(adultEquiv>0) lines.push({label:adultEquiv+' том хүн (тусгай нийт үнэ)', each:r.custom, qty:1, discountPct:adultDiscPct});
   } else if(adultEquiv===1){
-    lines.push({label:'1 том хүн (ганц хүн +'+Math.round(S.pricing.singleAdd/1000)+'к)', each:perPerson+S.pricing.singleAdd, qty:1});
+    lines.push({label:'1 том хүн (ганц хүн +'+Math.round(S.pricing.singleAdd/1000)+'к)', each:perPerson+S.pricing.singleAdd, qty:1, discountPct:adultDiscPct});
   } else if(adultEquiv>=2){
-    lines.push({label:adultEquiv+' том хүн (тус бүр '+money(perPerson)+')', each:perPerson, qty:adultEquiv});
+    lines.push({label:adultEquiv+' том хүн (тус бүр '+money(perPerson)+')', each:perPerson, qty:adultEquiv, discountPct:adultDiscPct});
   }
   kids.forEach(k=>{
     if(k.adultPriced) return;
     const t=tierById(k.tierId);
-    lines.push({label:'Хүүхэд '+kidAgeLabel(k)+(t?' ('+t.name+')':''), each:t?t.price:0, qty:1});
+    lines.push({label:'Хүүхэд '+kidAgeLabel(k)+(t?' ('+t.name+')':''), each:t?t.price:0, qty:1, discountPct:k.discountPct||0});
   });
-  lines.forEach(l=>l.sum=l.each*l.qty);
+  lines.forEach(l=>{
+    l.origSum=l.each*l.qty;
+    l.sum=Math.round(l.origSum*(1-(l.discountPct||0)/100));
+  });
   return{lines,total:lines.reduce((a,b)=>a+b.sum,0)};
 }
 function perNight(bk){return bk.rooms.reduce((s,r)=>s+roomPricing(r,bk.checkIn).total,0);}
@@ -1154,6 +1158,7 @@ function renderBookingModal(){
       <div class="row" style="align-items:flex-end">
         <div style="flex:1;min-width:120px"><label class="field">Өрөө</label><select onchange="draft.rooms[${ri}].num=this.value;renderBookingModal()">${roomOpts(r.num)}</select></div>
         <div style="flex:0 0 90px"><label class="field">Том хүн</label><input type="number" min="0" value="${r.adults}" onchange="draft.rooms[${ri}].adults=parseInt(this.value)||0;renderBookingModal()"></div>
+        <div style="flex:0 0 78px"><label class="field" style="font-size:11px">OFF %</label><input type="number" min="0" max="100" placeholder="0" value="${r.adultDiscountPct||''}" title="Том хүний хямдрал" onchange="draft.rooms[${ri}].adultDiscountPct=parseFloat(this.value)||0;renderBookingModal()"></div>
         <div style="flex:0 0 110px"><label class="field">Тусгай үнэ/хон</label><input type="number" min="0" placeholder="—" value="${r.custom||''}" onchange="draft.rooms[${ri}].custom=parseInt(this.value)||0;renderBookingModal()"></div>
         <button class="btn btn-ghost btn-sm" onclick="delRoom(${ri})">✕</button>
       </div>
@@ -1174,6 +1179,7 @@ function renderBookingModal(){
         <span style="font-size:12px;color:var(--muted)">сар</span>`:''}
         <select style="flex:1;min-width:120px" ${k.adultPriced?'disabled':''} onchange="draft.rooms[${ri}].children[${ki}].tierId=this.value;renderBookingModal()">${tierOpts(k.tierId)}</select>
         <label style="font-size:12px;display:flex;align-items:center;gap:4px"><input type="checkbox" style="width:auto" ${k.adultPriced?'checked':''} onchange="draft.rooms[${ri}].children[${ki}].adultPriced=this.checked;renderBookingModal()">том үнэ</label>
+        <input type="number" min="0" max="100" placeholder="OFF%" style="width:62px" title="Энэ хүүхдийн хямдрал" value="${k.discountPct||''}" onchange="draft.rooms[${ri}].children[${ki}].discountPct=parseFloat(this.value)||0;renderBookingModal()">
         <button class="btn-icon" onclick="delKid(${ri},${ki})">✕</button>
       </div>`;
     });
@@ -1184,7 +1190,8 @@ function renderBookingModal(){
       roomsH+=`<div class="kid" style="background:#eef4fb;border-color:#cfe0f2">
         <span style="font-size:12px;color:#1c6ea4;font-weight:700">Нэмэгдэх</span>
         <select style="width:90px" onchange="draft.rooms[${ri}].joiners[${ji}].kind=this.value;renderBookingModal()"><option value="adult" ${j.kind==='adult'?'selected':''}>Том хүн</option><option value="child" ${j.kind==='child'?'selected':''}>Хүүхэд</option></select>
-        ${j.kind==='child'?`<input type="number" min="0" max="17" value="${j.age||0}" style="width:52px" title="нас" onchange="draft.rooms[${ri}].joiners[${ji}].age=parseInt(this.value)||0;autoJoinerTier(${ri},${ji});renderBookingModal()"><span style="font-size:11px;color:var(--muted)">нас</span>`:''}
+        ${j.kind==='child'?`<input type="number" min="0" max="17" value="${j.age||0}" style="width:52px" title="нас" onchange="draft.rooms[${ri}].joiners[${ji}].age=parseInt(this.value)||0;autoJoinerTier(${ri},${ji});renderBookingModal()"><span style="font-size:11px;color:var(--muted)">нас</span>
+        <input type="number" min="0" max="100" placeholder="OFF%" style="width:58px" title="Хямдрал" value="${j.discountPct||''}" onchange="draft.rooms[${ri}].joiners[${ji}].discountPct=parseFloat(this.value)||0;renderBookingModal()">`:''}
         <span style="font-size:11px;color:var(--muted)">ирэх</span>
         <input type="date" value="${j.fromDate||rCheckIn(draft,r)}" style="width:140px" onchange="draft.rooms[${ri}].joiners[${ji}].fromDate=this.value;renderBookingModal()">
         <button class="btn-icon" onclick="delJoiner(${ri},${ji})">✕</button>
@@ -1646,7 +1653,7 @@ function messageBreakdown(bk){
       const rp=roomPricing(r,d);
       (rp.lines||[]).forEach(l=>{
         const key=l.label;
-        if(!acc[key]) acc[key]={label:l.label,qty:l.qty,each:l.each,count:0,total:0};
+        if(!acc[key]) acc[key]={label:l.label,qty:l.qty,each:l.each,discountPct:l.discountPct||0,count:0,total:0};
         acc[key].count+=1;
         acc[key].total+=l.sum;
       });
@@ -1666,7 +1673,10 @@ function breakdownText(bk){
   let txt='Огноо: '+fmtD(ci)+' - '+fmtD(co)+' ('+totalNights+' хоног)\n\n';
   txt+=lines.map(l=>{
     const base=stripPriceParen(l.label);
-    return base+' × '+money(l.each)+' × '+l.count+'хоног = '+money(l.total);
+    const hasDisc=l.discountPct>0;
+    const discEach=hasDisc?Math.round(l.each*(1-l.discountPct/100)):l.each;
+    const tag=hasDisc?' ('+l.discountPct+'% OFF)':'';
+    return base+tag+' × '+money(discEach)+' × '+l.count+'хоног = '+money(l.total);
   }).join('\n');
   const t=bookingTotals(bk);
   if(t.discountPct>0) txt+='\nХямдрал ('+t.discountPct+'%): −'+money(t.discountAmt);
@@ -4907,7 +4917,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='6.7';
+const APP_VER='6.8';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
