@@ -1407,12 +1407,30 @@ function openDetail(id){
     : t.fullyPaid?'<span class="pill full">💎 Бүрэн төлсөн</span>'
     : conf?'<span class="pill conf">✓ Баталгаажсан</span>'
     : '<span class="pill pend">⏳ Хүлээгдэж буй</span>';
-  const extrasH=(bk.extras||[]).map((e,i)=>`<div class="kid">
-      <input value="${e.name}" placeholder="Үйлчилгээ" style="flex:1;min-width:120px" onchange="setExtra('${id}',${i},'name',this.value)">
+  const extraSaleProducts=S.products.filter(p=>SALE_GROUPS.includes(p.group||'goods'));
+  function extraOptionsHtml(e){
+    const cur = e.svcId?'svc:'+e.svcId : e.productId?'prod:'+e.productId : 'other';
+    return `<option value="other" ${cur==='other'?'selected':''}>— Бусад (гараар бичих) —</option>
+      <optgroup label="💆 Барианы үйлчилгээ">${(S.massageServices||[]).map(s=>`<option value="svc:${s.id}" ${cur==='svc:'+s.id?'selected':''}>${s.name} · ${money(s.price)}</option>`).join('')}</optgroup>
+      <optgroup label="🛒 Зарах бараа">${extraSaleProducts.map(p=>`<option value="prod:${p.id}" ${cur==='prod:'+p.id?'selected':''}>${p.name} · ${money(p.price)}</option>`).join('')}</optgroup>`;
+  }
+  const extrasH=(bk.extras||[]).map((e,i)=>{
+    const cur = e.svcId?'svc:'+e.svcId : e.productId?'prod:'+e.productId : 'other';
+    const otherType = e.otherType||'goods';
+    return `<div class="kid" style="flex-wrap:wrap">
+      <select style="flex:1;min-width:160px" onchange="setExtraFromCatalog('${id}',${i},this.value)">${extraOptionsHtml(e)}</select>
+      ${cur==='other'?`
+        <select style="width:120px" onchange="setExtra('${id}',${i},'otherType',this.value)">
+          <option value="goods" ${otherType==='goods'?'selected':''}>Худалдан авалт</option>
+          <option value="service" ${otherType==='service'?'selected':''}>Үйлчилгээ</option>
+        </select>
+        <input value="${e.name}" placeholder="Нэр бичих" style="flex:1;min-width:120px" onchange="setExtraName('${id}',${i},this.value)">`:''}
       <input type="number" value="${e.price||0}" style="width:100px" onchange="setExtra('${id}',${i},'price',parseInt(this.value)||0)"><span style="font-size:12px">₮</span>
       <input type="number" min="1" value="${e.qty||1}" style="width:60px" onchange="setExtra('${id}',${i},'qty',parseInt(this.value)||1)"><span style="font-size:12px">ш</span>
       <button class="btn-icon" onclick="delExtra('${id}',${i})">✕</button>
-    </div>`).join('');
+    </div>
+    ${cur==='other'&&otherType==='goods'&&e.name&&!e.productId?'<div class="hint" style="font-size:10.5px;margin:-4px 0 4px 4px">💡 Хадгалахад энэ бараа Худалдан авалтын жагсаалтад автоматаар нэмэгдэнэ.</div>':''}`;
+  }).join('');
   const body=`
     <div class="row" style="justify-content:space-between;margin-bottom:10px">
       <div><b style="font-size:16px">${bk.phone}${bk.name?' · '+bk.name:''}</b>
@@ -1490,6 +1508,32 @@ function openDetail(id){
 }
 function addExtra(id){const bk=S.bookings.find(b=>b.id===id);bk.extras=bk.extras||[];bk.extras.push({name:'',price:0,qty:1});save();openDetail(id);}
 function setExtra(id,i,k,v){const bk=S.bookings.find(b=>b.id===id);bk.extras[i][k]=v;save();openDetail(id);}
+function setExtraName(id,i,val){
+  const bk=S.bookings.find(b=>b.id===id); const e=bk.extras[i];
+  e.name=val;
+  if((e.otherType||'goods')==='goods' && val.trim()){
+    let prod=S.products.find(p=>(p.group||'goods')==='goods' && p.name.trim().toLowerCase()===val.trim().toLowerCase());
+    if(!prod){
+      prod={id:uid('p'),group:'goods',name:val.trim(),category:'Бусад',unit:'ш',cost:0,price:e.price||0,stock:0,minStock:0};
+      S.products.push(prod);
+      toast('«'+val.trim()+'» Худалдан авалтын жагсаалтад нэмэгдлээ ✓','ok');
+    }
+    e.productId=prod.id;
+  }
+  save();openDetail(id);
+}
+function setExtraFromCatalog(id,i,val){
+  const bk=S.bookings.find(b=>b.id===id); const e=bk.extras[i];
+  if(val==='other'){ delete e.svcId; delete e.productId; }
+  else if(val.startsWith('svc:')){
+    const svc=(S.massageServices||[]).find(s=>s.id===val.slice(4));
+    if(svc){ e.svcId=svc.id; delete e.productId; e.name=svc.name; e.price=svc.price||0; }
+  } else if(val.startsWith('prod:')){
+    const p=S.products.find(x=>x.id===val.slice(5));
+    if(p){ e.productId=p.id; delete e.svcId; e.name=p.name; e.price=p.price||0; }
+  }
+  save();openDetail(id);
+}
 function delExtra(id,i){const bk=S.bookings.find(b=>b.id===id);bk.extras.splice(i,1);save();openDetail(id);}
 
 /* ---- Add fridge purchase directly from booking detail ---- */
@@ -3000,14 +3044,14 @@ function msgCalStep(d){const [y,m]=msgCalYM.split('-').map(Number);const nd=new 
 /* ---- Нэмэлт (billable) барианы үйлчилгээ бариачаас өөрөө нэмэх ---- */
 let exmDraft=null;
 function openAddExtraMassage(){
-  const svcs=(S.massageServices||[]).filter(s=>s.billable);
-  if(!svcs.length){toast('Нэмэлт төлбөртэй үйлчилгээ тохируулаагүй байна (Тохиргоо)','err');return;}
+  const svcs=(S.massageServices||[]);
+  if(!svcs.length){toast('Эхлээд Тохиргоонд барианы үйлчилгээ бүртгэнэ үү','err');return;}
   if(!S.therapists||!S.therapists.length){toast('Эхлээд Тохиргоонд бариачаа бүртгэнэ үү','err');return;}
   exmDraft={date:todayStr(),roomTarget:'',svcId:svcs[0].id,therapistId:S.therapists[0].id,note:''};
   renderAddExtraMassage();
 }
 function renderAddExtraMassage(){
-  const svcs=(S.massageServices||[]).filter(s=>s.billable);
+  const svcs=(S.massageServices||[]);
   const {roomTargets}=saleTargets(exmDraft.date);
   const occupied=roomTargets.filter(t=>t.bookingId);
   openModal('➕ Нэмэлт барианы үйлчилгээ',
@@ -5165,7 +5209,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='7.9';
+const APP_VER='8.0';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
