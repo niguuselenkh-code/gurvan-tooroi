@@ -966,7 +966,7 @@ function roomOccupancyOn(r,date){
   (r.joiners||[]).forEach(j=>{
     if(date && j.fromDate && date>=j.fromDate){
       if(j.kind==='adult') adults++;
-      else children.push({age:j.age,tierId:j.tierId,adultPriced:!!j.adultPriced,discountPct:j.discountPct||0,_joiner:true});
+      else children.push({age:j.age,tierId:j.tierId,adultPriced:!!j.adultPriced,discountPct:j.discountPct||0,customPrice:j.customPrice||0,_joiner:true});
     }
   });
   return {adults,children};
@@ -991,7 +991,10 @@ function roomPricing(r,date){
   kids.forEach(k=>{
     if(k.adultPriced) return;
     const t=tierById(k.tierId);
-    lines.push({label:'Хүүхэд '+kidAgeLabel(k)+(t?' ('+t.name+')':''), each:t?t.price:0, qty:1, discountPct:k.discountPct||0});
+    const hasCustom=k.customPrice>0;
+    const each=hasCustom?k.customPrice:(t?t.price:0);
+    const label='Хүүхэд '+kidAgeLabel(k)+(hasCustom?' (тусгай үнэ)':(t?' ('+t.name+')':''));
+    lines.push({label, each, qty:1, discountPct:k.discountPct||0});
   });
   lines.forEach(l=>{
     l.origSum=l.each*l.qty;
@@ -1179,6 +1182,7 @@ function renderBookingModal(){
         <span style="font-size:12px;color:var(--muted)">сар</span>`:''}
         <select style="flex:1;min-width:120px" ${k.adultPriced?'disabled':''} onchange="draft.rooms[${ri}].children[${ki}].tierId=this.value;renderBookingModal()">${tierOpts(k.tierId)}</select>
         <label style="font-size:12px;display:flex;align-items:center;gap:4px"><input type="checkbox" style="width:auto" ${k.adultPriced?'checked':''} onchange="draft.rooms[${ri}].children[${ki}].adultPriced=this.checked;renderBookingModal()">том үнэ</label>
+        <input type="number" min="0" placeholder="Тусгай үнэ" style="width:90px" title="Энэ хүүхдийн тусгай үнэ (заавал биш)" value="${k.customPrice||''}" onchange="draft.rooms[${ri}].children[${ki}].customPrice=parseInt(this.value)||0;renderBookingModal()">
         <input type="number" min="0" max="100" placeholder="OFF%" style="width:62px" title="Энэ хүүхдийн хямдрал" value="${k.discountPct||''}" onchange="draft.rooms[${ri}].children[${ki}].discountPct=parseFloat(this.value)||0;renderBookingModal()">
         <button class="btn-icon" onclick="delKid(${ri},${ki})">✕</button>
       </div>`;
@@ -1191,6 +1195,7 @@ function renderBookingModal(){
         <span style="font-size:12px;color:#1c6ea4;font-weight:700">Нэмэгдэх</span>
         <select style="width:90px" onchange="draft.rooms[${ri}].joiners[${ji}].kind=this.value;renderBookingModal()"><option value="adult" ${j.kind==='adult'?'selected':''}>Том хүн</option><option value="child" ${j.kind==='child'?'selected':''}>Хүүхэд</option></select>
         ${j.kind==='child'?`<input type="number" min="0" max="17" value="${j.age||0}" style="width:52px" title="нас" onchange="draft.rooms[${ri}].joiners[${ji}].age=parseInt(this.value)||0;autoJoinerTier(${ri},${ji});renderBookingModal()"><span style="font-size:11px;color:var(--muted)">нас</span>
+        <input type="number" min="0" placeholder="Тусгай үнэ" style="width:88px" title="Энэ хүүхдийн тусгай үнэ (заавал биш)" value="${j.customPrice||''}" onchange="draft.rooms[${ri}].joiners[${ji}].customPrice=parseInt(this.value)||0;renderBookingModal()">
         <input type="number" min="0" max="100" placeholder="OFF%" style="width:58px" title="Хямдрал" value="${j.discountPct||''}" onchange="draft.rooms[${ri}].joiners[${ji}].discountPct=parseFloat(this.value)||0;renderBookingModal()">`:''}
         <span style="font-size:11px;color:var(--muted)">ирэх</span>
         <input type="date" value="${j.fromDate||rCheckIn(draft,r)}" style="width:140px" onchange="draft.rooms[${ri}].joiners[${ji}].fromDate=this.value;renderBookingModal()">
@@ -1385,7 +1390,7 @@ function openDetail(id){
       ${t.fee?`<div class="sumline" style="color:var(--red)"><span>Торгууль (${bk.cancelInfo.type==='late'?'хожуу хойшлол':'цуцлалт'})</span><span>${money(t.fee)}</span></div>`:''}
       <div class="sumtot"><span>Нийт төлбөр</span><span>${money(t.grand)}</span></div>
       ${t.prepaid?`<div class="sumline" style="margin-top:6px"><span>Урьдчилгаа${acc?' ('+acc.name.split(' ')[0]+')':''}</span><span>${money(t.prepaid)}</span></div>`:''}
-      ${(bk.payments||[]).map((p,pi)=>{const pa=accById(p.accountId);return `<div class="sumline"><span>Төлбөр ${pi+1}${pa?' ('+pa.name.split(' ')[0]+')':''} · ${p.date||''} <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Устгах" onclick="delPayment('${id}',${pi})">✕</button></span><span>${money(p.amount||0)}</span></div>`;}).join('')}
+      ${(bk.payments||[]).map((p,pi)=>{const pa=accById(p.accountId);const label=p.isAdjustment?'⚖️ Тохируулга'+(p.note?' ('+p.note+')':''):'Төлбөр '+(pi+1)+(pa?' ('+pa.name.split(' ')[0]+')':'');return `<div class="sumline"><span>${label} · ${p.date||''} <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Устгах" onclick="delPayment('${id}',${pi})">✕</button></span><span>${money(p.amount||0)}</span></div>`;}).join('')}
       ${(bk.refunds||[]).map((r,ri)=>{const ra=accById(r.accountId);return `<div class="sumline" style="color:var(--red)"><span>↩ Буцаалт${ra?' ('+ra.name.split(' ')[0]+')':''} · ${r.date||''}${r.reason?' · '+r.reason:''} <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Устгах" onclick="delRefund('${id}',${ri})">✕</button></span><span>−${money(r.amount||0)}</span></div>`;}).join('')}
       <div class="sumline" style="font-weight:700;color:${t.balance>0?'var(--berry)':t.overpaid?'#c0392b':'var(--green)'}"><span>${t.balance>0?'Үлдэгдэл төлбөр':t.overpaid?'⚠️ Илүү төлөлт (буцаах)':'Бүрэн төлөгдсөн ✓'}</span><span>${money(Math.abs(t.balance))}</span></div>
     </div>
@@ -1406,6 +1411,7 @@ function openDetail(id){
     ${!canc?`<button class="btn btn-green btn-sm" onclick="openConfirm('${id}')">${conf?'Урьдчилгаа засах':'Баталгаажуулах'}</button>`:''}
     ${!canc&&conf&&t.balance>0?`<button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="openFinalPay('${id}')">💎 Үлдэгдэл төлбөр хийх</button>`:''}
     ${t.netPaid>0?`<button class="btn btn-ghost btn-sm" onclick="openRefund('${id}')">↩ Буцаалт хийх</button>`:''}
+    ${t.balance!==0?`<button class="btn btn-ghost btn-sm" onclick="reconcileBooking('${id}')">⚖️ Тэнцүүлэх</button>`:''}
     ${!canc?`<button class="btn btn-berry btn-sm" onclick="openCancel('${id}')">Цуцлах/хойшлол</button>`:`<button class="btn btn-ghost btn-sm" onclick="uncancel('${id}')">Сэргээх</button>`}
     <button class="btn-icon" onclick="delBooking('${id}')" title="Устгах">🗑</button>`;
   openModal('Захиалгын дэлгэрэнгүй',body,foot);
@@ -1553,6 +1559,31 @@ function doFinalPay(id){
 function delPayment(id,idx){
   const bk=S.bookings.find(b=>b.id===id);
   bk.payments.splice(idx,1);save();renderAll();openDetail(id);toast('Төлбөр устгагдлаа');
+}
+/* ---- Төлбөр тэнцүүлэх (үнийн өөрчлөлт зэргээс үүссэн зөрүүг мөнгөн урсгалгүйгээр тэглэх) ---- */
+function reconcileBooking(id){
+  const bk=S.bookings.find(b=>b.id===id); if(!bk)return;
+  const t=bookingTotals(bk);
+  if(t.balance===0){toast('Аль хэдийн тэнцсэн байна','ok');return;}
+  const isUnder=t.balance>0;
+  openModal('⚖️ Төлбөр тэнцүүлэх',
+    `<div class="hint" style="margin-bottom:10px">Одоогийн зөрүү: <b style="color:${isUnder?'var(--berry)':'#c0392b'}">${money(Math.abs(t.balance))}</b> ${isUnder?'(дутуу төлөгдсөн)':'(илүү төлөгдсөн)'}.<br>Энэ нь бодит мөнгөн гүйлгээ биш — жиш. үнийн тохиргоо өөрчлөгдсөнөөс үүссэн зөрүүг тооцооноос арилгана.</div>
+     <label class="field">Шалтгаан</label><input id="rc_reason" value="Үнийн тохиргооны зөрүү" style="width:100%">`,
+    `<button class="btn btn-ghost" onclick="openDetail('${id}')">Болих</button>
+     <button class="btn btn-primary" onclick="confirmReconcile('${id}')">Тэнцүүлэх</button>`);
+}
+function confirmReconcile(id){
+  const bk=S.bookings.find(b=>b.id===id); if(!bk)return;
+  const t=bookingTotals(bk);
+  const reason=(document.getElementById('rc_reason').value||'Тохируулга').trim();
+  if(t.balance>0){
+    bk.payments=bk.payments||[];
+    bk.payments.push({amount:t.balance,accountId:'',date:todayStr(),at:new Date().toISOString(),isAdjustment:true,note:reason});
+  } else if(t.balance<0){
+    bk.refunds=bk.refunds||[];
+    bk.refunds.push({amount:-t.balance,accountId:'',date:todayStr(),reason:'Тохируулга: '+reason,at:new Date().toISOString(),isAdjustment:true});
+  }
+  save();closeModal();renderAll();openDetail(id);toast('Тэнцүүлэгдлээ ✓','ok');
 }
 function openRefund(id){
   const bk=S.bookings.find(b=>b.id===id);
@@ -1887,13 +1918,13 @@ function renderSettings(){
 
     <div class="card set-sec">
       <h3>🚪 Өрөө ба хүний үнэ</h3>
-      <div class="hint" style="margin-bottom:8px">«Хүн тус бүрийн үнэ» баганад 2+ хүн хамт байх үеийн НЭГ хүний ногдох үнийг бичнэ. Нийт төлбөр = энэ үнэ × хүний тоо. Ганцаараа орвол доор харуулсан «1 хүн (нийт)» дүнг нэг л удаа тооцно.<br>Шууд засах нь үнийг <b>бүх огноонд</b> дариулна. Тодорхой огнооноос эхлэх үнийн өөрчлөлт хэрэгтэй бол (жиш: 7-р сарын 1-нээс) 📅 товчийг ашиглана уу.</div>
+      <div class="hint" style="margin-bottom:8px">«Хүн тус бүрийн үнэ» баганад 2+ хүн хамт байх үеийн НЭГ хүний ногдох үнийг бичнэ. Нийт төлбөр = энэ үнэ × хүний тоо. Ганцаараа орвол доор харуулсан «1 хүн (нийт)» дүнг нэг л удаа тооцно.<br><b>Шууд засахад зөвхөн өнөөдрөөс хойшхи (шинэ захиалга, ирээдүйн хоног) үнэ өөрчлөгдөнө — өнгөрсөн болон одоо явж буй захиалгын тооцоонд нөлөөлөхгүй.</b> Тодорхой ирээдүйн огнооноос эхлэх үнийн өөрчлөлт хэрэгтэй бол 📅 товчийг ашиглана уу.</div>
       <div style="overflow-x:auto"><table class="mini-tbl"><thead><tr><th>№</th><th>00</th><th>Ор</th><th>Хүн тус бүрийн үнэ (2+)</th><th>1 хүн (нийт)</th><th>2 хүн (нийт)</th><th></th></tr></thead><tbody>
       ${S.rooms.map((r,i)=>{const pp=(r.price!=null?r.price:0);return `<tr>
         <td><input type="number" value="${r.num}" style="width:60px" onchange="S.rooms[${i}].num=parseInt(this.value)||0"></td>
         <td><select style="width:90px" onchange="S.rooms[${i}].oo=this.value==='1'"><option value="1" ${r.oo?'selected':''}>00-той</option><option value="0" ${!r.oo?'selected':''}>00-гүй</option></select></td>
         <td><input type="number" value="${r.beds}" style="width:55px" onchange="S.rooms[${i}].beds=parseInt(this.value)||1"></td>
-        <td><input type="number" value="${pp}" style="width:120px" onchange="S.rooms[${i}].price=parseInt(this.value)||0;renderSettings()"></td>
+        <td><input type="number" value="${pp}" style="width:120px" onchange="quickSetRoomPrice(${i},this.value)"></td>
         <td style="color:var(--muted)">${money(pp+S.pricing.singleAdd)}</td>
         <td style="color:var(--muted)">${money(pp*2)}</td>
         <td><div class="row" style="gap:4px">
@@ -1956,14 +1987,15 @@ function renderSettings(){
 
     <div class="card set-sec">
       <h3>💆 Барианы үйлчилгээ</h3>
-      <div class="hint" style="margin-bottom:8px">«Бариач оролцох» — оролцоно (дараалан) эсвэл оролцохгүй (бэлтгэж өгөөд орхино). «Нэмэлт төлбөртэй» — тэмдэглэвэл хийхэд төлбөр нэхэмжлэлд нэмэгдэнэ; тэмдэглээгүй бол үндсэн төлбөрт багтсан гэж үзэж нэхэмжлэхгүй. «Бариа» нь насаар хугацаатай (0-1:15, 2-5:20, 6-8:25, 9-13:30, том:45-50).</div>
-      <div style="overflow-x:auto"><table class="mini-tbl"><thead><tr><th>Нэр</th><th>Үнэ (₮)</th><th>Минут</th><th>Бариач оролцох</th><th>Нэмэлт төлбөртэй</th><th>Орц</th><th></th></tr></thead><tbody>
+      <div class="hint" style="margin-bottom:8px">«Бариач оролцох» — оролцоно (дараалан) эсвэл оролцохгүй (бэлтгэж өгөөд орхино). «Нэмэлт төлбөртэй» — тэмдэглэвэл хийхэд төлбөр нэхэмжлэлд нэмэгдэнэ. <b>«Хувь тооцох»</b> — зөвхөн энэ тэмдэглэгдсэн үйлчилгээнээс бариачийн хувь тооцогдоно (жиш. зөвхөн «Нэмэлт бариа», «Нэмэлт үсний спа», бусад биш). «Бариа» нь насаар хугацаатай (0-1:15, 2-5:20, 6-8:25, 9-13:30, том:45-50).</div>
+      <div style="overflow-x:auto"><table class="mini-tbl"><thead><tr><th>Нэр</th><th>Үнэ (₮)</th><th>Минут</th><th>Бариач оролцох</th><th>Нэмэлт төлбөртэй</th><th title="Бариачийн хувь тооцох эсэх">Хувь тооцох</th><th>Орц</th><th></th></tr></thead><tbody>
       ${S.massageServices.map((s,i)=>`<tr>
         <td><input value="${s.name}" style="width:140px" onchange="S.massageServices[${i}].name=this.value"></td>
         <td><input type="number" value="${s.price}" style="width:100px" onchange="S.massageServices[${i}].price=parseInt(this.value)||0"></td>
         <td>${s.ageBased?'<span style="color:var(--muted);font-size:12px">насаар</span>':`<input type="number" value="${s.mins}" style="width:70px" onchange="S.massageServices[${i}].mins=parseInt(this.value)||0">`}</td>
         <td style="text-align:center"><input type="checkbox" ${s.therapist?'checked':''} onchange="S.massageServices[${i}].therapist=this.checked"></td>
         <td style="text-align:center"><input type="checkbox" ${s.billable?'checked':''} onchange="S.massageServices[${i}].billable=this.checked"></td>
+        <td style="text-align:center"><input type="checkbox" ${s.commissionable?'checked':''} onchange="S.massageServices[${i}].commissionable=this.checked"></td>
         <td><button class="btn btn-ghost btn-sm" onclick="openSvcNorms('${s.id}')">📦 ${(s.norms||[]).length||'—'}</button></td>
         <td><button class="btn-icon" onclick="delMsgSvc(${i})">✕</button></td></tr>`).join('')}
       </tbody></table></div>
@@ -2211,6 +2243,18 @@ function openRoomPriceSchedule(i){
     `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
      <button class="btn btn-primary" onclick="addRoomPriceHist(${i})">Товлох</button>`);
 }
+function quickSetRoomPrice(i,val){
+  const r=S.rooms[i]; if(!r)return;
+  const price=parseInt(val)||0;
+  const today=todayStr();
+  if(!r.priceHistory||!r.priceHistory.length) r.priceHistory=[{from:'0000-01-01',price:r.price||0}];
+  r.priceHistory=r.priceHistory.filter(h=>h.from!==today);
+  r.priceHistory.push({from:today,price});
+  r.priceHistory.sort((a,b)=>a.from.localeCompare(b.from));
+  r.price=price;
+  save();renderSettings();renderAll();
+  toast('Үнэ шинэчлэгдлээ — өнөөдрөөс хойш хэрэгжинэ ✓','ok');
+}
 function addRoomPriceHist(i){
   const r=S.rooms[i];
   const from=document.getElementById('rps_from').value;
@@ -2263,7 +2307,7 @@ function openSvcNorms(sid){
      <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="S.massageServices.find(x=>x.id==='${sid}').norms.push({productId:'${mats[0].id}',qty:1});openSvcNorms('${sid}')">+ Орц нэмэх</button>`,
     `<button class="btn btn-primary" onclick="save();closeModal();renderSettings();toast('Хадгаллаа','ok')">Хадгалах</button>`);
 }
-function addMsgSvc(){S.massageServices.push({id:uid('ms'),name:'Шинэ үйлчилгээ',price:0,mins:15,therapist:true,ageBased:false,billable:false,norms:[]});renderSettings();}
+function addMsgSvc(){S.massageServices.push({id:uid('ms'),name:'Шинэ үйлчилгээ',price:0,mins:15,therapist:true,ageBased:false,billable:false,commissionable:false,norms:[]});renderSettings();}
 function svcOptsMsg(sel,allowNone){return (allowNone?`<option value="">— байхгүй —</option>`:'')+S.massageServices.map(s=>`<option value="${s.id}" ${s.id===sel?'selected':''}>${s.name}</option>`).join('');}
 function msgRuleRow(cat,label,evenLabel){
   const cfg=(S.msgDefaults&&S.msgDefaults[cat])||{};
@@ -2565,7 +2609,7 @@ function togglePersonDone(bkId,date,roomNum,key,checked){
   // Нэмэлт төлбөртэй үйлчилгээ
   if(checked){
     if(cell.svc!=='rest'&&svc&&svc.billable&&!cell.billed){
-      bk.extras.push({name:svc.name+' (№'+roomNum+' '+(person?person.label:'')+')',price:(svc.price||0),qty:1,_msgKey:ekey});
+      bk.extras.push({name:svc.name+' (№'+roomNum+' '+(person?person.label:'')+')',price:(svc.price||0),qty:1,_msgKey:ekey,svcId:svc.id});
       cell.billed=true;
     }
   }else{bk.extras=bk.extras.filter(e=>e._msgKey!==ekey);cell.billed=false;}
@@ -2858,6 +2902,8 @@ function renderMsgCommissionBox(){
   S.bookings.forEach(bk=>{
     (bk.extras||[]).forEach(e=>{
       if(!e._msgKey||!e.therapistId) return;
+      const svc=e.svcId?(S.massageServices||[]).find(s=>s.id===e.svcId):null;
+      if(!svc||!svc.commissionable) return; // зөвхөн "Хувь тооцох" тэмдэглэсэн үйлчилгээ
       if(byTh[e.therapistId]) byTh[e.therapistId].revenue+=(e.price||0)*(e.qty||1);
     });
   });
@@ -4615,6 +4661,8 @@ function renderMassageCommission(from,to){
   S.bookings.forEach(bk=>{
     (bk.extras||[]).forEach(e=>{
       if(!e._msgKey) return;                     // зөвхөн бариагаас үүссэн нэмэлт төлбөр
+      const svc=e.svcId?(S.massageServices||[]).find(s=>s.id===e.svcId):null;
+      if(!svc||!svc.commissionable) return;       // зөвхөн "Хувь тооцох" тэмдэглэсэн үйлчилгээ
       const parts=e._msgKey.split(':');           // ['msg', bkId, date, roomNum, key]
       const d=parts[2]||'';
       if(d>=from && d<=to) revenue+=(e.price||0)*(e.qty||1);
@@ -4917,7 +4965,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='6.8';
+const APP_VER='7.1';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
