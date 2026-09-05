@@ -704,7 +704,9 @@ function defaults(){return{
   marketPrices:{},
   staff:[],
   massageCommissionPercent:0,
+  vatPercent:10,
   cookShifts:[],
+  trash:[],
   purchases:[],
   roomAssets:{},
   mealSlots:[
@@ -817,6 +819,8 @@ function load(){try{const r=localStorage.getItem(KEY);S=r?JSON.parse(r):defaults
   S.purchases=S.purchases||[];
   S.roomAssets=S.roomAssets||{};
   S.massageCommissionPercent=S.massageCommissionPercent||0;
+  S.vatPercent=S.vatPercent||10;
+  S.trash=S.trash||[];
   S.cookShifts=S.cookShifts||[];
   // Хуучин хадгалсан загварт {задаргаа} байхгүй бол автоматаар нэмнэ (нэг удаа)
   if(S.template && S.template.indexOf('{задаргаа}')===-1){
@@ -960,13 +964,21 @@ function roomPriceOnDate(room,date){
   hist.forEach(h=>{ if(h.from<=date && h.from>=best.from) best=h; });
   return best.price;
 }
+function tierPriceOnDate(tier,date){
+  if(!tier) return 0;
+  if(!date) return tier.price;
+  const hist=(tier.priceHistory&&tier.priceHistory.length)?tier.priceHistory:[{from:'0000-01-01',price:tier.price}];
+  let best=hist[0];
+  hist.forEach(h=>{ if(h.from<=date && h.from>=best.from) best=h; });
+  return best.price;
+}
 function roomOccupancyOn(r,date){
   let adults=r.adults||0;
   let children=(r.children||[]).slice();
   (r.joiners||[]).forEach(j=>{
     if(date && j.fromDate && date>=j.fromDate){
       if(j.kind==='adult') adults++;
-      else children.push({age:j.age,tierId:j.tierId,adultPriced:!!j.adultPriced,discountPct:j.discountPct||0,customPrice:j.customPrice||0,_joiner:true});
+      else children.push({age:j.age,tierId:j.tierId,adultPriced:!!j.adultPriced,discountPct:j.discountPct||0,customPrice:j.customPrice||0,tierPriceSnap:j.tierPriceSnap,_joiner:true});
     }
   });
   return {adults,children};
@@ -978,11 +990,11 @@ function roomPricing(r,date){
   const kids=occ.children;
   const adultKids=kids.filter(k=>k.adultPriced).length;
   const adultEquiv=adults+adultKids; // том хүн + том үнээр тооцох хүүхэд
-  const perPerson=date?roomPriceOnDate(room,date):(room.price!=null?room.price:(room.oo?S.pricing.baseOO:S.pricing.baseNoOO));
+  const perPerson = r.priceSnapshot!=null ? r.priceSnapshot : (date?roomPriceOnDate(room,date):(room.price!=null?room.price:(room.oo?S.pricing.baseOO:S.pricing.baseNoOO)));
   const lines=[];
   const adultDiscPct=r.adultDiscountPct||0;
   if(r.custom>0){
-    if(adultEquiv>0) lines.push({label:adultEquiv+' том хүн (тусгай нийт үнэ)', each:r.custom, qty:1, discountPct:adultDiscPct});
+    if(adultEquiv>0) lines.push({label:adultEquiv+' том хүн (тусгай нийт үнэ)', each:r.custom, qty:1, discountPct:0}); // Тусгай үнэ = эцсийн үнэ, OFF% давхар хэрэглэхгүй
   } else if(adultEquiv===1){
     lines.push({label:'1 том хүн (ганц хүн +'+Math.round(S.pricing.singleAdd/1000)+'к)', each:perPerson+S.pricing.singleAdd, qty:1, discountPct:adultDiscPct});
   } else if(adultEquiv>=2){
@@ -992,7 +1004,8 @@ function roomPricing(r,date){
     if(k.adultPriced) return;
     const t=tierById(k.tierId);
     const hasCustom=k.customPrice>0;
-    const each=hasCustom?k.customPrice:(t?t.price:0);
+    const tierPrice = k.tierPriceSnap!=null ? k.tierPriceSnap : (date?tierPriceOnDate(t,date):(t?t.price:0));
+    const each=hasCustom?k.customPrice:tierPrice;
     const label='Хүүхэд '+kidAgeLabel(k)+(hasCustom?' (тусгай үнэ)':(t?' ('+t.name+')':''));
     lines.push({label, each, qty:1, discountPct:k.discountPct||0});
   });
@@ -1049,6 +1062,10 @@ function bookingTotals(bk){
   const stay=stayBase-discountAmt;
   const extras=(bk.extras||[]).reduce((s,e)=>s+(e.price||0)*(e.qty||1),0);
   const fee=bk.cancelInfo?bk.cancelInfo.fee:0;
+  const preVat=stay+extras+fee;
+  const vatEnabled=!!bk.vatEnabled;
+  const vatPct=S.vatPercent||10;
+  const vatAmt=vatEnabled?Math.round(preVat*vatPct/100):0;
   const prepaid=(bk.prepay&&bk.prepay.received)?(bk.prepay.amount||0):0;
   const payments=bk.payments||[];
   const legacyFinal=(bk.finalPay&&bk.finalPay.received&&!payments.length)?(bk.finalPay.amount||0):0;
@@ -1056,11 +1073,11 @@ function bookingTotals(bk){
   const refunded=(bk.refunds||[]).reduce((s,r)=>s+(r.amount||0),0);
   const paid=prepaid+finalPaid;         // нийт орсон мөнгө
   const netPaid=paid-refunded;          // буцаалт хассан цэвэр төлсөн
-  const grand=stay+extras+fee;
+  const grand=preVat+vatAmt;
   const balance=grand-netPaid;          // үлдэгдэл (буцаалтыг тооцсон)
   const overpaid=balance<0?-balance:0;  // илүү төлөлт
   const fullyPaid = bk.status!=='cancelled' && netPaid>0 && balance<=0;
-  return{pn,nightly:sb.nightly,breakdown:sb,stayBase,discountPct,discountAmt,stay,extras,fee,grand,prepaid,finalPaid,refunded,paid,netPaid,balance,overpaid,fullyPaid};
+  return{pn,nightly:sb.nightly,breakdown:sb,stayBase,discountPct,discountAmt,stay,extras,fee,preVat,vatEnabled,vatPct,vatAmt,grand,prepaid,finalPaid,refunded,paid,netPaid,balance,overpaid,fullyPaid};
 }
 function prepaySuggest(bk){const sb=stayBreakdown(bk);return Math.round(sb.total*(S.prepay.percent/100));}
 
@@ -1089,7 +1106,9 @@ function blankRoom(){return{num:S.rooms[0].num,adults:1,children:[],custom:0};}
 function newDraft(){return{rooms:[blankRoom()],checkIn:todayStr(),nights:2,arrive:'12:00',leave:'11:00',phone:'',name:'',note:'',nightOverrides:[],discountPct:0};}
 function autoTier(ri,ki){const k=draft.rooms[ri].children[ki];const a=k.age;
   if(a<1){ k.tierId = (k.months||0)>=6 ? 't_bor' : 't_inf'; }   // 0-6 сар хоолгүй · 6 сар-1 нас бантан
-  else if(a<=3)k.tierId='t_norm';else if(a<=8)k.tierId='t_68';else if(a<=13)k.tierId='t_913';else{k.adultPriced=true;}}
+  else if(a<=3)k.tierId='t_norm';else if(a<=8)k.tierId='t_68';else if(a<=13)k.tierId='t_913';else{k.adultPriced=true;}
+  k.tierPriceSnap=null; // насаар шинэ ангилал сонгогдсон тул үнийг шинээр авна
+}
 function kidAgeLabel(k){
   const a=k.age||0;
   if(a<1) return (k.months||0)+' сар';
@@ -1126,7 +1145,7 @@ function editBooking(id){
     editId=id;
     draft={rooms:JSON.parse(JSON.stringify(bk.rooms)),checkIn:bk.checkIn,nights:bk.nights,
       arrive:bk.arriveTime||'12:00',leave:bk.leaveTime||'11:00',phone:bk.phone,name:bk.name||'',note:bk.note||'',
-      nightOverrides:JSON.parse(JSON.stringify(bk.nightOverrides||[])),discountPct:bk.discountPct||0};
+      nightOverrides:JSON.parse(JSON.stringify(bk.nightOverrides||[])),discountPct:bk.discountPct||0,vatEnabled:!!bk.vatEnabled};
     syncNightOverrides();
     startDraftAutosave();
     renderBookingModal();
@@ -1140,6 +1159,8 @@ function renderBookingModal(){
   const totals=bookingTotalsFromDraft();
   draft.discountPct=draft.discountPct||0;
   const discountedTotal=Math.round(totals.total*(1-draft.discountPct/100));
+  const vatAmtPreview=draft.vatEnabled?Math.round(discountedTotal*(S.vatPercent||10)/100):0;
+  const finalTotalPreview=discountedTotal+vatAmtPreview;
   const singleRoomDraft = draft.rooms.length===1;
   let roomsH='';
   draft.rooms.forEach((r,ri)=>{
@@ -1159,10 +1180,10 @@ function renderBookingModal(){
     }
     roomsH+=`<div class="roombox">
       <div class="row" style="align-items:flex-end">
-        <div style="flex:1;min-width:120px"><label class="field">Өрөө</label><select onchange="draft.rooms[${ri}].num=this.value;renderBookingModal()">${roomOpts(r.num)}</select></div>
+        <div style="flex:1;min-width:120px"><label class="field">Өрөө</label><select onchange="draft.rooms[${ri}].num=this.value;draft.rooms[${ri}].priceSnapshot=null;renderBookingModal()">${roomOpts(r.num)}</select></div>
         <div style="flex:0 0 90px"><label class="field">Том хүн</label><input type="number" min="0" value="${r.adults}" onchange="draft.rooms[${ri}].adults=parseInt(this.value)||0;renderBookingModal()"></div>
-        <div style="flex:0 0 78px"><label class="field" style="font-size:11px">OFF %</label><input type="number" min="0" max="100" placeholder="0" value="${r.adultDiscountPct||''}" title="Том хүний хямдрал" onchange="draft.rooms[${ri}].adultDiscountPct=parseFloat(this.value)||0;renderBookingModal()"></div>
-        <div style="flex:0 0 110px"><label class="field">Тусгай үнэ/хон</label><input type="number" min="0" placeholder="—" value="${r.custom||''}" onchange="draft.rooms[${ri}].custom=parseInt(this.value)||0;renderBookingModal()"></div>
+        <div style="flex:0 0 78px"><label class="field" style="font-size:11px">OFF %</label><input type="number" min="0" max="100" placeholder="0" ${r.custom>0?'disabled title="Тусгай үнэ бөглөсөн үед хэрэглэгдэхгүй (тусгай үнэ = эцсийн үнэ)"':'title="Том хүний хямдрал"'} value="${r.adultDiscountPct||''}" onchange="draft.rooms[${ri}].adultDiscountPct=parseFloat(this.value)||0;renderBookingModal()"></div>
+        <div style="flex:0 0 110px"><label class="field">Тусгай үнэ/хон</label><input type="number" min="0" placeholder="—" title="Энэ бол ЭЦСИЙН үнэ — OFF% дахин хэрэглэгдэхгүй" value="${r.custom||''}" onchange="draft.rooms[${ri}].custom=parseInt(this.value)||0;renderBookingModal()"></div>
         <button class="btn btn-ghost btn-sm" onclick="delRoom(${ri})">✕</button>
       </div>
       ${busy?`<div class="chip" style="margin-top:8px">⚠️ №${r.num} энэ хугацаанд давхцаж байна</div>`:''}
@@ -1180,9 +1201,9 @@ function renderBookingModal(){
         <span style="font-size:12px;color:var(--muted)">нас</span>
         ${(k.age||0)<1?`<input type="number" min="0" max="11" value="${k.months||0}" style="width:52px" title="Сар" onchange="draft.rooms[${ri}].children[${ki}].months=parseInt(this.value)||0;autoTier(${ri},${ki});renderBookingModal()">
         <span style="font-size:12px;color:var(--muted)">сар</span>`:''}
-        <select style="flex:1;min-width:120px" ${k.adultPriced?'disabled':''} onchange="draft.rooms[${ri}].children[${ki}].tierId=this.value;renderBookingModal()">${tierOpts(k.tierId)}</select>
+        <select style="flex:1;min-width:120px" ${k.adultPriced?'disabled':''} onchange="draft.rooms[${ri}].children[${ki}].tierId=this.value;draft.rooms[${ri}].children[${ki}].tierPriceSnap=null;renderBookingModal()">${tierOpts(k.tierId)}</select>
         <label style="font-size:12px;display:flex;align-items:center;gap:4px"><input type="checkbox" style="width:auto" ${k.adultPriced?'checked':''} onchange="draft.rooms[${ri}].children[${ki}].adultPriced=this.checked;renderBookingModal()">том үнэ</label>
-        <input type="number" min="0" placeholder="Тусгай үнэ" style="width:90px" title="Энэ хүүхдийн тусгай үнэ (заавал биш)" value="${k.customPrice||''}" onchange="draft.rooms[${ri}].children[${ki}].customPrice=parseInt(this.value)||0;renderBookingModal()">
+        <input type="number" min="0" placeholder="Авто: ${money(tierById(k.tierId)?tierById(k.tierId).price:0)}" style="width:110px" title="Хоосон бол насны автомат үнэ хэрэглэнэ" value="${k.customPrice||''}" onchange="draft.rooms[${ri}].children[${ki}].customPrice=parseInt(this.value)||0;renderBookingModal()">
         <input type="number" min="0" max="100" placeholder="OFF%" style="width:62px" title="Энэ хүүхдийн хямдрал" value="${k.discountPct||''}" onchange="draft.rooms[${ri}].children[${ki}].discountPct=parseFloat(this.value)||0;renderBookingModal()">
         <button class="btn-icon" onclick="delKid(${ri},${ki})">✕</button>
       </div>`;
@@ -1195,7 +1216,9 @@ function renderBookingModal(){
         <span style="font-size:12px;color:#1c6ea4;font-weight:700">Нэмэгдэх</span>
         <select style="width:90px" onchange="draft.rooms[${ri}].joiners[${ji}].kind=this.value;renderBookingModal()"><option value="adult" ${j.kind==='adult'?'selected':''}>Том хүн</option><option value="child" ${j.kind==='child'?'selected':''}>Хүүхэд</option></select>
         ${j.kind==='child'?`<input type="number" min="0" max="17" value="${j.age||0}" style="width:52px" title="нас" onchange="draft.rooms[${ri}].joiners[${ji}].age=parseInt(this.value)||0;autoJoinerTier(${ri},${ji});renderBookingModal()"><span style="font-size:11px;color:var(--muted)">нас</span>
-        <input type="number" min="0" placeholder="Тусгай үнэ" style="width:88px" title="Энэ хүүхдийн тусгай үнэ (заавал биш)" value="${j.customPrice||''}" onchange="draft.rooms[${ri}].joiners[${ji}].customPrice=parseInt(this.value)||0;renderBookingModal()">
+        <select style="min-width:110px" ${j.adultPriced?'disabled':''} onchange="draft.rooms[${ri}].joiners[${ji}].tierId=this.value;draft.rooms[${ri}].joiners[${ji}].tierPriceSnap=null;renderBookingModal()">${tierOpts(j.tierId)}</select>
+        <label style="font-size:11px;display:flex;align-items:center;gap:3px"><input type="checkbox" style="width:auto" ${j.adultPriced?'checked':''} onchange="draft.rooms[${ri}].joiners[${ji}].adultPriced=this.checked;renderBookingModal()">том үнэ</label>
+        <input type="number" min="0" placeholder="Авто: ${money(tierById(j.tierId)?tierById(j.tierId).price:0)}" style="width:110px" title="Хоосон бол насны автомат үнэ хэрэглэнэ" value="${j.customPrice||''}" onchange="draft.rooms[${ri}].joiners[${ji}].customPrice=parseInt(this.value)||0;renderBookingModal()">
         <input type="number" min="0" max="100" placeholder="OFF%" style="width:58px" title="Хямдрал" value="${j.discountPct||''}" onchange="draft.rooms[${ri}].joiners[${ji}].discountPct=parseFloat(this.value)||0;renderBookingModal()">`:''}
         <span style="font-size:11px;color:var(--muted)">ирэх</span>
         <input type="date" value="${j.fromDate||rCheckIn(draft,r)}" style="width:140px" onchange="draft.rooms[${ri}].joiners[${ji}].fromDate=this.value;renderBookingModal()">
@@ -1246,11 +1269,14 @@ function renderBookingModal(){
     </div>`}
     <div style="margin-top:12px"><label class="field">Тэмдэглэл</label><input id="d_note" value="${draft.note||''}" onchange="draft.note=this.value"></div>
     <div style="margin-top:12px"><label class="field">Хямдрал (%)</label><input type="number" min="0" max="100" step="any" placeholder="0" value="${draft.discountPct||''}" onchange="draft.discountPct=parseFloat(this.value)||0;renderBookingModal()"><div class="hint" style="font-size:10.5px">Байрлалын үнээс хасна. Нэмэлт бараа, торгуульд нөлөөлөхгүй.</div></div>
+    <div style="margin-top:12px"><label style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px"><input type="checkbox" style="width:auto" ${draft.vatEnabled?'checked':''} onchange="draft.vatEnabled=this.checked;renderBookingModal()">🧾 НӨАТ авах (${S.vatPercent||10}%)</label><div class="hint" style="font-size:10.5px">Нийт төлбөрийн дүнгээс (хямдрал хассаны дараа) НӨАТ нэмж тооцно.</div></div>
     <div class="card" style="padding:14px;margin-top:14px">
       ${draft.discountPct>0?`<div class="sumline"><span>Байрлалын үнэ</span><span>${money(totals.total)}</span></div>
       <div class="sumline" style="color:var(--berry)"><span>Хямдрал (${draft.discountPct}%)</span><span>−${money(Math.round(totals.total*draft.discountPct/100))}</span></div>`:''}
-      <div class="sumtot"><span>Нийт төлбөр</span><span>${money(discountedTotal)}</span></div>
-      <div class="sumline" style="margin-top:6px;color:var(--berry);font-weight:700"><span>Урьдчилгаа санал (${S.prepay.percent}%)</span><span>${money(Math.round(discountedTotal*S.prepay.percent/100))}</span></div>
+      ${draft.vatEnabled?`<div class="sumline"><span>НӨАТ-гүй дүн</span><span>${money(discountedTotal)}</span></div>
+      <div class="sumline" style="color:#1c6ea4"><span>НӨАТ (${S.vatPercent||10}%)</span><span>+${money(vatAmtPreview)}</span></div>`:''}
+      <div class="sumtot"><span>Нийт төлбөр</span><span>${money(finalTotalPreview)}</span></div>
+      <div class="sumline" style="margin-top:6px;color:var(--berry);font-weight:700"><span>Урьдчилгаа санал (${S.prepay.percent}%)</span><span>${money(Math.round(finalTotalPreview*S.prepay.percent/100))}</span></div>
     </div>`;
   openModal(editId?'Захиалга засах':'Шинэ захиалга',body,
     `<button class="btn btn-ghost" onclick="cancelDraft()">Болих</button>
@@ -1271,7 +1297,9 @@ function addJoiner(ri){
 }
 function delJoiner(ri,ji){draft.rooms[ri].joiners.splice(ji,1);renderBookingModal();}
 function autoJoinerTier(ri,ji){const j=draft.rooms[ri].joiners[ji];const a=j.age;
-  if(a<1)j.tierId='t_inf';else if(a<=3)j.tierId='t_norm';else if(a<=8)j.tierId='t_68';else if(a<=13)j.tierId='t_913';else{j.adultPriced=true;}}
+  if(a<1)j.tierId='t_inf';else if(a<=3)j.tierId='t_norm';else if(a<=8)j.tierId='t_68';else if(a<=13)j.tierId='t_913';else{j.adultPriced=true;}
+  j.tierPriceSnap=null;
+}
 function cancelDraft(){stopDraftAutosave();clearDraftBackup();editId=null;draft=null;closeModal();}
 function checkPhoneHistory(phone){
   const box=document.getElementById('phoneHist'); if(!box)return;
@@ -1303,6 +1331,23 @@ function saveBooking(){
     r.num=parseInt(r.num)||r.num;
     if(r.checkIn===''||r.checkIn==null) delete r.checkIn;
     if(r.nights===''||r.nights==null||+r.nights<=0) delete r.nights; else r.nights=+r.nights;
+    // Үнийг "царцаана" — зөвхөн анх удаа тавьсан бол. Дараа нь Тохиргооны үнэ өөрчлөгдсөн ч энэ захиалганд хүрэхгүй.
+    if(r.priceSnapshot==null){
+      const room=roomByNum(r.num);
+      r.priceSnapshot = room ? (room.price!=null?room.price:(room.oo?S.pricing.baseOO:S.pricing.baseNoOO)) : 0;
+    }
+    (r.children||[]).forEach(k=>{
+      if(k.tierPriceSnap==null){
+        const t=tierById(k.tierId);
+        k.tierPriceSnap = t ? t.price : 0;
+      }
+    });
+    (r.joiners||[]).forEach(j=>{
+      if(j.kind==='child' && j.tierPriceSnap==null){
+        const t=tierById(j.tierId);
+        j.tierPriceSnap = t ? t.price : 0;
+      }
+    });
   });
   const bk={
     id:editId||uid('b'),phone:draft.phone.trim(),name:(draft.name||'').trim(),
@@ -1310,6 +1355,7 @@ function saveBooking(){
     note:(draft.note||'').trim(),rooms,
     nightOverrides:JSON.parse(JSON.stringify(draft.nightOverrides||[])),
     discountPct:draft.discountPct||0,
+    vatEnabled:!!draft.vatEnabled,
     status:ex?ex.status:'pending',
     prepay:ex?ex.prepay:{amount:0,accountId:S.accounts[0]?.id||'',date:'',received:false},
     payments:ex?(ex.payments||[]):[],
@@ -1325,6 +1371,19 @@ function saveBooking(){
 }
 
 /* ============================================================ DETAIL / ACTIONS */
+function toggleCashCollected(id,idx){
+  const bk=S.bookings.find(b=>b.id===id); if(!bk)return;
+  const p=bk.payments[idx]; if(!p||!p.heldBy)return;
+  p.collected=!p.collected;
+  save();renderAll();openDetail(id);
+  toast(p.collected?'Хүлээн авсан гэж тэмдэглэлээ ✓':'Буцаагдлаа — хүлээгээгүй болов','ok');
+}
+function toggleVat(id){
+  const bk=S.bookings.find(b=>b.id===id); if(!bk)return;
+  bk.vatEnabled=!bk.vatEnabled;
+  save();renderAll();openDetail(id);
+  toast(bk.vatEnabled?'НӨАТ нэмэгдлээ ✓':'НӨАТ хасагдлаа','ok');
+}
 function editDiscount(id){
   const bk=S.bookings.find(b=>b.id===id); if(!bk)return;
   openModal('Хямдрал тохируулах',
@@ -1388,9 +1447,22 @@ function openDetail(id){
       </div>
       ${t.extras?`<div class="sumline"><span>Нэмэлт үйлчилгээ</span><span>${money(t.extras)}</span></div>`:''}
       ${t.fee?`<div class="sumline" style="color:var(--red)"><span>Торгууль (${bk.cancelInfo.type==='late'?'хожуу хойшлол':'цуцлалт'})</span><span>${money(t.fee)}</span></div>`:''}
+      ${t.vatEnabled?`<div class="sumline" style="color:#1c6ea4"><span>НӨАТ (${t.vatPct}%) <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Унтраах" onclick="toggleVat('${id}')">✕</button></span><span>+${money(t.vatAmt)}</span></div>`:`<div class="sumline" style="font-size:11.5px;color:var(--muted)"><span>НӨАТгүй <button class="btn-icon" style="padding:0 4px;font-size:11px" title="НӨАТ авах" onclick="toggleVat('${id}')">🧾 НӨАТ авах</button></span><span></span></div>`}
       <div class="sumtot"><span>Нийт төлбөр</span><span>${money(t.grand)}</span></div>
       ${t.prepaid?`<div class="sumline" style="margin-top:6px"><span>Урьдчилгаа${acc?' ('+acc.name.split(' ')[0]+')':''}</span><span>${money(t.prepaid)}</span></div>`:''}
-      ${(bk.payments||[]).map((p,pi)=>{const pa=accById(p.accountId);const label=p.isAdjustment?'⚖️ Тохируулга'+(p.note?' ('+p.note+')':''):'Төлбөр '+(pi+1)+(pa?' ('+pa.name.split(' ')[0]+')':'');return `<div class="sumline"><span>${label} · ${p.date||''} <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Устгах" onclick="delPayment('${id}',${pi})">✕</button></span><span>${money(p.amount||0)}</span></div>`;}).join('')}
+      ${(bk.payments||[]).map((p,pi)=>{
+        const pa=accById(p.accountId);
+        const staffM=p.heldBy?(S.staff||[]).find(s=>s.id===p.heldBy):null;
+        let label, extra='';
+        if(p.isAdjustment){ label='⚖️ Тохируулга'+(p.note?' ('+p.note+')':''); }
+        else if(p.heldBy){
+          label='💵 Бэлэн ('+(staffM?staffM.name:'ажилтан')+')';
+          extra=p.collected
+            ? ` <span class="pill ok" style="font-size:9.5px">Хүлээн авсан</span> <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Буцаах" onclick="toggleCashCollected('${id}',${pi})">↺</button>`
+            : ` <span class="pill" style="background:#fde8ec;color:var(--berry);font-size:9.5px">Хүлээгээгүй</span> <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Хүлээн авсан" onclick="toggleCashCollected('${id}',${pi})">✓</button>`;
+        } else { label='Төлбөр '+(pi+1)+(pa?' ('+pa.name.split(' ')[0]+')':''); }
+        return `<div class="sumline"><span>${label} · ${p.date||''}${extra} <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Устгах" onclick="delPayment('${id}',${pi})">✕</button></span><span>${money(p.amount||0)}</span></div>`;
+      }).join('')}
       ${(bk.refunds||[]).map((r,ri)=>{const ra=accById(r.accountId);return `<div class="sumline" style="color:var(--red)"><span>↩ Буцаалт${ra?' ('+ra.name.split(' ')[0]+')':''} · ${r.date||''}${r.reason?' · '+r.reason:''} <button class="btn-icon" style="padding:0 4px;font-size:11px" title="Устгах" onclick="delRefund('${id}',${ri})">✕</button></span><span>−${money(r.amount||0)}</span></div>`;}).join('')}
       <div class="sumline" style="font-weight:700;color:${t.balance>0?'var(--berry)':t.overpaid?'#c0392b':'var(--green)'}"><span>${t.balance>0?'Үлдэгдэл төлбөр':t.overpaid?'⚠️ Илүү төлөлт (буцаах)':'Бүрэн төлөгдсөн ✓'}</span><span>${money(Math.abs(t.balance))}</span></div>
     </div>
@@ -1534,12 +1606,18 @@ function doConfirm(id){
 function openFinalPay(id){
   const bk=S.bookings.find(b=>b.id===id);
   const t=bookingTotals(bk);
+  const staff=S.staff||[];
   openModal('Үлдэгдэл төлбөр хийх',
     `<p class="hint" style="margin-bottom:10px">Нийт: <b>${money(t.grand)}</b> · Төлсөн: <b style="color:var(--green)">${money(t.paid)}</b> · Үлдэгдэл: <b style="color:var(--berry)">${money(t.balance)}</b></p>
      <div class="form-grid">
       <div><label class="field">Одоо төлж буй дүн (₮)</label><input id="f_amt" type="number" value="${t.balance>0?t.balance:0}"></div>
-      <div><label class="field">Данс</label><select id="f_acc">${S.accounts.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')}</select></div>
       <div><label class="field">Огноо</label><input id="f_date" type="date" value="${todayStr()}"></div>
+    </div>
+    <div style="margin-top:10px"><label style="font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px"><input type="checkbox" id="f_iscash" style="width:auto" onchange="document.getElementById('f_accbox').style.display=this.checked?'none':'block';document.getElementById('f_staffbox').style.display=this.checked?'block':'none'">💵 Бэлэн мөнгө ажилтанд үлдээсэн (данс руу ороогүй)</label></div>
+    <div id="f_accbox"><label class="field">Данс</label><select id="f_acc">${S.accounts.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')}</select></div>
+    <div id="f_staffbox" style="display:none">
+      ${staff.length?`<label class="field">Хэн үлдээж авсан</label><select id="f_staff">${staff.map(s=>`<option value="${s.id}">${s.name}</option>`).join('')}</select>`
+        :'<div class="hint" style="color:var(--red)">Эхлээд Тохиргоонд ажилтан бүртгэнэ үү.</div>'}
     </div>
     <div class="hint" style="margin-top:8px">Дүнг өөрчилж хэсэгчлэн төлж болно. Үлдэгдэл дүнг бүтнээр нь оруулбал захиалга «Бүрэн төлсөн» болж хаагдана.</div>`,
     `<button class="btn btn-ghost" onclick="openDetail('${id}')">Буцах</button>
@@ -1549,8 +1627,15 @@ function doFinalPay(id){
   const bk=S.bookings.find(b=>b.id===id);
   const amt=parseInt(document.getElementById('f_amt').value)||0;
   if(amt<=0){toast('Дүн оруулна уу','err');return;}
+  const isCash=document.getElementById('f_iscash').checked;
   bk.payments=bk.payments||[];
-  bk.payments.push({amount:amt,accountId:document.getElementById('f_acc').value,date:document.getElementById('f_date').value,at:new Date().toISOString()});
+  if(isCash){
+    const staffId=document.getElementById('f_staff')?document.getElementById('f_staff').value:'';
+    if(!staffId){toast('Ажилтан сонгоно уу','err');return;}
+    bk.payments.push({amount:amt,accountId:'',date:document.getElementById('f_date').value,at:new Date().toISOString(),heldBy:staffId,collected:false});
+  } else {
+    bk.payments.push({amount:amt,accountId:document.getElementById('f_acc').value,date:document.getElementById('f_date').value,at:new Date().toISOString()});
+  }
   bk.finalPay=null; // хуучин формат цэвэрлэнэ
   save();closeModal();renderAll();openDetail(id);
   const t=bookingTotals(bk);
@@ -1671,7 +1756,49 @@ function delBooking(id){
     `<button class="btn btn-ghost" onclick="openDetail('${id}')">Болих</button>
      <button class="btn btn-berry" onclick="confirmDel('${id}')">Устгах</button>`);
 }
-function confirmDel(id){S.bookings=S.bookings.filter(b=>b.id!==id);save();closeModal();renderAll();toast('Устгагдлаа');}
+// Устгасан зүйлийг сэргээж болохоор хогийн санд хадгална (30 хоногийн дараа автоматаар устна)
+const TRASH_LABEL={booking:'📋 Захиалга',product:'📦 Бараа'};
+function renderTrashBox(){
+  const box=document.getElementById('trashBox'); if(!box)return;
+  const items=S.trash||[];
+  if(!items.length){box.innerHTML='<div class="hint">Хогийн сав хоосон байна.</div>';return;}
+  box.innerHTML=items.map(t=>{
+    const d=new Date(t.deletedAt);
+    const dateStr=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+    return `<div class="row" style="justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line)">
+      <div><span class="pill" style="font-size:10px;margin-right:6px">${TRASH_LABEL[t.type]||t.type}</span><b>${t.label||''}</b><div style="font-size:10.5px;color:var(--muted)">Устгасан: ${dateStr}</div></div>
+      <div class="row" style="gap:5px">
+        <button class="btn btn-primary btn-sm" onclick="restoreFromTrash('${t.id}')">↺ Сэргээх</button>
+        <button class="btn-icon" title="Бүрмөсөн устгах" onclick="purgeTrashItem('${t.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function moveToTrash(type,data,label){
+  S.trash=S.trash||[];
+  S.trash.unshift({id:uid('tr'),type,data:JSON.parse(JSON.stringify(data)),label,deletedAt:new Date().toISOString()});
+  // 30 хоногоос хуучин зүйлийг цэвэрлэнэ
+  const cutoff=Date.now()-30*24*3600*1000;
+  S.trash=S.trash.filter(t=>new Date(t.deletedAt).getTime()>cutoff);
+}
+function restoreFromTrash(trashId){
+  const idx=S.trash.findIndex(t=>t.id===trashId); if(idx<0)return;
+  const item=S.trash[idx];
+  if(item.type==='booking') S.bookings.push(item.data);
+  else if(item.type==='product') S.products.push(item.data);
+  S.trash.splice(idx,1);
+  save();renderAll();renderSettings();toast('Сэргээгдлээ ✓','ok');
+}
+function purgeTrashItem(trashId){
+  S.trash=S.trash.filter(t=>t.id!==trashId);
+  save();renderSettings();toast('Бүрмөсөн устгагдлаа');
+}
+function confirmDel(id){
+  const bk=S.bookings.find(b=>b.id===id); if(!bk)return;
+  moveToTrash('booking',bk,(bk.name||bk.phone||'')+' · '+(bk.checkIn||''));
+  S.bookings=S.bookings.filter(b=>b.id!==id);save();closeModal();renderAll();
+  toast('Устгагдлаа — 30 хоногийн дотор Тохиргооноос сэргээж болно','ok');
+}
 
 /* ---- message ---- */
 // Хүн тус бүрийн үнийн задаргаа (тоо × үнэ × хоног = дүн)
@@ -1711,6 +1838,7 @@ function breakdownText(bk){
   }).join('\n');
   const t=bookingTotals(bk);
   if(t.discountPct>0) txt+='\nХямдрал ('+t.discountPct+'%): −'+money(t.discountAmt);
+  if(t.vatEnabled) txt+='\nНӨАТ ('+t.vatPct+'%): +'+money(t.vatAmt);
   txt+='\n\nНийт: '+money(t.grand);
   return txt;
 }
@@ -1747,7 +1875,20 @@ function renderReminders(){
   const departures=S.bookings.filter(b=>b.status!=='cancelled'&&bookingCheckoutDate(b)===today);
   const pending=S.bookings.filter(b=>b.status==='pending'&&!b.msgSentAt);
   const overdueUnpaid=S.bookings.filter(b=>b.status!=='cancelled'&&bookingCheckoutDate(b)<today&&bookingTotals(b).balance>0);
+  const uncollectedCash=[];
+  S.bookings.forEach(bk=>{
+    (bk.payments||[]).forEach((p,pi)=>{
+      if(p.heldBy&&!p.collected) uncollectedCash.push({bk,p,pi});
+    });
+  });
   let h='';
+  if(uncollectedCash.length){
+    const total=uncollectedCash.reduce((s,x)=>s+(x.p.amount||0),0);
+    h+=`<div class="rcard warn"><div class="rt">💵 Ажилтанд бэлэн мөнгө үлдсэн (${money(total)})</div><div class="rv">${uncollectedCash.map(x=>{
+      const st=(S.staff||[]).find(s=>s.id===x.p.heldBy);
+      return `<a href="#" onclick="openDetail('${x.bk.id}');return false" style="color:inherit;text-decoration:underline">${x.bk.phone} · ${st?st.name:'ажилтан'} (${money(x.p.amount)})</a>`;
+    }).join(', ')}</div></div>`;
+  }
   if(overdueUnpaid.length)h+=`<div class="rcard warn"><div class="rt">🔴 Гарсан ч төлбөр дутуу</div><div class="rv">${overdueUnpaid.map(b=>`<a href="#" onclick="openDetail('${b.id}');return false" style="color:inherit;text-decoration:underline">${b.phone} (${money(bookingTotals(b).balance)})</a>`).join(', ')}</div></div>`;
   if(unpaid24.length)h+=`<div class="rcard warn"><div class="rt">⏰ 24 цаг өнгөрсөн — урьдчилгаа хүлээгдэж буй</div><div class="rv">${unpaid24.map(b=>b.phone).join(', ')}</div></div>`;
   h+=`<div class="rcard"><div class="rt">📥 Өнөөдөр ирэх</div><div class="rv">${arrivals.length?arrivals.map(b=>b.phone+' (№'+b.rooms.map(r=>r.num).join(',')+')').join('; '):'—'}</div></div>`;
@@ -1937,10 +2078,11 @@ function renderSettings(){
 
     <div class="card set-sec">
       <h3>🧒 Хүүхдийн ангилал (нас/хоол)</h3>
+      <div class="hint" style="margin-bottom:8px"><b>Үнэ өөрчлөхөд зөвхөн өнөөдрөөс хойшхи (шинэ захиалга, ирээдүйн хоног) үнэ өөрчлөгдөнө</b> — өнгөрсөн, одоо явж буй захиалгын тооцоонд нөлөөлөхгүй.</div>
       <table class="mini-tbl"><thead><tr><th>Нэр</th><th>Үнэ (₮)</th><th></th></tr></thead><tbody>
       ${S.tiers.map((t,i)=>`<tr>
         <td><input value="${t.name}" onchange="S.tiers[${i}].name=this.value"></td>
-        <td><input type="number" value="${t.price}" style="width:110px" onchange="S.tiers[${i}].price=parseInt(this.value)||0"></td>
+        <td><input type="number" value="${t.price}" style="width:110px" onchange="quickSetTierPrice(${i},this.value)"></td>
         <td><button class="btn-icon" onclick="delTier(${i})">✕</button></td></tr>`).join('')}
       </tbody></table>
       <div class="row" style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="addTier()">+ Ангилал</button><button class="btn btn-primary btn-sm" onclick="saveTiers()">Хадгалах</button></div>
@@ -2113,11 +2255,18 @@ function renderSettings(){
     </div>
 
     <div class="card set-sec">
+      <h3>🗑 Устгасан зүйлс (сэргээх)</h3>
+      <div class="hint" style="margin-bottom:10px">Алдаагаар устгасан захиалга, бараа 30 хоногийн дотор энд байж, сэргээж болно.</div>
+      <div id="trashBox"></div>
+    </div>
+
+    <div class="card set-sec">
       <h3>🗑 Өгөгдөл</h3>
       <div class="hint" style="margin-bottom:10px">Бүх захиалга, тохиргоог устгаж анхны байдалд шилжүүлнэ.</div>
       <button class="btn btn-berry btn-sm" onclick="resetAll()">Бүх өгөгдөл цэвэрлэх</button>
     </div>`;
   document.getElementById('setBody').innerHTML=body;
+  renderTrashBox();
   renderMealSlotsSettings();
   renderStaffSettings();
   renderRoomAssets();
@@ -2254,6 +2403,18 @@ function quickSetRoomPrice(i,val){
   r.price=price;
   save();renderSettings();renderAll();
   toast('Үнэ шинэчлэгдлээ — өнөөдрөөс хойш хэрэгжинэ ✓','ok');
+}
+function quickSetTierPrice(i,val){
+  const t=S.tiers[i]; if(!t)return;
+  const price=parseInt(val)||0;
+  const today=todayStr();
+  if(!t.priceHistory||!t.priceHistory.length) t.priceHistory=[{from:'0000-01-01',price:t.price||0}];
+  t.priceHistory=t.priceHistory.filter(h=>h.from!==today);
+  t.priceHistory.push({from:today,price});
+  t.priceHistory.sort((a,b)=>a.from.localeCompare(b.from));
+  t.price=price;
+  save();renderSettings();renderAll();
+  toast('Хүүхдийн үнэ шинэчлэгдлээ — өнөөдрөөс хойш хэрэгжинэ ✓','ok');
 }
 function addRoomPriceHist(i){
   const r=S.rooms[i];
@@ -2741,6 +2902,9 @@ function renderMassageGrid(){
   rooms.forEach(({roomNum,bk,room})=>{
     const people=roomPeople(room,msgDate);
     const cells=bk.msgPlan[msgDate][roomNum]||{};
+    const totalNights=daysBetween(bookingCheckinDate(bk),bookingCheckoutDate(bk));
+    const dayIdx=daysBetween(bookingCheckinDate(bk),msgDate)+1;
+    const nightsInfo=`${dayIdx}/${totalNights} хон`;
     let roomCards='';
     people.forEach((p,pi)=>{
       const c=cells[p.key]||{svc:'rest',done:false};
@@ -2748,7 +2912,7 @@ function renderMassageGrid(){
       const svc=svcById(c.svc);
       const free=svc&&svc.therapist===false;
       rowsH+=`<tr class="${off?'offday':''} ${c.done?'rdone':''}">
-        ${pi===0?`<td class="rmc" rowspan="${people.length}"><b>№${roomNum}</b><div class="sm">${bk.name||bk.phone}</div></td>`:''}
+        ${pi===0?`<td class="rmc" rowspan="${people.length}"><b>№${roomNum}</b><div class="sm">${bk.name||bk.phone}</div><div class="sm" style="color:var(--berry);font-weight:700">${nightsInfo}</div></td>`:''}
         <td class="pc"><span class="cb ${p.cat}"></span>${p.label}</td>
         <td><select ${c.done?'disabled':''} onchange="setPersonCell('${bk.id}','${msgDate}',${roomNum},'${p.key}',this.value)">${svcSelectOpts(c.svc)}</select></td>
         <td class="mc">${m?m+'м':'—'}${free?'<span class="par">зэрэг</span>':''}</td>
@@ -2772,7 +2936,7 @@ function renderMassageGrid(){
       </div>`;
     });
     cardsH+=`<div class="msg-room-card ${off?'offday':''}">
-      <div class="msg-room-h"><b>№${roomNum}</b><span class="sm">${bk.name||bk.phone}</span></div>
+      <div class="msg-room-h"><b>№${roomNum}</b><span class="sm">${bk.name||bk.phone}</span><span class="sm" style="color:var(--berry);font-weight:700">${nightsInfo}</span></div>
       ${roomCards}
     </div>`;
   });
@@ -3384,8 +3548,11 @@ function deleteProduct(id){
     `<button class="btn btn-ghost" onclick="closeModal()">Болих</button><button class="btn btn-berry" onclick="confirmDelProduct('${id}')">Устгах</button>`);
 }
 function confirmDelProduct(id){
+  const p=S.products.find(x=>x.id===id); if(!p)return;
+  moveToTrash('product',p,p.name);
   S.products=S.products.filter(x=>x.id!==id);
-  save();closeModal();renderAll();toast('Устгагдлаа');
+  save();closeModal();renderAll();
+  toast('Устгагдлаа — 30 хоногийн дотор Тохиргооноос сэргээж болно','ok');
 }
 function seedProducts(){
   const samples=[
@@ -3554,10 +3721,14 @@ function stockTakeItems(){
   return S.products.filter(p=>groups.includes(p.group||'goods')&&(p.group||'goods')!=='service');
 }
 function renderStockTake(){
+  let totalDiffValue=0, totalMissingValue=0, totalExcessValue=0;
   const rows=stockTakeItems().map(p=>{
     const sum=moveSummary(p.id,stDraft.from);
     const phys=stDraft.physical[p.id];
     const diff=phys-p.stock;
+    const diffValue=diff*(p.cost||0);
+    totalDiffValue+=diffValue;
+    if(diff<0) totalMissingValue+=Math.abs(diffValue); else if(diff>0) totalExcessValue+=diffValue;
     return `<tr>
       <td><b>${p.name}</b></td>
       <td style="color:var(--green)">+${sum.inQty}</td>
@@ -3567,17 +3738,46 @@ function renderStockTake(){
       <td><b>${p.stock}</b></td>
       <td><input type="number" min="0" step="any" style="width:80px;padding:5px 7px" value="${phys}" onchange="stDraft.physical['${p.id}']=parseFloat(this.value)||0;renderStockTake()"></td>
       <td style="font-weight:700;color:${diff===0?'var(--green)':'var(--red)'}">${diff===0?'0':(diff>0?'+':'')+diff}</td>
+      <td style="font-weight:700;color:${diffValue===0?'var(--muted)':diffValue<0?'var(--red)':'var(--green)'}">${diffValue===0?'—':(diffValue>0?'+':'')+money(diffValue)}</td>
     </tr>`;
   }).join('');
   const scopeLbl=stDraft.scope==='sale'?'Зарах бараа':stDraft.scope==='stock'?'Агуулах':'Бүх бараа';
+  const soldBreakdown = stDraft.scope==='sale' ? renderSoldBreakdownHtml(stDraft.from, todayStr()) : '';
   openModal('🧾 Тулгалт · '+scopeLbl+(stDraft.from?' ('+stDraft.from+'-с хойш)':''),
     `<div class="hint" style="margin-bottom:10px">Бодит үлдэгдлээ тоолж бичнэ. Зөрүү = Бодит − Систем. Зөрүү гарвал бараа бүртгэлгүй гарсан (дутсан) гэсэн үг.</div>
+     <div class="msum" style="margin-bottom:12px">
+       <div class="card"><div class="v" style="color:var(--red)">${money(totalMissingValue)}</div><div class="l">Дутсан барааны үнэ</div></div>
+       <div class="card"><div class="v" style="color:var(--green)">${money(totalExcessValue)}</div><div class="l">Илүү гарсан барааны үнэ</div></div>
+       <div class="card"><div class="v" style="color:${totalDiffValue<0?'var(--red)':'var(--navy)'}">${totalDiffValue>=0?'+':''}${money(totalDiffValue)}</div><div class="l">Цэвэр зөрүү</div></div>
+     </div>
      <div style="overflow-x:auto"><table class="ptbl">
-       <thead><tr><th>Бараа</th><th title="Нөхсөн">+Нэмсэн</th><th title="Зочинд зарсан">−Зочин</th><th title="Дотоод хэрэглээ">−Дотоод</th><th title="Бариа/Хоолны хэрэглээ">−Хэрэглээ</th><th>Систем</th><th>Бодит</th><th>Зөрүү</th></tr></thead>
+       <thead><tr><th>Бараа</th><th title="Нөхсөн">+Нэмсэн</th><th title="Зочинд зарсан">−Зочин</th><th title="Дотоод хэрэглээ">−Дотоод</th><th title="Бариа/Хоолны хэрэглээ">−Хэрэглээ</th><th>Систем</th><th>Бодит</th><th>Зөрүү</th><th>Зөрүүний үнэ</th></tr></thead>
        <tbody>${rows}</tbody>
-     </table></div>`,
+     </table></div>
+     ${soldBreakdown}`,
     `<button class="btn btn-ghost" onclick="closeModal()">Болих</button>
      <button class="btn btn-primary" onclick="confirmStockTake()">Тулгаж хаах</button>`);
+}
+// Сүүлийн тулгалтаас хойш аль өрөө/ажилтанд юу зарагдсаныг задалж харуулна (тулгалтын зөрүүг тайлбарлахад тус болно)
+function renderSoldBreakdownHtml(from,to){
+  const sold=(S.purchases||[]).filter(p=>(p.date||'')>=(from||'0000-01-01')&&(p.date||'')<=to);
+  if(!sold.length) return '<div class="hint" style="margin-top:12px">Энэ хугацаанд худалдан авалт бүртгэгдээгүй байна.</div>';
+  sold.sort((a,b)=>a.date.localeCompare(b.date));
+  const total=sold.reduce((s,p)=>s+p.total,0);
+  return `<div style="margin-top:16px">
+    <h3 style="font-size:14px;color:var(--navy);margin-bottom:8px">📋 Энэ хугацаанд зарагдсан (${from||'эхнээс'} — ${to}) · Нийт ${money(total)}</h3>
+    <div style="overflow-x:auto"><table class="mini-tbl">
+      <thead><tr><th>Огноо</th><th>Хэн</th><th>Бараа</th><th>Дүн</th></tr></thead>
+      <tbody>${sold.map(p=>{
+        let who='';
+        if(p.targetType==='room') who='Өрөө '+p.roomNum;
+        else{ const st=(S.staff||[]).find(s=>s.id===p.staffId); who='👷 '+(st?st.name:'Ажилтан'); }
+        const goods=(p.lines||[]).map(l=>l.name+' ×'+l.qty).join(', ');
+        return `<tr><td>${p.date}</td><td><b>${who}</b></td><td style="font-size:12px">${goods}</td><td>${money(p.total)}</td></tr>`;
+      }).join('')}</tbody>
+    </table></div>
+    <div class="hint" style="margin-top:6px">Дээрх жагсаалт тухайн хугацаанд бүртгэгдсэн худалдан авалт. Хэрэв зөрүү гарвал энд бүртгэгдээгүй зарагдсан бараа байгаа магадлалтай.</div>
+  </div>`;
 }
 function confirmStockTake(){
   const lines=[];
@@ -4965,7 +5165,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='7.1';
+const APP_VER='7.9';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
