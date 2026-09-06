@@ -1455,25 +1455,21 @@ function openDetail(id){
     const isNewName = kind==='service' ? !e.svcId : !e.productId;
     const catalogList = kind==='service' ? (S.massageServices||[]) : extraSaleProducts;
     const curVal = kind==='service' ? (e.svcId||'new') : (e.productId||'new');
-    return `<div class="rcard" style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:8px;background:#fff">
-      <div class="row" style="gap:6px;flex-wrap:wrap;align-items:center">
-        <select style="width:130px;font-weight:600" onchange="setExtraKind('${id}',${i},this.value)">
-          <option value="service" ${kind==='service'?'selected':''}>💆 Үйлчилгээ</option>
-          <option value="goods" ${kind==='goods'?'selected':''}>🛒 Худалдан авалт</option>
+    return `<div class="rcard" style="border:1px solid var(--line);border-radius:10px;padding:8px 9px;margin-bottom:6px;background:#fff">
+      <div class="row" style="gap:5px;flex-wrap:wrap;align-items:center">
+        <select style="width:110px;font-weight:600;font-size:12px" onchange="setExtraKind('${id}',${i},this.value)">
+          <option value="service" ${kind==='service'?'selected':''}>💆 Үйлч.</option>
+          <option value="goods" ${kind==='goods'?'selected':''}>🛒 Худ.авалт</option>
         </select>
-        <select style="flex:1;min-width:150px" onchange="setExtraCatalogItem('${id}',${i},this.value)">
+        <select style="flex:1;min-width:110px;font-size:12.5px" onchange="setExtraCatalogItem('${id}',${i},this.value)">
           ${catalogList.map(x=>`<option value="${x.id}" ${curVal===x.id?'selected':''}>${x.name} · ${money(x.price)}</option>`).join('')}
-          <option value="new" ${curVal==='new'?'selected':''}>➕ ${kind==='service'?'Шинэ нэр (гараар)':'Шинэ бараа нэмэх'}</option>
+          <option value="new" ${curVal==='new'?'selected':''}>➕ ${kind==='service'?'Шинэ нэр':'Шинэ бараа'}</option>
         </select>
+        ${isNewName?`<input value="${e.name}" placeholder="${kind==='service'?'Нэр':'Барааны нэр'}" style="width:100px;font-size:12.5px" onchange="setExtraName('${id}',${i},this.value)">`:''}
+        <input type="number" value="${e.price||0}" style="width:80px;font-size:12.5px" onchange="setExtra('${id}',${i},'price',parseInt(this.value)||0)">
+        <input type="number" min="1" value="${e.qty||1}" style="width:48px;font-size:12.5px" onchange="setExtra('${id}',${i},'qty',parseInt(this.value)||1)">
         <button class="btn-icon" onclick="delExtra('${id}',${i})">✕</button>
       </div>
-      <div class="row" style="gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px">
-        ${isNewName?`<input value="${e.name}" placeholder="${kind==='service'?'Үйлчилгээний нэр':'Барааны нэр'}" style="flex:1;min-width:140px" onchange="setExtraName('${id}',${i},this.value)">`:'<span style="flex:1;min-width:140px;font-size:12.5px;color:var(--muted)">'+e.name+'</span>'}
-        <input type="number" value="${e.price||0}" style="width:100px" onchange="setExtra('${id}',${i},'price',parseInt(this.value)||0)"><span style="font-size:12px">₮</span>
-        <input type="number" min="1" value="${e.qty||1}" style="width:60px" onchange="setExtra('${id}',${i},'qty',parseInt(this.value)||1)"><span style="font-size:12px">ш</span>
-      </div>
-      ${kind==='goods'&&isNewName&&e.name&&!e.productId?'<div class="hint" style="font-size:10.5px;margin-top:4px">💡 Хадгалахад энэ бараа Агуулахад автоматаар нэмэгдэж, нөөцөөс хасагдана.</div>':''}
-      ${kind==='goods'&&e.productId?'<div class="hint" style="font-size:10.5px;margin-top:4px;color:#1c6ea4">📦 Агуулахаас хасагдана.</div>':''}
     </div>`;
   }).join('');
   const body=`
@@ -5364,7 +5360,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='8.9';
+const APP_VER='9.1';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
