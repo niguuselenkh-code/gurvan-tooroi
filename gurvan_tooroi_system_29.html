@@ -125,15 +125,15 @@
   .modal{background:#fff;border-radius:16px;max-width:640px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:pop .2s ease}
   @keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1}}
   .modal-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
-  .modal-head h3{font-size:17px;color:var(--navy);font-weight:700}
-  .modal-body{padding:18px 20px;max-height:68vh;overflow-y:auto}
+  .modal-head h3{font-size:15.5px;color:var(--navy);font-weight:700}
+  .modal-body{padding:16px 18px;max-height:68vh;overflow-y:auto;font-size:13.5px}
   .modal-foot{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
   .x{background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1}
   .roombox{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--soft)}
   .kid{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 8px}
   .chip{display:inline-block;background:#fbe4e1;color:var(--red);font-size:12px;font-weight:600;padding:3px 9px;border-radius:8px}
-  .sumline{display:flex;justify-content:space-between;font-size:13px;padding:2px 0;color:var(--muted)}
-  .sumtot{display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:var(--navy);border-top:1px solid var(--line);margin-top:8px;padding-top:8px}
+  .sumline{display:flex;justify-content:space-between;font-size:12.5px;padding:2px 0;color:var(--muted)}
+  .sumtot{display:flex;justify-content:space-between;font-size:14.5px;font-weight:800;color:var(--navy);border-top:1px solid var(--line);margin-top:8px;padding-top:8px}
   .hint{font-size:12px;color:var(--muted);margin-top:6px}
   #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:13px 22px;border-radius:12px;font-weight:600;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;transition:.3s;z-index:200;max-width:90vw;text-align:center}
   #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
@@ -1478,7 +1478,7 @@ function openDetail(id){
   }).join('');
   const body=`
     <div class="row" style="justify-content:space-between;margin-bottom:10px">
-      <div><b style="font-size:16px">${bk.phone}${bk.name?' · '+bk.name:''}</b>
+      <div><b style="font-size:14.5px">${bk.phone}${bk.name?' · '+bk.name:''}</b>
         <div class="desc">Ирэх ${fmtD(bk.checkIn)} ${bk.arriveTime} → Гарах ${fmtD(out)} ${bk.leaveTime} (${bk.nights} хон)</div></div>
       <div>${statusPill}</div>
     </div>
@@ -1533,7 +1533,7 @@ function openDetail(id){
     <div id="extraBox">${extrasH||'<div class="hint">Одоогоор алга</div>'}</div>
     <div class="row" style="margin-top:8px;gap:8px">
       <button class="btn btn-ghost btn-sm" onclick="addExtra('${id}')">+ Нэмэлт мөр (гараар)</button>
-      <button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="openAddPurchase('${id}')">🥤 Хөргөгчний бараа нэмэх</button>
+      <button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="openAddPurchase('${id}')">🛒 Бараа/Үйлчилгээ нэмэх</button>
     </div>
     <div class="hint" style="margin-top:10px">
       ${bk.msgSentAt?'📤 Мессеж явуулсан: '+new Date(bk.msgSentAt).toLocaleString('mn-MN'):'Мессеж хараахан явуулаагүй'}<br>
@@ -1624,27 +1624,39 @@ function delExtra(id,i){
 /* ---- Add fridge purchase directly from booking detail ---- */
 let purchDraft=null;
 function openAddPurchase(id){
-  if(!S.products.length){toast('Эхлээд «Хөргөгчний бараа» табаас бараа бүртгэнэ үү','err');return;}
+  if(!S.products.length && !(S.massageServices||[]).length){toast('Эхлээд Агуулах эсвэл Барианы үйлчилгээ бүртгэнэ үү','err');return;}
   const bk=S.bookings.find(b=>b.id===id);if(!bk)return;
-  purchDraft={bookingId:id,roomNum:bk.rooms[0]?.num,productId:S.products[0].id,qty:1};
+  const firstProd=S.products[0];
+  purchDraft={bookingId:id,roomNum:bk.rooms[0]?.num,kind:firstProd?'goods':'service',productId:firstProd?firstProd.id:null,svcId:!firstProd?((S.massageServices||[])[0]||{}).id:null,qty:1};
+  renderAddPurchase();
+}
+function selectPurchItem(val){
+  if(val.startsWith('svc:')){ purchDraft.kind='service'; purchDraft.svcId=val.slice(4); purchDraft.productId=null; }
+  else { purchDraft.kind='goods'; purchDraft.productId=val.slice(5); purchDraft.svcId=null; }
+  purchDraft.qty=1;
   renderAddPurchase();
 }
 function renderAddPurchase(){
   const bk=S.bookings.find(b=>b.id===purchDraft.bookingId);
-  const p=S.products.find(x=>x.id===purchDraft.productId);
   const roomOptsH=bk.rooms.map(r=>`<option value="${r.num}" ${r.num==purchDraft.roomNum?'selected':''}>№${r.num}</option>`).join('');
-  const goods=S.products.filter(x=>(x.group||'goods')==='goods');
-  const services=S.products.filter(x=>x.group==='service');
-  const optHtml=x=>`<option value="${x.id}" ${x.id===purchDraft.productId?'selected':''}>${x.name} · ${money(x.price)} · үлдэгдэл ${x.stock}</option>`;
-  const prodOptsH=(goods.length?`<optgroup label="Хүнс, ахуй бараа">${goods.map(optHtml).join('')}</optgroup>`:'')
-    + (services.length?`<optgroup label="Нэмэлт үйлчилгээ">${services.map(optHtml).join('')}</optgroup>`:'');
-  const maxQty=p?p.stock:0;
-  if(purchDraft.qty>maxQty)purchDraft.qty=Math.max(1,maxQty);
-  const total=p?p.price*purchDraft.qty:0;
+  const goods=S.products.filter(x=>SALE_GROUPS.includes(x.group||'goods'));
+  const services=S.massageServices||[];
+  const curVal=purchDraft.kind==='service'?'svc:'+purchDraft.svcId:'prod:'+purchDraft.productId;
+  const optHtml=x=>`<option value="prod:${x.id}" ${curVal==='prod:'+x.id?'selected':''}>${x.name} · ${money(x.price)} · үлдэгдэл ${x.stock}</option>`;
+  const svcOptHtml=x=>`<option value="svc:${x.id}" ${curVal==='svc:'+x.id?'selected':''}>${x.name} · ${money(x.price)}</option>`;
+  const itemOptsH=(goods.length?`<optgroup label="🛒 Агуулахын бараа">${goods.map(optHtml).join('')}</optgroup>`:'')
+    + (services.length?`<optgroup label="💆 Барианы үйлчилгээ">${services.map(svcOptHtml).join('')}</optgroup>`:'');
+  const isGoods=purchDraft.kind==='goods';
+  const p=isGoods?S.products.find(x=>x.id===purchDraft.productId):null;
+  const svc=!isGoods?(S.massageServices||[]).find(x=>x.id===purchDraft.svcId):null;
+  const item=p||svc;
+  const maxQty=isGoods?(p?p.stock:0):999;
+  if(isGoods && purchDraft.qty>maxQty)purchDraft.qty=Math.max(1,maxQty);
+  const total=item?item.price*purchDraft.qty:0;
   const body=`
     <div class="form-grid">
       ${bk.rooms.length>1?`<div><label class="field">Өрөө</label><select onchange="purchDraft.roomNum=this.value;renderAddPurchase()">${roomOptsH}</select></div>`:''}
-      <div style="grid-column:${bk.rooms.length>1?'auto':'1/-1'}"><label class="field">Бараа</label><select onchange="purchDraft.productId=this.value;purchDraft.qty=1;renderAddPurchase()">${prodOptsH}</select></div>
+      <div style="grid-column:${bk.rooms.length>1?'auto':'1/-1'}"><label class="field">Бараа / Үйлчилгээ</label><select onchange="selectPurchItem(this.value)">${itemOptsH}</select></div>
     </div>
     <div style="margin-top:12px;display:flex;align-items:center;gap:10px">
       <label class="field" style="margin-bottom:0">Тоо ширхэг</label>
@@ -1653,16 +1665,15 @@ function renderAddPurchase(){
         <span style="min-width:26px;text-align:center;font-weight:700">${purchDraft.qty}</span>
         <button class="btn-icon" onclick="changePurchQty(1)">+</button>
       </div>
-      ${maxQty<=0?'<span style="color:var(--red);font-size:12.5px">Үлдэгдэл дууссан</span>':''}
+      ${isGoods&&maxQty<=0?'<span style="color:var(--red);font-size:12.5px">Үлдэгдэл дууссан</span>':''}
     </div>
     <div class="sumtot" style="margin-top:14px"><span>Нийт дүн (№${purchDraft.roomNum})</span><span>${money(total)}</span></div>`;
-  openModal('🥤 Хөргөгчний бараа нэмэх', body,
+  openModal('🛒 Бараа / Үйлчилгээ нэмэх', body,
     `<button class="btn btn-ghost" onclick="openDetail('${purchDraft.bookingId}')">Болих</button>
-     <button class="btn btn-primary" ${maxQty<=0?'disabled':''} onclick="confirmAddPurchase()">Нэмэх</button>`);
+     <button class="btn btn-primary" ${isGoods&&maxQty<=0?'disabled':''} onclick="confirmAddPurchase()">Нэмэх</button>`);
 }
 function changePurchQty(d){
-  const p=S.products.find(x=>x.id===purchDraft.productId);
-  const max=p?p.stock:0;
+  const max=purchDraft.kind==='goods'?(S.products.find(x=>x.id===purchDraft.productId)?.stock||0):999;
   const nv=purchDraft.qty+d;
   if(nv<1||nv>max)return;
   purchDraft.qty=nv;
@@ -1670,18 +1681,26 @@ function changePurchQty(d){
 }
 function confirmAddPurchase(){
   const bk=S.bookings.find(b=>b.id===purchDraft.bookingId);
-  const p=S.products.find(x=>x.id===purchDraft.productId);
-  if(!bk||!p)return;
-  if(purchDraft.qty<1||purchDraft.qty>p.stock){toast('Үлдэгдэл хүрэлцэхгүй','err');return;}
-  p.stock-=purchDraft.qty;
-  logMove(p.id,-purchDraft.qty,'guest',{who:(bk.name||bk.phone)+' (№'+purchDraft.roomNum+')',note:'Зочны худалдан авалт'});
-  bk.extras=bk.extras||[];
-  bk.extras.push({name:p.name+' (№'+purchDraft.roomNum+', хөргөгч)', price:p.price, qty:purchDraft.qty});
-  S.productSales.push({id:uid('ps'),bookingId:bk.id,date:todayStr(),items:[{productId:p.id,name:p.name,qty:purchDraft.qty,price:p.price,cost:p.cost}],total:p.price*purchDraft.qty,ts:new Date().toISOString()});
+  if(!bk)return;
+  if(purchDraft.kind==='goods'){
+    const p=S.products.find(x=>x.id===purchDraft.productId);
+    if(!p)return;
+    if(purchDraft.qty<1||purchDraft.qty>p.stock){toast('Үлдэгдэл хүрэлцэхгүй','err');return;}
+    p.stock-=purchDraft.qty;
+    logMove(p.id,-purchDraft.qty,'guest',{who:(bk.name||bk.phone)+' (№'+purchDraft.roomNum+')',note:'Зочны худалдан авалт'});
+    bk.extras=bk.extras||[];
+    bk.extras.push({name:p.name+' (№'+purchDraft.roomNum+', хөргөгч)', price:p.price, qty:purchDraft.qty, productId:p.id, kind:'goods', _deductedQty:purchDraft.qty});
+    S.productSales.push({id:uid('ps'),bookingId:bk.id,date:todayStr(),items:[{productId:p.id,name:p.name,qty:purchDraft.qty,price:p.price,cost:p.cost}],total:p.price*purchDraft.qty,ts:new Date().toISOString()});
+  } else {
+    const svc=(S.massageServices||[]).find(x=>x.id===purchDraft.svcId);
+    if(!svc)return;
+    bk.extras=bk.extras||[];
+    bk.extras.push({name:svc.name+' (№'+purchDraft.roomNum+')', price:svc.price, qty:purchDraft.qty, svcId:svc.id, kind:'service'});
+  }
   const bid=purchDraft.bookingId;
   purchDraft=null;
   save();renderAll();openDetail(bid);
-  toast('Худалдан авалт нэмэгдлээ ✓','ok');
+  toast('Нэмэгдлээ ✓','ok');
 }
 function setRoomNote(id,ri,val){const bk=S.bookings.find(b=>b.id===id);bk.rooms[ri].note=val;save();renderAll();toast('Тайлбар хадгаллаа','ok');}
 function ensureNightOverridesLen(bk){
@@ -5345,7 +5364,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='8.8';
+const APP_VER='8.9';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
