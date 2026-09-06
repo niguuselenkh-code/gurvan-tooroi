@@ -147,6 +147,12 @@
   .stat .value{font-size:22px;font-weight:800;color:var(--navy);margin-top:4px}
   .stat .value.berry{color:var(--berry)}.stat .value.green{color:var(--green)}.stat .value.blue{color:#1c6ea4}
   .rangebar{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
+  .rp-subtabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;border-bottom:2px solid var(--line);padding-bottom:0}
+  .rp-subtab{background:none;border:none;padding:9px 16px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s}
+  .rp-subtab:hover{color:var(--navy)}
+  .rp-subtab.active{color:var(--berry);border-bottom-color:var(--berry)}
+  .rp-panel{animation:fadein .15s ease}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
   .rangebar .rf{display:flex;flex-direction:column;gap:4px}
   .rangebar .rf label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase}
   .rangebar input{width:150px}
@@ -381,6 +387,7 @@
       <button class="btn btn-primary" id="newBkBtn2">+ Шинэ захиалга</button>
     </div>
     <div class="filt" id="listFilt"></div>
+    <div id="cashHeldBox" style="margin-bottom:12px"></div>
     <div class="card"><div id="bookingList"></div></div>
   </section>
 
@@ -554,64 +561,83 @@
     </div>
     <div class="stats" id="rpStats"></div>
     <div id="rpRefundReminder"></div>
-    <div class="grid" style="display:grid;gap:16px;grid-template-columns:1fr 1fr" id="rpCols">
+
+    <div class="rp-subtabs" id="rpSubtabs">
+      <button class="rp-subtab active" data-rptab="overview" onclick="setReportTab('overview')">📊 Ерөнхий</button>
+      <button class="rp-subtab" data-rptab="income" onclick="setReportTab('income')">💰 Орлого</button>
+      <button class="rp-subtab" data-rptab="warehouse" onclick="setReportTab('warehouse')">📦 Агуулах · Зардал</button>
+      <button class="rp-subtab" data-rptab="massage" onclick="setReportTab('massage')">💆 Бариа</button>
+    </div>
+
+    <div class="rp-panel" data-rppanel="overview">
+      <div class="grid" style="display:grid;gap:16px;grid-template-columns:1fr 1fr" id="rpCols">
+        <div class="card" style="padding:16px">
+          <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">🚪 Өрөөгөөр</h3>
+          <div style="overflow-x:auto"><table class="mini-tbl" id="rpRoomTbl"></table></div>
+        </div>
+        <div class="card" style="padding:16px">
+          <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">🧒 Хүүхдийн ангиллаар</h3>
+          <div style="overflow-x:auto"><table class="mini-tbl" id="rpKidTbl"></table></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rp-panel" data-rppanel="income" style="display:none">
       <div class="card" style="padding:16px">
-        <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">🚪 Өрөөгөөр</h3>
-        <div style="overflow-x:auto"><table class="mini-tbl" id="rpRoomTbl"></table></div>
+        <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+          <h3 style="font-size:15px;color:var(--navy);margin:0">🛒 Борлуулалт (зарагдсан)</h3>
+          <div style="font-size:18px;font-weight:800;color:var(--green)">Нийт: <span id="rpSalesSum">0₮</span></div>
+        </div>
+        <div class="hint" style="margin-bottom:10px">Сонгосон хугацаанд зочид, ажилчдад зарагдсан бараа, үйлчилгээ — ангиллаар, тоо ба дүнгээр.</div>
+        <div style="overflow-x:auto"><table class="mini-tbl" id="rpSalesTbl"></table></div>
+        <div style="margin-top:8px;font-size:12px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap">
+          <span>Зочдод: <b id="rpSalesRoom">0₮</b></span>
+          <span>Ажилчдад: <b id="rpSalesStaff">0₮</b></span>
+          <span>Ажилчид төлөөгүй: <b style="color:var(--berry)" id="rpSalesUnpaid">0₮</b></span>
+        </div>
       </div>
+    </div>
+
+    <div class="rp-panel" data-rppanel="warehouse" style="display:none">
       <div class="card" style="padding:16px">
-        <h3 style="font-size:15px;color:var(--navy);margin-bottom:10px">🧒 Хүүхдийн ангиллаар</h3>
-        <div style="overflow-x:auto"><table class="mini-tbl" id="rpKidTbl"></table></div>
+        <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+          <h3 style="font-size:15px;color:var(--navy);margin:0">📦 Агуулахын хөдөлгөөн</h3>
+          <select id="rpStockGroup" style="width:auto;font-size:12.5px" onchange="renderReport()">
+            <option value="all">Бүх бүлэг</option>
+            <option value="food">🍲 Хүнс</option>
+            <option value="house">🧹 Ахуй</option>
+            <option value="build">🧱 Барилга</option>
+            <option value="asset">🏛 Үндсэн хөрөнгө</option>
+            <option value="massage">💆 Бариа</option>
+          </select>
+        </div>
+        <div class="hint" style="margin-bottom:10px">Сонгосон хугацаанд бараа бүрд хэдэн удаа, хэдэн нэгж орж/гарсныг харуулна.</div>
+        <div style="overflow-x:auto"><table class="mini-tbl" id="rpStockTbl"></table></div>
+      </div>
+      <div class="card" style="padding:16px;margin-top:16px">
+        <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+          <h3 style="font-size:15px;color:var(--navy);margin:0">💸 Худалдан авалтын зардал</h3>
+          <div style="font-size:18px;font-weight:800;color:var(--berry)">Нийт: <span id="rpCostSum">0₮</span></div>
+        </div>
+        <div class="hint" style="margin-bottom:10px">Сонгосон хугацаанд нөөцөд зарцуулсан мөнгө — захаар болон бараагаар.</div>
+        <div class="grid" style="display:grid;gap:16px;grid-template-columns:1fr 1fr">
+          <div><h4 style="font-size:13px;color:var(--muted);margin-bottom:6px">🏪 Захаар</h4><div style="overflow-x:auto"><table class="mini-tbl" id="rpCostTbl"></table></div></div>
+          <div><h4 style="font-size:13px;color:var(--muted);margin-bottom:6px">📦 Бараагаар (топ 15)</h4><div style="overflow-x:auto"><table class="mini-tbl" id="rpCostProdTbl"></table></div></div>
+        </div>
       </div>
     </div>
-    <div class="card" style="padding:16px;margin-top:16px">
-      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-        <h3 style="font-size:15px;color:var(--navy);margin:0">📦 Агуулахын хөдөлгөөн</h3>
-        <select id="rpStockGroup" style="width:auto;font-size:12.5px" onchange="renderReport()">
-          <option value="all">Бүх бүлэг</option>
-          <option value="food">🍲 Хүнс</option>
-          <option value="house">🧹 Ахуй</option>
-          <option value="build">🧱 Барилга</option>
-          <option value="asset">🏛 Үндсэн хөрөнгө</option>
-          <option value="massage">💆 Бариа</option>
-        </select>
-      </div>
-      <div class="hint" style="margin-bottom:10px">Сонгосон хугацаанд бараа бүрд хэдэн удаа, хэдэн нэгж орж/гарсныг харуулна.</div>
-      <div style="overflow-x:auto"><table class="mini-tbl" id="rpStockTbl"></table></div>
-    </div>
-    <div class="card" style="padding:16px;margin-top:16px">
-      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
-        <h3 style="font-size:15px;color:var(--navy);margin:0">💸 Худалдан авалтын зардал</h3>
-        <div style="font-size:18px;font-weight:800;color:var(--berry)">Нийт: <span id="rpCostSum">0₮</span></div>
-      </div>
-      <div class="hint" style="margin-bottom:10px">Сонгосон хугацаанд нөөцөд зарцуулсан мөнгө — захаар болон бараагаар.</div>
-      <div class="grid" style="display:grid;gap:16px;grid-template-columns:1fr 1fr">
-        <div><h4 style="font-size:13px;color:var(--muted);margin-bottom:6px">🏪 Захаар</h4><div style="overflow-x:auto"><table class="mini-tbl" id="rpCostTbl"></table></div></div>
-        <div><h4 style="font-size:13px;color:var(--muted);margin-bottom:6px">📦 Бараагаар (топ 15)</h4><div style="overflow-x:auto"><table class="mini-tbl" id="rpCostProdTbl"></table></div></div>
-      </div>
-    </div>
-    <div class="card" style="padding:16px;margin-top:16px">
-      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
-        <h3 style="font-size:15px;color:var(--navy);margin:0">🛒 Борлуулалт (зарагдсан)</h3>
-        <div style="font-size:18px;font-weight:800;color:var(--green)">Нийт: <span id="rpSalesSum">0₮</span></div>
-      </div>
-      <div class="hint" style="margin-bottom:10px">Сонгосон хугацаанд зочид, ажилчдад зарагдсан бараа, үйлчилгээ — ангиллаар, тоо ба дүнгээр.</div>
-      <div style="overflow-x:auto"><table class="mini-tbl" id="rpSalesTbl"></table></div>
-      <div style="margin-top:8px;font-size:12px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap">
-        <span>Зочдод: <b id="rpSalesRoom">0₮</b></span>
-        <span>Ажилчдад: <b id="rpSalesStaff">0₮</b></span>
-        <span>Ажилчид төлөөгүй: <b style="color:var(--berry)" id="rpSalesUnpaid">0₮</b></span>
-      </div>
-    </div>
-    <div class="card" style="padding:16px;margin-top:16px">
-      <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
-        <h3 style="font-size:15px;color:var(--navy);margin:0">💆 Барианы нэмэлт орлого · Бариачийн хувь</h3>
-        <div style="font-size:12px;color:var(--muted)">Хувь: <b id="rpMsgCommPct">0</b>%</div>
-      </div>
-      <div class="hint" style="margin-bottom:10px">Сонгосон хугацаанд хийгдсэн нэмэлт төлбөртэй (billable) барианы үйлчилгээний нийт орлого, түүнээс бариачдад олгох хувь.</div>
-      <div class="msum">
-        <div class="card"><div class="v" style="color:var(--navy)" id="rpMsgRevenue">0₮</div><div class="l">Нэмэлт барианы орлого</div></div>
-        <div class="card"><div class="v" style="color:var(--berry)" id="rpMsgCommission">0₮</div><div class="l">Бариачийн хувь</div></div>
+
+    <div class="rp-panel" data-rppanel="massage" style="display:none">
+      <div class="card" style="padding:16px">
+        <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+          <h3 style="font-size:15px;color:var(--navy);margin:0">💆 Барианы нэмэлт орлого · Бариачийн хувь</h3>
+          <div style="font-size:12px;color:var(--muted)">Хувь: <b id="rpMsgCommPct">0</b>%</div>
+        </div>
+        <div class="hint" style="margin-bottom:10px">Сонгосон хугацаанд хийгдсэн нэмэлт төлбөртэй (billable) барианы үйлчилгээний нийт орлого, түүнээс бариачдад олгох хувь.</div>
+        <div class="msum">
+          <div class="card"><div class="v" style="color:var(--navy)" id="rpMsgRevenue">0₮</div><div class="l">Нэмэлт барианы орлого</div></div>
+          <div class="card"><div class="v" style="color:var(--berry)" id="rpMsgCommission">0₮</div><div class="l">Бариачийн хувь</div></div>
+        </div>
       </div>
     </div>
   </section>
@@ -1082,6 +1108,19 @@ function bookingTotals(bk){
 function prepaySuggest(bk){const sb=stayBreakdown(bk);return Math.round(sb.total*(S.prepay.percent/100));}
 
 /* ============================================================ CONFLICT */
+function sameDayTurnoverWarning(num,checkInDate,arriveTime,exclId){
+  if(!checkInDate||!arriveTime) return null;
+  const lastNightDate=addDays(checkInDate,-1);
+  const departing=S.bookings.find(b=>{
+    if(b.id===exclId||b.status==='cancelled') return false;
+    if(bookingCheckoutDate(b)!==checkInDate) return false;
+    return effectiveRoomsForDate(b,lastNightDate).includes(+num);
+  });
+  if(!departing) return null;
+  const leaveTime=departing.leaveTime||'11:00';
+  if(arriveTime<leaveTime) return {departing,leaveTime};
+  return null;
+}
 function roomConflictOnDate(num,date,exclId){
   return S.bookings.some(b=>{
     if(b.id===exclId||b.status==='cancelled')return false;
@@ -1178,6 +1217,8 @@ function renderBookingModal(){
         busy=roomConflict(r.num,ci,n,editId);
       }
     }
+    const roomCheckIn=singleRoomDraft?draft.checkIn:rCheckIn(draft,r);
+    const turnover=!busy?sameDayTurnoverWarning(r.num,roomCheckIn,draft.arrive,editId):null;
     roomsH+=`<div class="roombox">
       <div class="row" style="align-items:flex-end">
         <div style="flex:1;min-width:120px"><label class="field">Өрөө</label><select onchange="draft.rooms[${ri}].num=this.value;draft.rooms[${ri}].priceSnapshot=null;renderBookingModal()">${roomOpts(r.num)}</select></div>
@@ -1187,6 +1228,7 @@ function renderBookingModal(){
         <button class="btn btn-ghost btn-sm" onclick="delRoom(${ri})">✕</button>
       </div>
       ${busy?`<div class="chip" style="margin-top:8px">⚠️ №${r.num} энэ хугацаанд давхцаж байна</div>`:''}
+      ${turnover?`<div class="chip" style="margin-top:8px;background:#fdf0e0;color:#c98a2e;border-color:#e8c68a">⏰ Анхаар: №${r.num}-ийн өмнөх зочин ${turnover.leaveTime}-д гардаг (${turnover.departing.phone}), гэтэл энэ зочин ${draft.arrive||'?'}-д ирнэ гэж байна — өрөө хараахан бэлэн болоогүй байх магадлалтай!</div>`:''}
       ${!singleRoomDraft?`<div class="row" style="align-items:flex-end;gap:8px;margin-top:8px;background:var(--soft);padding:8px 10px;border-radius:8px">
         <div style="flex:1;min-width:130px"><label class="field" style="font-size:11px">Энэ өрөөний ирэх өдөр</label><input type="date" value="${rCheckIn(draft,r)}" onchange="draft.rooms[${ri}].checkIn=this.value;renderBookingModal()"></div>
         <div style="flex:0 0 90px"><label class="field" style="font-size:11px">Хоног</label><input type="number" min="1" value="${rNights(draft,r)}" onchange="draft.rooms[${ri}].nights=parseInt(this.value)||1;renderBookingModal()"></div>
@@ -1408,28 +1450,31 @@ function openDetail(id){
     : conf?'<span class="pill conf">✓ Баталгаажсан</span>'
     : '<span class="pill pend">⏳ Хүлээгдэж буй</span>';
   const extraSaleProducts=S.products.filter(p=>SALE_GROUPS.includes(p.group||'goods'));
-  function extraOptionsHtml(e){
-    const cur = e.svcId?'svc:'+e.svcId : e.productId?'prod:'+e.productId : 'other';
-    return `<option value="other" ${cur==='other'?'selected':''}>— Бусад (гараар бичих) —</option>
-      <optgroup label="💆 Барианы үйлчилгээ">${(S.massageServices||[]).map(s=>`<option value="svc:${s.id}" ${cur==='svc:'+s.id?'selected':''}>${s.name} · ${money(s.price)}</option>`).join('')}</optgroup>
-      <optgroup label="🛒 Зарах бараа">${extraSaleProducts.map(p=>`<option value="prod:${p.id}" ${cur==='prod:'+p.id?'selected':''}>${p.name} · ${money(p.price)}</option>`).join('')}</optgroup>`;
-  }
   const extrasH=(bk.extras||[]).map((e,i)=>{
-    const cur = e.svcId?'svc:'+e.svcId : e.productId?'prod:'+e.productId : 'other';
-    const otherType = e.otherType||'goods';
-    return `<div class="kid" style="flex-wrap:wrap">
-      <select style="flex:1;min-width:160px" onchange="setExtraFromCatalog('${id}',${i},this.value)">${extraOptionsHtml(e)}</select>
-      ${cur==='other'?`
-        <select style="width:120px" onchange="setExtra('${id}',${i},'otherType',this.value)">
-          <option value="goods" ${otherType==='goods'?'selected':''}>Худалдан авалт</option>
-          <option value="service" ${otherType==='service'?'selected':''}>Үйлчилгээ</option>
+    const kind=e.kind||(e.svcId?'service':'goods');
+    const isNewName = kind==='service' ? !e.svcId : !e.productId;
+    const catalogList = kind==='service' ? (S.massageServices||[]) : extraSaleProducts;
+    const curVal = kind==='service' ? (e.svcId||'new') : (e.productId||'new');
+    return `<div class="rcard" style="border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:8px;background:#fff">
+      <div class="row" style="gap:6px;flex-wrap:wrap;align-items:center">
+        <select style="width:130px;font-weight:600" onchange="setExtraKind('${id}',${i},this.value)">
+          <option value="service" ${kind==='service'?'selected':''}>💆 Үйлчилгээ</option>
+          <option value="goods" ${kind==='goods'?'selected':''}>🛒 Худалдан авалт</option>
         </select>
-        <input value="${e.name}" placeholder="Нэр бичих" style="flex:1;min-width:120px" onchange="setExtraName('${id}',${i},this.value)">`:''}
-      <input type="number" value="${e.price||0}" style="width:100px" onchange="setExtra('${id}',${i},'price',parseInt(this.value)||0)"><span style="font-size:12px">₮</span>
-      <input type="number" min="1" value="${e.qty||1}" style="width:60px" onchange="setExtra('${id}',${i},'qty',parseInt(this.value)||1)"><span style="font-size:12px">ш</span>
-      <button class="btn-icon" onclick="delExtra('${id}',${i})">✕</button>
-    </div>
-    ${cur==='other'&&otherType==='goods'&&e.name&&!e.productId?'<div class="hint" style="font-size:10.5px;margin:-4px 0 4px 4px">💡 Хадгалахад энэ бараа Худалдан авалтын жагсаалтад автоматаар нэмэгдэнэ.</div>':''}`;
+        <select style="flex:1;min-width:150px" onchange="setExtraCatalogItem('${id}',${i},this.value)">
+          ${catalogList.map(x=>`<option value="${x.id}" ${curVal===x.id?'selected':''}>${x.name} · ${money(x.price)}</option>`).join('')}
+          <option value="new" ${curVal==='new'?'selected':''}>➕ ${kind==='service'?'Шинэ нэр (гараар)':'Шинэ бараа нэмэх'}</option>
+        </select>
+        <button class="btn-icon" onclick="delExtra('${id}',${i})">✕</button>
+      </div>
+      <div class="row" style="gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px">
+        ${isNewName?`<input value="${e.name}" placeholder="${kind==='service'?'Үйлчилгээний нэр':'Барааны нэр'}" style="flex:1;min-width:140px" onchange="setExtraName('${id}',${i},this.value)">`:'<span style="flex:1;min-width:140px;font-size:12.5px;color:var(--muted)">'+e.name+'</span>'}
+        <input type="number" value="${e.price||0}" style="width:100px" onchange="setExtra('${id}',${i},'price',parseInt(this.value)||0)"><span style="font-size:12px">₮</span>
+        <input type="number" min="1" value="${e.qty||1}" style="width:60px" onchange="setExtra('${id}',${i},'qty',parseInt(this.value)||1)"><span style="font-size:12px">ш</span>
+      </div>
+      ${kind==='goods'&&isNewName&&e.name&&!e.productId?'<div class="hint" style="font-size:10.5px;margin-top:4px">💡 Хадгалахад энэ бараа Агуулахад автоматаар нэмэгдэж, нөөцөөс хасагдана.</div>':''}
+      ${kind==='goods'&&e.productId?'<div class="hint" style="font-size:10.5px;margin-top:4px;color:#1c6ea4">📦 Агуулахаас хасагдана.</div>':''}
+    </div>`;
   }).join('');
   const body=`
     <div class="row" style="justify-content:space-between;margin-bottom:10px">
@@ -1506,12 +1551,59 @@ function openDetail(id){
     <button class="btn-icon" onclick="delBooking('${id}')" title="Устгах">🗑</button>`;
   openModal('Захиалгын дэлгэрэнгүй',body,foot);
 }
-function addExtra(id){const bk=S.bookings.find(b=>b.id===id);bk.extras=bk.extras||[];bk.extras.push({name:'',price:0,qty:1});save();openDetail(id);}
-function setExtra(id,i,k,v){const bk=S.bookings.find(b=>b.id===id);bk.extras[i][k]=v;save();openDetail(id);}
+function addExtra(id){const bk=S.bookings.find(b=>b.id===id);bk.extras=bk.extras||[];bk.extras.push({name:'',price:0,qty:1,kind:'service'});save();openDetail(id);}
+// Тухайн мөрийн "барааны" хасалтыг бодит нөөцтэй нийцүүлнэ (шинэ тоогоор дахин тооцоолно)
+function applyExtraStockDelta(e,newQty){
+  if(e.kind!=='goods'||!e.productId) return;
+  const p=S.products.find(x=>x.id===e.productId); if(!p) return;
+  const prevQty=e._deductedQty||0;
+  const diff=newQty-prevQty;
+  if(diff!==0){ p.stock-=diff; logMove(p.id,-diff,'guest',{note:'Захиалгын нэмэлт (гараар)'}); }
+  e._deductedQty=newQty;
+}
+function reverseExtraStock(e){ if(e.kind==='goods'&&e.productId) applyExtraStockDelta(e,0); }
+function setExtra(id,i,k,v){
+  const bk=S.bookings.find(b=>b.id===id); const e=bk.extras[i];
+  e[k]=v;
+  if(k==='qty') applyExtraStockDelta(e,+v||0);
+  save();openDetail(id);
+}
+// Төрөл сонгох: Үйлчилгээ / Худалдан авалт — сонгомогц тухайн төрлийн эхний зүйлийг автоматаар оноож үнийг нь бөглөнө
+function setExtraKind(id,i,kind){
+  const bk=S.bookings.find(b=>b.id===id); const e=bk.extras[i];
+  reverseExtraStock(e);
+  delete e.svcId; delete e.productId;
+  e.kind=kind;
+  if(kind==='service'){
+    const first=(S.massageServices||[])[0];
+    if(first){ e.svcId=first.id; e.name=first.name; e.price=first.price||0; } else { e.name=''; e.price=0; }
+  } else {
+    const first=S.products.filter(p=>SALE_GROUPS.includes(p.group||'goods'))[0];
+    if(first){ e.productId=first.id; e.name=first.name; e.price=first.price||0; applyExtraStockDelta(e,e.qty||1); } else { e.name=''; e.price=0; }
+  }
+  save();openDetail(id);
+}
+// Тухайн төрлийн жагсаалтаас сонгох ('new' бол шинэ нэр гараар бичихийг зөвшөөрнө)
+function setExtraCatalogItem(id,i,val){
+  const bk=S.bookings.find(b=>b.id===id); const e=bk.extras[i];
+  if(e.kind==='service'){
+    if(val==='new'){ delete e.svcId; e.name=''; }
+    else{ const svc=(S.massageServices||[]).find(s=>s.id===val); if(svc){ e.svcId=svc.id; e.name=svc.name; e.price=svc.price||0; } }
+  } else {
+    reverseExtraStock(e);
+    if(val==='new'){ delete e.productId; e.name=''; }
+    else{
+      const p=S.products.find(x=>x.id===val);
+      if(p){ e.productId=p.id; e.name=p.name; e.price=p.price||0; applyExtraStockDelta(e,e.qty||1); }
+    }
+  }
+  save();openDetail(id);
+}
+// Шинэ нэр бичихэд (зөвхөн "Худалдан авалт" төрөлд) барааг жагсаалтад автоматаар нэмж, нөөцөөс хасна
 function setExtraName(id,i,val){
   const bk=S.bookings.find(b=>b.id===id); const e=bk.extras[i];
   e.name=val;
-  if((e.otherType||'goods')==='goods' && val.trim()){
+  if(e.kind==='goods' && val.trim() && !e.productId){
     let prod=S.products.find(p=>(p.group||'goods')==='goods' && p.name.trim().toLowerCase()===val.trim().toLowerCase());
     if(!prod){
       prod={id:uid('p'),group:'goods',name:val.trim(),category:'Бусад',unit:'ш',cost:0,price:e.price||0,stock:0,minStock:0};
@@ -1519,22 +1611,15 @@ function setExtraName(id,i,val){
       toast('«'+val.trim()+'» Худалдан авалтын жагсаалтад нэмэгдлээ ✓','ok');
     }
     e.productId=prod.id;
+    applyExtraStockDelta(e,e.qty||1);
   }
   save();openDetail(id);
 }
-function setExtraFromCatalog(id,i,val){
+function delExtra(id,i){
   const bk=S.bookings.find(b=>b.id===id); const e=bk.extras[i];
-  if(val==='other'){ delete e.svcId; delete e.productId; }
-  else if(val.startsWith('svc:')){
-    const svc=(S.massageServices||[]).find(s=>s.id===val.slice(4));
-    if(svc){ e.svcId=svc.id; delete e.productId; e.name=svc.name; e.price=svc.price||0; }
-  } else if(val.startsWith('prod:')){
-    const p=S.products.find(x=>x.id===val.slice(5));
-    if(p){ e.productId=p.id; delete e.svcId; e.name=p.name; e.price=p.price||0; }
-  }
-  save();openDetail(id);
+  reverseExtraStock(e);
+  bk.extras.splice(i,1);save();openDetail(id);
 }
-function delExtra(id,i){const bk=S.bookings.find(b=>b.id===id);bk.extras.splice(i,1);save();openDetail(id);}
 
 /* ---- Add fridge purchase directly from booking detail ---- */
 let purchDraft=null;
@@ -1912,6 +1997,34 @@ function copyMsg(){const ta=document.getElementById('msgText');ta.select();try{n
 function markSent(id){const bk=S.bookings.find(b=>b.id===id);bk.msgSentAt=new Date().toISOString();save();closeModal();renderAll();toast('Тэмдэглэлээ','ok');}
 
 /* ============================================================ REMINDERS */
+function getUncollectedCash(){
+  const list=[];
+  S.bookings.forEach(bk=>{
+    (bk.payments||[]).forEach((p,pi)=>{
+      if(p.heldBy&&!p.collected) list.push({bk,p,pi});
+    });
+  });
+  return list;
+}
+// Тайван, дарамтгүй байнгын харагдац — Захиалгын жагсаалт табын дээд хэсэгт
+function renderCashHeldBox(){
+  const box=document.getElementById('cashHeldBox'); if(!box)return;
+  const items=getUncollectedCash();
+  if(!items.length){box.innerHTML='';return;}
+  const total=items.reduce((s,x)=>s+(x.p.amount||0),0);
+  box.innerHTML=`<div class="card" style="padding:12px 16px;background:#fdf7ee;border:1px solid #f0e0c0">
+    <div style="font-size:13px;font-weight:700;color:#8a6d1a;margin-bottom:6px">💵 Бэлэн мөнгө ажилтанд байгаа — нийт ${money(total)}</div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      ${items.map(x=>{
+        const st=(S.staff||[]).find(s=>s.id===x.p.heldBy);
+        return `<div style="font-size:12.5px;display:flex;justify-content:space-between;gap:8px">
+          <a href="#" onclick="openDetail('${x.bk.id}');return false" style="color:inherit;text-decoration:underline">${x.bk.phone} · ${st?st.name:'ажилтан'} · ${x.p.date||''}</a>
+          <span style="font-weight:600">${money(x.p.amount)}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
 function renderReminders(){
   const now=Date.now();const today=todayStr();
   const unpaid24=S.bookings.filter(b=>b.status!=='cancelled'&&b.msgSentAt&&!(b.prepay&&b.prepay.received)&&(now-new Date(b.msgSentAt))>864e5);
@@ -1919,12 +2032,7 @@ function renderReminders(){
   const departures=S.bookings.filter(b=>b.status!=='cancelled'&&bookingCheckoutDate(b)===today);
   const pending=S.bookings.filter(b=>b.status==='pending'&&!b.msgSentAt);
   const overdueUnpaid=S.bookings.filter(b=>b.status!=='cancelled'&&bookingCheckoutDate(b)<today&&bookingTotals(b).balance>0);
-  const uncollectedCash=[];
-  S.bookings.forEach(bk=>{
-    (bk.payments||[]).forEach((p,pi)=>{
-      if(p.heldBy&&!p.collected) uncollectedCash.push({bk,p,pi});
-    });
-  });
+  const uncollectedCash=getUncollectedCash();
   let h='';
   if(uncollectedCash.length){
     const total=uncollectedCash.reduce((s,x)=>s+(x.p.amount||0),0);
@@ -2008,7 +2116,7 @@ function renderCalendar(){
           label=(phone3?phone3+' ':'')+occLabel;
         }
         bodyH+=`<td class="cell" data-bk="${bk.id}" title="${bk.phone} · ${bk.nights}хон${bt.overpaid>0?' · ⚠️буцаах '+money(bt.overpaid):''}">
-          <div class="occ ${bt.fullyPaid?'full':bk.status==='confirmed'?'conf':'pend'} ${isSegStart?'start':''}">${isSegStart?refundFlag:''}${isSegStart?label:''}</div></td>`;
+          <div class="occ ${bt.fullyPaid?'full':bk.status==='confirmed'?'conf':'pend'} ${isSegStart?'start':''}">${isSegStart?refundFlag:''}${label}</div></td>`;
       } else {
         bodyH+=`<td class="cell" data-new="${room.num}|${day}"></td>`;
       }
@@ -2053,6 +2161,7 @@ document.getElementById('todayM').onclick=()=>{const d=new Date();calYM=d.getFul
 
 /* ============================================================ LIST */
 function renderList(){
+  renderCashHeldBox();
   const filters=[['all','Бүгд'],['pending','Хүлээгдэж буй'],['confirmed','Баталгаажсан'],['unpaid','Урьдчилгаа аваагүй'],['overdue','Гарсан ч төлбөр дутуу'],['full','Бүрэн төлсөн'],['cancelled','Цуцлагдсан']];
   document.getElementById('listFilt').innerHTML=filters.map(([k,l])=>`<button class="btn ${listFilter===k?'btn-primary':'btn-ghost'} btn-sm" onclick="listFilter='${k}';renderList()">${l}</button>`).join('');
   let list=[...S.bookings].sort((a,b)=>a.checkIn.localeCompare(b.checkIn));
@@ -3189,6 +3298,7 @@ function productForm(p,defGroup){
          <div><label class="field">Орцын/хэрэглээний нэгж</label><input id="p_runit" value="${p?p.recipeUnit||'':''}" placeholder="гр / мл / ш (хоосон=ижил)"><div class="hint" style="font-size:10.5px">Жиш. хогийн уут: хадгалах «боодол», хэрэглэх «ширхэг»</div></div>
          <div style="grid-column:1/-1"><label class="field">Хөрвүүлэлт: 1 ${p?p.unit||'нэгж':'нэгж'} = ? хэрэглээний нэгж</label><input id="p_conv" type="number" min="0" step="any" value="${p?(p.convFactor||''):''}" placeholder="ж: 1 боодол = 30 ширхэг"><div class="hint" style="font-size:10.5px">Хоосон бол автоматаар (кг=1000гр, л=1000мл), ижил бол 1</div></div>`}
     <div><label class="field">${isAsset?'Тоо ширхэг':'Үлдэгдэл'} *</label><input id="p_stock" type="number" min="0" step="any" value="${p?p.stock:''}"></div>
+    ${isAsset?'':`<div><label class="field">Огноо</label><input id="p_stockdate" type="date" value="${todayStr()}"><div class="hint" style="font-size:10.5px">${p?'Үлдэгдэл өөрчлөгдвөл энэ огноогоор бүртгэнэ':'Эхний үлдэгдэл орсон огноо'}</div></div>`}
     ${isAsset
       ? `<input id="p_min" type="hidden" value="0">`
       : `<div><label class="field">Доод хязгаар</label><input id="p_min" type="number" min="0" step="any" value="${p?(p.minStock??5):5}"><div class="hint" style="font-size:10.5px">Үүнээс бага бол "дуусаж байна"</div></div>`}
@@ -3276,8 +3386,19 @@ function saveProduct(id){
     normMaxDays:normMaxEl?(+normMaxEl.value||0):(existing?existing.normMaxDays||0:0),
     normPerRoom:normPerRoomEl?(+normPerRoomEl.value||0):(existing?existing.normPerRoom||0:0),
     normFixedQty:normFixedEl?(+normFixedEl.value||0):(existing?existing.normFixedQty||0:0)};
-  if(id){Object.assign(S.products.find(x=>x.id===id),data);toast('Шинэчлэгдлээ','ok');}
-  else{const np={id:uid('p'),...data};S.products.push(np);if(np.stock>0)logMove(np.id,np.stock,'init',{note:'Эхний үлдэгдэл'});toast('Нэмэгдлээ','ok');}
+  const stockDateEl=document.getElementById('p_stockdate');
+  const stockDate=stockDateEl?(stockDateEl.value||todayStr()):todayStr();
+  if(id){
+    const before=existing?existing.stock:0;
+    Object.assign(existing,data);
+    const diff=data.stock-before;
+    if(diff!==0) logMove(id,diff,'adjust',{date:stockDate,note:'Барааны мэдээлэл засварласан'});
+    toast('Шинэчлэгдлээ','ok');
+  } else {
+    const np={id:uid('p'),...data};S.products.push(np);
+    if(np.stock>0)logMove(np.id,np.stock,'init',{date:stockDate,note:'Эхний үлдэгдэл'});
+    toast('Нэмэгдлээ','ok');
+  }
   save();closeModal();renderAll();
 }
 /* ---- Хэрэглээний норм: "Задалсан" бүртгэл (удаан хугацааны бараа) ---- */
@@ -3722,6 +3843,12 @@ function confirmInternalUse(){
 
 /* ---- Тулгалт (stock-take) ---- */
 function lastStockTake(){return S.stockTakes.length?S.stockTakes[S.stockTakes.length-1]:null;}
+// Тухайн барааг хамарсан хамгийн сүүлийн тулгалтыг олно (sale/stock/all scope-оор)
+function lastStockTakeFor(product){
+  const g=product.group||'goods';
+  const relevant=(S.stockTakes||[]).filter(st=>stockScopeGroups(st.scope).includes(g));
+  return relevant.length?relevant[relevant.length-1]:null;
+}
 function movesSince(productId,fromDate){
   return S.stockMoves.filter(m=>m.productId===productId && (!fromDate || m.date>=fromDate));
 }
@@ -3756,7 +3883,7 @@ function openStockTake(scope){
   const items=S.products.filter(p=>groups.includes(p.group||'goods')&&(p.group||'goods')!=='service');
   if(!items.length){toast('Тоолох бараа алга','err');return;}
   const lt=lastStockTake();
-  stDraft={from:lt?lt.date:null,physical:{},scope};
+  stDraft={from:lt?lt.date:null,physical:{},scope,takeDate:todayStr()};
   items.forEach(p=>stDraft.physical[p.id]=p.stock);
   renderStockTake();
 }
@@ -3789,6 +3916,7 @@ function renderStockTake(){
   const soldBreakdown = stDraft.scope==='sale' ? renderSoldBreakdownHtml(stDraft.from, todayStr()) : '';
   openModal('🧾 Тулгалт · '+scopeLbl+(stDraft.from?' ('+stDraft.from+'-с хойш)':''),
     `<div class="hint" style="margin-bottom:10px">Бодит үлдэгдлээ тоолж бичнэ. Зөрүү = Бодит − Систем. Зөрүү гарвал бараа бүртгэлгүй гарсан (дутсан) гэсэн үг.</div>
+     <div style="margin-bottom:12px"><label class="field">Тоолсон огноо</label><input type="date" style="width:160px" value="${stDraft.takeDate||todayStr()}" onchange="stDraft.takeDate=this.value"><div class="hint" style="font-size:10.5px">Хэрэв өчигдөр тоолоод өнөөдөр компьютерт оруулж байгаа бол, бодит тоолсон өдрөө сонгоно уу.</div></div>
      <div class="msum" style="margin-bottom:12px">
        <div class="card"><div class="v" style="color:var(--red)">${money(totalMissingValue)}</div><div class="l">Дутсан барааны үнэ</div></div>
        <div class="card"><div class="v" style="color:var(--green)">${money(totalExcessValue)}</div><div class="l">Илүү гарсан барааны үнэ</div></div>
@@ -3824,14 +3952,15 @@ function renderSoldBreakdownHtml(from,to){
   </div>`;
 }
 function confirmStockTake(){
+  const takeDate=stDraft.takeDate||todayStr();
   const lines=[];
   stockTakeItems().forEach(p=>{
     const phys=stDraft.physical[p.id]!=null?stDraft.physical[p.id]:p.stock;
     const diff=phys-p.stock;
     lines.push({productId:p.id,name:p.name,system:p.stock,physical:phys,diff});
-    if(diff!==0){ p.stock=phys; logMove(p.id,diff,'adjust',{note:'Тулгалтын зөрүү'}); }
+    if(diff!==0){ p.stock=phys; logMove(p.id,diff,'adjust',{date:takeDate,note:'Тулгалтын зөрүү'}); }
   });
-  S.stockTakes.push({id:uid('st'),date:todayStr(),from:stDraft.from,scope:stDraft.scope,lines,ts:new Date().toISOString()});
+  S.stockTakes.push({id:uid('st'),date:takeDate,from:stDraft.from,scope:stDraft.scope,lines,ts:new Date().toISOString()});
   stDraft=null;save();closeModal();renderAll();toast('Тулгалт хаагдлаа ✓','ok');
 }
 
@@ -4218,9 +4347,10 @@ function renderStock(){
       else if(daysLeft<=7)exp=` <span style="color:#c98a2e">⏰${daysLeft}</span>`;
     }
     const cookMode=(typeof currentRole==='function'&&currentRole()==='cook');
+    const lastTake=lastStockTakeFor(p);
     return `<div class="stock-item">
       <span class="st ${stDot(p)}" title="${stockStatus(p).txt}"></span>
-      <div class="nm" ${cookMode?'':`onclick="openProductModal('${p.id}')" style="cursor:pointer"`}><b>${p.name}</b>${exp}${used?`<span class="sub"> · хэрэглээ −${used}</span>`:''}</div>
+      <div class="nm" ${cookMode?'':`onclick="openProductModal('${p.id}')" style="cursor:pointer"`}><b>${p.name}</b>${exp}${used?`<span class="sub"> · хэрэглээ −${used}</span>`:''}<div class="sub" style="font-size:9.5px;color:${lastTake?'var(--muted)':'#c98a2e'}">${lastTake?'Сүүлд тоолсон: '+lastTake.date:'⚠️ Тоологдоогүй'}</div></div>
       <span class="qty">${p.stock}<span style="font-weight:400;color:var(--muted);font-size:10px"> ${p.unit}</span></span>
       <div class="acts">
         <button class="btn-icon" title="Нөөц нэмэх" onclick="restockProduct('${p.id}')">📥</button>
@@ -4797,6 +4927,12 @@ function monthRange(offset){
   const to=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(lastDay);
   return{from,to};
 }
+let reportTab='overview';
+function setReportTab(tab){
+  reportTab=tab;
+  document.querySelectorAll('.rp-subtab').forEach(b=>b.classList.toggle('active',b.dataset.rptab===tab));
+  document.querySelectorAll('.rp-panel').forEach(p=>{ p.style.display=(p.dataset.rppanel===tab)?'':'none'; });
+}
 function setReportRange(kind){
   let r;
   if(kind==='month') r=monthRange(0);
@@ -5209,7 +5345,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='8.0';
+const APP_VER='8.8';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
