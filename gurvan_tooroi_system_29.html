@@ -1634,11 +1634,11 @@ function openAddPurchase(id){
   if(!S.products.length && !(S.massageServices||[]).length){toast('Эхлээд Агуулах эсвэл Барианы үйлчилгээ бүртгэнэ үү','err');return;}
   const bk=S.bookings.find(b=>b.id===id);if(!bk)return;
   const firstProd=S.products[0];
-  purchDraft={bookingId:id,roomNum:bk.rooms[0]?.num,kind:firstProd?'goods':'service',productId:firstProd?firstProd.id:null,svcId:!firstProd?((S.massageServices||[])[0]||{}).id:null,qty:1};
+  purchDraft={bookingId:id,roomNum:bk.rooms[0]?.num,kind:firstProd?'goods':'service',productId:firstProd?firstProd.id:null,svcId:!firstProd?((S.massageServices||[])[0]||{}).id:null,qty:1,therapistId:(S.therapists||[])[0]?.id||''};
   renderAddPurchase();
 }
 function selectPurchItem(val){
-  if(val.startsWith('svc:')){ purchDraft.kind='service'; purchDraft.svcId=val.slice(4); purchDraft.productId=null; }
+  if(val.startsWith('svc:')){ purchDraft.kind='service'; purchDraft.svcId=val.slice(4); purchDraft.productId=null; if(!purchDraft.therapistId) purchDraft.therapistId=(S.therapists||[])[0]?.id||''; }
   else { purchDraft.kind='goods'; purchDraft.productId=val.slice(5); purchDraft.svcId=null; }
   purchDraft.qty=1;
   renderAddPurchase();
@@ -1665,6 +1665,11 @@ function renderAddPurchase(){
       ${bk.rooms.length>1?`<div><label class="field">Өрөө</label><select onchange="purchDraft.roomNum=this.value;renderAddPurchase()">${roomOptsH}</select></div>`:''}
       <div style="grid-column:${bk.rooms.length>1?'auto':'1/-1'}"><label class="field">Бараа / Үйлчилгээ</label><select onchange="selectPurchItem(this.value)">${itemOptsH}</select></div>
     </div>
+    ${!isGoods?`<div style="margin-top:10px">
+      ${(S.therapists||[]).length?`<label class="field">Хийсэн бариач *</label><select onchange="purchDraft.therapistId=this.value">${(S.therapists||[]).map(t=>`<option value="${t.id}" ${purchDraft.therapistId===t.id?'selected':''}>${t.name}</option>`).join('')}</select>`:'<div class="hint" style="color:var(--red)">Тохиргоонд бариач бүртгээгүй тул хувь тооцоход орохгүй.</div>'}
+      <label class="field" style="margin-top:8px">Тэмдэглэл / хэрэглэсэн материал</label><input id="purch_note" value="${purchDraft.note||''}" placeholder="ж: чихний лаа, аав" onchange="purchDraft.note=this.value">
+      ${svc&&(svc.norms||[]).length?'<div class="hint" style="font-size:10.5px;margin-top:4px">📦 Энэ үйлчилгээтэй холбоотой бараа ('+svc.norms.map(nm=>{const pp=S.products.find(x=>x.id===nm.productId);return pp?pp.name:'';}).filter(Boolean).join(', ')+') автоматаар агуулахаас хасагдана.</div>':''}
+    </div>`:''}
     <div style="margin-top:12px;display:flex;align-items:center;gap:10px">
       <label class="field" style="margin-bottom:0">Тоо ширхэг</label>
       <div class="qty" style="gap:8px">
@@ -1701,8 +1706,20 @@ function confirmAddPurchase(){
   } else {
     const svc=(S.massageServices||[]).find(x=>x.id===purchDraft.svcId);
     if(!svc)return;
+    if((S.therapists||[]).length && !purchDraft.therapistId){toast('Хийсэн бариач сонгоно уу','err');return;}
+    const noteEl=document.getElementById('purch_note');
+    const note=(noteEl?noteEl.value:purchDraft.note||'').trim();
     bk.extras=bk.extras||[];
-    bk.extras.push({name:svc.name+' (№'+purchDraft.roomNum+')', price:svc.price, qty:purchDraft.qty, svcId:svc.id, kind:'service'});
+    bk.extras.push({name:svc.name+(note?' ('+note+')':'')+' (№'+purchDraft.roomNum+')', price:svc.price, qty:purchDraft.qty, svcId:svc.id, kind:'service',
+      therapistId:purchDraft.therapistId||'', note,
+      _msgKey:'msg:'+bk.id+':'+todayStr()+':'+purchDraft.roomNum+':pur_'+uid('x')});
+    // Үйлчилгээтэй холбоотой бараа материал (жиш. чихний лаа, тос) байвал агуулахаас автоматаар хасна
+    (svc.norms||[]).forEach(nm=>{
+      const pm=S.products.find(x=>x.id===nm.productId); if(!pm)return;
+      const q=(nm.qty||0)*purchDraft.qty; if(q<=0)return;
+      pm.stock-=q;
+      logMove(pm.id,-q,'massage',{date:todayStr(),who:svc.name+' (№'+purchDraft.roomNum+')',note:'Захиалгаас нэмсэн — '+(bk.name||bk.phone)});
+    });
   }
   const bid=purchDraft.bookingId;
   purchDraft=null;
@@ -5426,7 +5443,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='9.2';
+const APP_VER='9.4';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
