@@ -2206,7 +2206,7 @@ function renderCalendar(){
           const adultsTot=occ.adults+occ.children.filter(k=>k.adultPriced).length;
           const kidsTot=occ.children.filter(k=>!k.adultPriced).length;
           const occLabel=adultsTot+'Т'+(kidsTot?kidsTot+'Х':'');
-          const phone3=(bk.phone||'').slice(0,3);
+          const phone3=(bk.phone||'').slice(0,4);
           label=phone3?phone3+'<br>'+occLabel:occLabel;
         }
         bodyH+=`<td class="cell" data-bk="${bk.id}" title="${bk.phone} · ${bk.nights}хон${bt.overpaid>0?' · ⚠️буцаах '+money(bt.overpaid):''}">
@@ -5515,7 +5515,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='9.9';
+const APP_VER='9.10';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
