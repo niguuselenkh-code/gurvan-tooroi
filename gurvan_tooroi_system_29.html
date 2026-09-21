@@ -320,8 +320,9 @@
     table.cal .rlabel{min-width:28px;padding:5px 4px;font-size:12px;text-align:center}
     table.cal .rlabel .beds-info{display:none}
     table.cal thead th.corner{min-width:28px;padding-left:4px;text-align:center}
-    table.cal thead th{min-width:30px;padding:4px 1px;font-size:10.5px}
-    table.cal tbody td.cell{min-width:30px}
+    table.cal thead th{min-width:40px;padding:4px 1px;font-size:10.5px}
+    table.cal tbody td.cell{min-width:40px}
+    .occ{font-size:9.5px;padding:0 3px}
     table.cal tfoot td.sumlab{min-width:36px;max-width:48px;padding:4px 3px;font-size:9.5px;white-space:normal;line-height:1.2}
     table.cal .rlabel{white-space:normal;line-height:1.15}
     /* Массажны grid, мини календарь */
@@ -971,6 +972,7 @@ function bookingCheckinDate(bk){
   return minIn;
 }
 function bookingCheckoutDate(bk){
+  if(bk.earlyCheckout && bk.earlyCheckout.date) return bk.earlyCheckout.date;
   let maxOut=addDays(bk.checkIn,bk.nights);
   (bk.rooms||[]).forEach(r=>{ const out=addDays(rCheckIn(bk,r),rNights(bk,r)); if(out>maxOut) maxOut=out; });
   return maxOut;
@@ -981,6 +983,8 @@ function effectiveRoomsForNight(bk,i){
   return [ +(ov.roomNum!=null?ov.roomNum:bk.rooms[0].num) ];
 }
 function effectiveRoomsForDate(bk,date){
+  // Эрт гарсан бол, тэр өдрөөс хойш (тэр өдрийг оролцуулан) өрөөг чөлөөтэй гэж үзнэ — хоног/үнэд нөлөөлөхгүй
+  if(bk.earlyCheckout && bk.earlyCheckout.date && date>=bk.earlyCheckout.date) return [];
   if(bk.rooms.length===1){
     const idx=daysBetween(bk.checkIn,date);
     if(idx<0||idx>=bk.nights) return [];
@@ -1128,7 +1132,7 @@ function sameDayTurnoverWarning(num,checkInDate,arriveTime,exclId){
     return effectiveRoomsForDate(b,lastNightDate).includes(+num);
   });
   if(!departing) return null;
-  const leaveTime=departing.leaveTime||'11:00';
+  const leaveTime=(departing.earlyCheckout&&departing.earlyCheckout.date===checkInDate)?(departing.earlyCheckout.time||'11:00'):(departing.leaveTime||'11:00');
   if(arriveTime<leaveTime) return {departing,leaveTime};
   return null;
 }
@@ -1492,7 +1496,9 @@ function openDetail(id){
     <div class="card" style="padding:12px;margin-bottom:12px">
       ${bk.rooms.map((r,ri)=>{const pr=roomPricing(r,bk.checkIn);const room=roomByNum(r.num);const kids=r.children||[];
         const ages=kids.map(k=>k.age+'н'+(k.adultPriced?' (том үнэ)':'')).join(', ');
+        const lineRows=pr.lines.map(l=>`<div class="sumline" style="font-size:11px;padding-left:10px"><span>${l.label}${l.discountPct>0?' ('+l.discountPct+'% OFF)':''}</span><span>${money(l.sum)}</span></div>`).join('');
         return `<div class="sumline"><span>№${r.num} (${room?.oo?'00-той':'00-гүй'}) · ${r.adults} том${kids.length?', '+kids.length+' хүүхэд: '+ages:''}</span><span>${money(pr.total)}/эхний хон</span></div>
+        ${lineRows}
         <input placeholder="Нэмэлт тайлбар (жиш: харшилтай, тусгай хүсэлт...)" value="${r.note||''}" style="margin:4px 0 8px;font-size:12.5px;padding:6px 9px" onchange="setRoomNote('${id}',${ri},this.value)">`;}).join('')}
       <div style="margin:4px 0">
         ${t.discountPct>0?`<div class="sumline"><span>Байрлалын үнэ (хямдралгүй)</span><span>${money(t.stayBase)}</span></div>
@@ -1543,7 +1549,7 @@ function openDetail(id){
       <button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="openAddPurchase('${id}')">🛒 Бараа/Үйлчилгээ нэмэх</button>
     </div>
     <div class="hint" style="margin-top:10px">
-      ${bk.msgSentAt?'📤 Мессеж явуулсан: '+new Date(bk.msgSentAt).toLocaleString('mn-MN'):'Мессеж хараахан явуулаагүй'}<br>
+      ${bk.msgSentAt?'📤 Мессеж явуулсан: '+new Date(bk.msgSentAt).toLocaleString('mn-MN')+(bk.msgChannel?' · '+({messenger:'💬 Мессенжер',phone:'📞 Утас',viber:'📱 Viber',other:'Бусад'}[bk.msgChannel]||''):'')+(bk.msgSentByRole?' · '+(ROLE_LABEL[bk.msgSentByRole]||bk.msgSentByRole):''):'Мессеж хараахан явуулаагүй'}<br>
       ${bk.confirmedAt?'✓ Баталгаажсан: '+new Date(bk.confirmedAt).toLocaleString('mn-MN'):''}
       ${t.fullyPaid&&(bk.payments||[]).length?'<br>💎 Бүрэн төлсөн: '+new Date(bk.payments[bk.payments.length-1].at||bk.payments[bk.payments.length-1].date).toLocaleString('mn-MN'):''}
     </div>`;
@@ -1554,6 +1560,7 @@ function openDetail(id){
     ${!canc&&conf&&t.balance>0?`<button class="btn btn-sm" style="background:#1c6ea4;color:#fff" onclick="openFinalPay('${id}')">💎 Үлдэгдэл төлбөр хийх</button>`:''}
     ${t.netPaid>0?`<button class="btn btn-ghost btn-sm" onclick="openRefund('${id}')">↩ Буцаалт хийх</button>`:''}
     ${t.balance!==0?`<button class="btn btn-ghost btn-sm" onclick="reconcileBooking('${id}')">⚖️ Тэнцүүлэх</button>`:''}
+    ${!canc?`<button class="btn btn-ghost btn-sm" onclick="openEarlyCheckout('${id}')">🚪 ${bk.earlyCheckout?'Эрт гарсан ('+bk.earlyCheckout.date+' '+bk.earlyCheckout.time+')':'Эрт гарсан гэж тэмдэглэх'}</button>`:''}
     ${!canc?`<button class="btn btn-berry btn-sm" onclick="openCancel('${id}')">Цуцлах/хойшлол</button>`:`<button class="btn btn-ghost btn-sm" onclick="uncancel('${id}')">Сэргээх</button>`}
     <button class="btn-icon" onclick="delBooking('${id}')" title="Устгах">🗑</button>`;
   openModal('Захиалгын дэлгэрэнгүй',body,foot);
@@ -1818,6 +1825,36 @@ function delPayment(id,idx){
   bk.payments.splice(idx,1);save();renderAll();openDetail(id);toast('Төлбөр устгагдлаа');
 }
 /* ---- Төлбөр тэнцүүлэх (үнийн өөрчлөлт зэргээс үүссэн зөрүүг мөнгөн урсгалгүйгээр тэглэх) ---- */
+function openEarlyCheckout(id){
+  const bk=S.bookings.find(b=>b.id===id); if(!bk)return;
+  const nominalOut=addDays(bk.checkIn,bk.nights);
+  const ec=bk.earlyCheckout||{date:nominalOut,time:bk.leaveTime||'11:00'};
+  openModal('🚪 Эрт гарсан гэж тэмдэглэх',
+    `<div class="hint" style="margin-bottom:10px">Зочин төлөвлөснөөс эрт гарсан бол энд тэмдэглэнэ. <b>Хоног, төлбөрийн дүн өөрчлөгдөхгүй</b> — зөвхөн тэр өдрөөс хойш өрөөг чөлөөтэй гэж үзэж, шинэ зочин авах боломжтой болно.</div>
+     <div class="form-grid">
+      <div><label class="field">Бодит гарсан огноо</label><input type="date" id="ec_date" value="${ec.date}"></div>
+      <div><label class="field">Бодит гарсан цаг</label><input type="time" id="ec_time" value="${ec.time}"></div>
+     </div>
+     <div class="hint" style="margin-top:8px">Анхны төлөвлөсөн гарах огноо: ${nominalOut}</div>`,
+    `${bk.earlyCheckout?`<button class="btn btn-ghost" onclick="clearEarlyCheckout('${id}')">Арилгах</button>`:''}
+     <button class="btn btn-ghost" onclick="openDetail('${id}')">Болих</button>
+     <button class="btn btn-primary" onclick="saveEarlyCheckout('${id}')">Хадгалах</button>`);
+}
+function saveEarlyCheckout(id){
+  const bk=S.bookings.find(b=>b.id===id); if(!bk)return;
+  const date=document.getElementById('ec_date').value;
+  const time=document.getElementById('ec_time').value||'11:00';
+  if(!date){toast('Огноо оруулна уу','err');return;}
+  bk.earlyCheckout={date,time};
+  save();closeModal();renderAll();openDetail(id);
+  toast('Тэмдэглэгдлээ ✓ Өрөө '+date+'-ний '+time+'-с хойш чөлөөтэй болно','ok');
+}
+function clearEarlyCheckout(id){
+  const bk=S.bookings.find(b=>b.id===id); if(!bk)return;
+  delete bk.earlyCheckout;
+  save();closeModal();renderAll();openDetail(id);
+  toast('Арилгагдлаа','ok');
+}
 function reconcileBooking(id){
   const bk=S.bookings.find(b=>b.id===id); if(!bk)return;
   const t=bookingTotals(bk);
@@ -2031,13 +2068,27 @@ function showMessage(id){
   const msg=buildMessage(bk);
   openModal('Баталгаажуулах мессеж',
     `<textarea id="msgText" style="min-height:280px">${msg}</textarea>
-     <div class="hint">Хуулж аваад Viber/утсаар илгээнэ үү. «Явуулсан» дарвал 24 цагийн сануулга эхэлнэ.</div>`,
+     <div class="hint" style="margin-bottom:8px">Хуулж аваад Viber/утсаар илгээнэ үү. «Явуулсан» дарвал 24 цагийн сануулга эхэлнэ.</div>
+     <label class="field">Ямар сувгаар илгээх вэ?</label>
+     <select id="msgChannel">
+       <option value="messenger" ${bk.msgChannel==='messenger'?'selected':''}>💬 Мессенжер (Facebook)</option>
+       <option value="phone" ${bk.msgChannel==='phone'?'selected':''}>📞 Утас (дуудлага/SMS)</option>
+       <option value="viber" ${bk.msgChannel==='viber'?'selected':''}>📱 Viber</option>
+       <option value="other" ${bk.msgChannel==='other'?'selected':''}>Бусад</option>
+     </select>`,
     `<button class="btn btn-ghost" onclick="openDetail('${id}')">Буцах</button>
      <button class="btn btn-ghost" onclick="copyMsg()">Хуулах</button>
      <button class="btn btn-primary" onclick="markSent('${id}')">Явуулсан гэж тэмдэглэх</button>`);
 }
 function copyMsg(){const ta=document.getElementById('msgText');ta.select();try{navigator.clipboard.writeText(ta.value);}catch(e){document.execCommand('copy');}toast('Хуулагдлаа ✓','ok');}
-function markSent(id){const bk=S.bookings.find(b=>b.id===id);bk.msgSentAt=new Date().toISOString();save();closeModal();renderAll();toast('Тэмдэглэлээ','ok');}
+function markSent(id){
+  const bk=S.bookings.find(b=>b.id===id);
+  bk.msgSentAt=new Date().toISOString();
+  const chEl=document.getElementById('msgChannel');
+  bk.msgChannel=chEl?chEl.value:(bk.msgChannel||'');
+  bk.msgSentByRole=(typeof currentRole==='function')?currentRole():'manager';
+  save();closeModal();renderAll();toast('Тэмдэглэлээ','ok');
+}
 
 /* ============================================================ REMINDERS */
 function getUncollectedCash(){
@@ -5335,18 +5386,39 @@ function syncPush(force){
   if(!syncOn||!syncRef||syncApplying)return;
   clearTimeout(syncPushT);
   syncPushT=setTimeout(()=>{
-    try{
-      S._rev=Date.now();
-      syncRef.set({_rev:S._rev,data:JSON.stringify(S),at:new Date().toISOString()});
-      try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
-    }catch(e){setSyncStatus('err');}
+    // Дарж бичихээс өмнө серверийг шалгана — хэрэв бидний мэдэхгүй шинэ өгөгдөл орсон бол дарж бичихгүй, харин түүнийг татаж авна
+    syncRef.once('value').then(snap=>{
+      const v=snap.val();
+      const serverRev=v&&v._rev?v._rev:0;
+      const localRev=S._rev||0;
+      if(serverRev>localRev){
+        // Сервер дээр бидний хараагүй шинэ өгөгдөл байна — дарж бичихгүйгээр татаж авна
+        try{
+          syncApplying=true;
+          S=JSON.parse(v.data);
+          try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+          renderAll();
+        }catch(e){}finally{syncApplying=false;}
+        toast('⚠️ Өөр төхөөрөмжөөс шинэ мэдээлэл ирсэн байсан тул автоматаар шинэчиллээ. Сая хийсэн өөрчлөлтөө шалгаад дахин оруулна уу.','err');
+        return;
+      }
+      try{
+        S._rev=Date.now();
+        syncRef.set({_rev:S._rev,data:JSON.stringify(S),at:new Date().toISOString()});
+        try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+      }catch(e){setSyncStatus('err');}
+    }).catch(()=>{
+      // Сервертэй холбогдож чадаагүй бол хуучин байдлаар (шууд) илгээж үзнэ
+      try{
+        S._rev=Date.now();
+        syncRef.set({_rev:S._rev,data:JSON.stringify(S),at:new Date().toISOString()});
+        try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+      }catch(e){setSyncStatus('err');}
+    });
   },force?0:600);
 }
 function savePins(){
   S.pins=S.pins||{manager:'',therapist:'',operator:'',cook:''};
-  // Одоогийн төхөөрөмжөө шинэ кодоор нээлттэй байлгана (өөрөө түгжигдэхээс сэргийлнэ)
-  const role=currentRole();
-  if(S.pins[role]) setUnlocked(role,S.pins[role]);
   save();renderSettings();toast('Код хадгалагдлаа ✓','ok');
 }
 function copyLinkFrom(elId){
@@ -5443,7 +5515,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='9.4';
+const APP_VER='9.8';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
@@ -5506,14 +5578,14 @@ function tryUnlock(){
   const role=currentRole();
   const v=(document.getElementById('gatePin').value||'').trim();
   const pin=(S.pins&&S.pins[role])||'';
-  if(v===pin){setUnlocked(role,pin);hideGate();applyRole();}
+  if(v===pin){hideGate();applyRole();}
   else{const e=document.getElementById('gateErr');if(e)e.textContent='Код буруу байна';const i=document.getElementById('gatePin');if(i){i.value='';i.focus();}}
 }
 function applyGate(){
   const role=currentRole();
   const pin=(S.pins&&S.pins[role])||'';
   if(!pin){hideGate();applyRole();return;}
-  if(unlockedPin(role)===pin){hideGate();applyRole();return;}
+  // Тухайн төхөөрөмж дээр санахгүй — апп нээх бүрд код асууна
   showGate('pin');
 }
 
