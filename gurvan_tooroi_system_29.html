@@ -320,9 +320,9 @@
     table.cal .rlabel{min-width:28px;padding:5px 4px;font-size:12px;text-align:center}
     table.cal .rlabel .beds-info{display:none}
     table.cal thead th.corner{min-width:28px;padding-left:4px;text-align:center}
-    table.cal thead th{min-width:40px;padding:4px 1px;font-size:10.5px}
-    table.cal tbody td.cell{min-width:40px}
-    .occ{font-size:9.5px;padding:0 3px}
+    table.cal thead th{min-width:38px;padding:4px 1px;font-size:10.5px}
+    table.cal tbody td.cell{min-width:38px}
+    .occ{font-size:10px;padding:0 2px}
     table.cal tfoot td.sumlab{min-width:36px;max-width:48px;padding:4px 3px;font-size:9.5px;white-space:normal;line-height:1.2}
     table.cal .rlabel{white-space:normal;line-height:1.15}
     /* Массажны grid, мини календарь */
@@ -2207,10 +2207,10 @@ function renderCalendar(){
           const kidsTot=occ.children.filter(k=>!k.adultPriced).length;
           const occLabel=adultsTot+'Т'+(kidsTot?kidsTot+'Х':'');
           const phone3=(bk.phone||'').slice(0,3);
-          label=(phone3?phone3+' ':'')+occLabel;
+          label=phone3?phone3+'<br>'+occLabel:occLabel;
         }
         bodyH+=`<td class="cell" data-bk="${bk.id}" title="${bk.phone} · ${bk.nights}хон${bt.overpaid>0?' · ⚠️буцаах '+money(bt.overpaid):''}">
-          <div class="occ ${bt.fullyPaid?'full':bk.status==='confirmed'?'conf':'pend'} ${isSegStart?'start':''}">${isSegStart?refundFlag:''}${label}</div></td>`;
+          <div class="occ ${bt.fullyPaid?'full':bk.status==='confirmed'?'conf':'pend'} ${isSegStart?'start':''}" ${isSegStart?'style="flex-direction:column;white-space:normal;line-height:1.15;overflow:visible"':''}>${isSegStart?refundFlag:''}${label}</div></td>`;
       } else {
         bodyH+=`<td class="cell" data-new="${room.num}|${day}"></td>`;
       }
@@ -5515,7 +5515,7 @@ function setupRoleApp(){
   }catch(e){/* хуучин хөтөч бол static manifest.json хэвээр үлдэнэ */}
 }
 setupRoleApp();
-const APP_VER='9.8';
+const APP_VER='9.9';
 function applyRole(){
   const role=currentRole();
   if(role==='therapist'){
