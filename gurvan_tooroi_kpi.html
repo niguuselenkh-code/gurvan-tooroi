@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Гурван Тоорой — Ажилчдын KPI</title>
+<style>
+  :root{
+    --bg:#f6f5f1; --card:#ffffff; --ink:#2b2b26; --muted:#7a7a70;
+    --line:#e3e0d6; --accent:#4a7c59; --accent-d:#355e41; --warn:#b5572c;
+    --bad:#b23a3a; --good:#3d7a3d; --mid:#b7892b;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:40px;}
+  header{background:var(--accent-d);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:5;}
+  header h1{margin:0;font-size:17px;font-weight:600;}
+  header .sub{font-size:12px;opacity:.85;margin-top:2px;}
+  nav.tabs{display:flex;overflow-x:auto;background:var(--accent);position:sticky;top:50px;z-index:5;}
+  nav.tabs button{flex:1 0 auto;background:none;border:none;color:#fff;padding:10px 9px;font-size:12px;opacity:.8;cursor:pointer;white-space:nowrap;}
+  nav.tabs button.on{opacity:1;font-weight:700;border-bottom:3px solid #fff;}
+  main{padding:12px;max-width:900px;margin:0 auto;}
+  .panel{display:none;}
+  .panel.on{display:block;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px;}
+  .card h2{font-size:15px;margin:0 0 8px;color:var(--accent-d);}
+  .card h3{font-size:13.5px;margin:10px 0 6px;}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px;}
+  label{font-size:12.5px;color:var(--muted);}
+  input[type=text],input[type=number],select{border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:14px;background:#fff;color:var(--ink);}
+  input[type=number]{width:70px;}
+  input[type=text]{width:100%;}
+  input[disabled]{background:#f1efe6;color:var(--muted);}
+  button{border:none;border-radius:6px;padding:7px 12px;font-size:13px;cursor:pointer;background:var(--accent);color:#fff;}
+  button.sec{background:#eceae2;color:var(--ink);}
+  button.danger{background:var(--bad);color:#fff;}
+  button.sm{padding:4px 8px;font-size:12px;}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  table th,table td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;}
+  table th{color:var(--muted);font-weight:600;font-size:11.5px;}
+  .crit-row{display:flex;gap:6px;align-items:center;margin-bottom:4px;}
+  .crit-row input[type=text]{flex:1;}
+  .pill{display:inline-block;border-radius:20px;padding:2px 9px;font-size:11.5px;font-weight:700;color:#fff;}
+  .pill.good{background:var(--good);} .pill.mid{background:var(--mid);} .pill.bad{background:var(--bad);}
+  .badge{display:inline-block;border-radius:6px;padding:1px 6px;font-size:11px;background:#e7f0e9;color:var(--accent-d);}
+  .staff-card{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px;}
+  .staff-card .head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+  .staff-card .head b{font-size:14px;}
+  .staff-card .head span{font-size:12px;color:var(--muted);}
+  .score-grid{display:grid;grid-template-columns:1fr 70px;gap:6px 10px;align-items:center;font-size:13px;margin:4px 0;}
+  .score-grid label{font-size:12.5px;color:var(--ink);}
+  .chk-row{display:flex;gap:8px;align-items:flex-start;margin:6px 0;font-size:13px;}
+  .chk-row input[type=checkbox]{margin-top:3px;width:18px;height:18px;}
+  .totals{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;}
+  .totals b{font-size:14px;}
+  .muted{color:var(--muted);font-size:12px;}
+  .note{background:#f1ede1;border:1px solid #e2d9bd;border-radius:8px;padding:8px 10px;font-size:12.5px;color:#5c4f2b;margin-bottom:12px;}
+  .toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+  .wbar{display:flex;height:10px;border-radius:6px;overflow:hidden;margin:8px 0;border:1px solid var(--line);}
+  .wbar span{display:block;height:100%;}
+  select, input[type=month], input[type=date]{font-size:14px;}
+  @media print{
+    header,nav.tabs,.toolbar,.no-print,button{display:none !important;}
+    .panel{display:none !important;}
+    .panel.print-target{display:block !important;}
+    body{background:#fff;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Гурван Тоорой — Ажилчдын KPI тооцоолуур</h1>
+  <div class="sub">ERP-ээс тусдаа, бие даасан систем · өгөгдөл энэ төхөөрөмж дээр хадгалагдана</div>
+</header>
+<nav class="tabs" id="tabs"></nav>
+<main>
+  <div class="note no-print">
+    KPI оноо 5 эх үүсвэрээс бүрдэнэ: <b>Гэнэтийн шалгалт</b> (давамгай жин), <b>Хамт олны үнэлгээ</b>, <b>Үйлчлүүлэгчтэй харилцах ёс зүй</b>, <b>Чанарын шалгуур</b>, <b>Стандарт нийцэл</b>. Жингийн харьцааг Тохиргоо табаас өөрчилнө. Тухайн сард Гэнэтийн шалгалт эсвэл Хамт олны үнэлгээ хийгдээгүй бол тэдгээрийн жин бусад дөрвөн эх үүсвэрт автоматаар дахин хуваарилагдана.
+  </div>
+  <div id="body"></div>
+</main>
+<input type="file" id="importFile" accept=".json" style="display:none">
+<script>
+/* ===================== STATE ===================== */
+const LS_KEY = 'gt_kpi_standalone_v3';
+let S = null;
+
+function pad2(n){ return n<10 ? '0'+n : ''+n; }
+function nowYM(){ const d=new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1); }
+function todayISO(){ const d=new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+function uid(){ return 'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function round3(n){ return Math.round(n*1000)/1000; }
+function fmtMoney(n){ n = Math.round(n||0); return n.toLocaleString('en-US').replace(/,/g,"'"); }
+function clamp(n,a,b){ return Math.max(a,Math.min(b,n)); }
+
+function rescaleWeights(list, target){
+  const sum = list.reduce((a,c)=>a+c.weight,0);
+  if(sum<=0) return list.map(c=>({...c}));
+  let scaled = list.map(c=>({ label:c.label, weight: round3(c.weight/sum*target) }));
+  let newSum = round3(scaled.reduce((a,c)=>a+c.weight,0));
+  let diff = round3(target-newSum);
+  if(Math.abs(diff) > 0.0001){
+    let maxIdx = 0;
+    scaled.forEach((c,i)=>{ if(c.weight>scaled[maxIdx].weight) maxIdx=i; });
+    scaled[maxIdx].weight = round3(scaled[maxIdx].weight + diff);
+  }
+  return scaled;
+}
+
+const STD_LABELS_DEFAULT = ['Цаг баримталгаа','Ажлын байрны дэг журам, хувцаслалт','Бүртгэл/тэмдэглэл хөтлөлт'];
+
+function DEFAULT_SERVICE_CRITERIA(){
+  return rescaleWeights([
+    {label:'Зочидтой эелдэг, хүндэтгэлтэй харилцсан эсэх', weight:0.40},
+    {label:'Зочны хүсэлт, санал гомдолд хурдан, бодитой хариу үзүүлсэн эсэх', weight:0.30},
+    {label:'Харилцааны ёс зүй, мэргэжлийн төрх (хувцаслалт, үг хэллэг) хэвшсэн эсэх', weight:0.30},
+  ], 1);
+}
+
+function DEFAULT_ROLES(){
+  const mk = (id,name,crit,insp,targetPay)=>({
+    id, name, targetPay,
+    criteria: rescaleWeights(crit, 1),
+    stdLabels: STD_LABELS_DEFAULT.slice(),
+    inspectionChecklist: rescaleWeights(insp, 1),
+  });
+  return [
+    mk('cook','Тогооч',[
+      {label:'Хоолны амт, чанарын тогтвортой байдал', weight:0.35},
+      {label:'Цэс, норм, зардал хэмнэлт', weight:0.30},
+      {label:'Эрүүл ахуй, хүнсний аюулгүй байдал', weight:0.35},
+    ],[
+      {label:'Гар, хувцас цэвэр, ариун цэврийн шаардлага хангасан', weight:0.15},
+      {label:'Хоол хүнсний хадгалалт стандарт (хөргөгч, температур, хугацаа)', weight:0.20},
+      {label:'Цэсэнд заасан жор, хэмжээ дагасан эсэх', weight:0.15},
+      {label:'Ажлын байр, тавцан цэвэр, эмх цэгцтэй', weight:0.15},
+      {label:'Хог хаягдал ангилж зайлуулсан эсэх', weight:0.10},
+      {label:'Галын аюулгүй байдлын дэг журам мөрдсөн эсэх', weight:0.15},
+      {label:'Захиалгыг цаг тухайд, зөв гүйцэтгэсэн эсэх (шалгалтын мөч дээр)', weight:0.10},
+    ], 1200000),
+    mk('kitchen','Гал тогооны туслах',[
+      {label:'Бэлтгэл ажил, цэвэрлэгээний чанар', weight:0.35},
+      {label:'Хог хаягдал, нөөц материалын менежмент', weight:0.30},
+      {label:'Цаг барих, хариуцлага', weight:0.35},
+    ],[
+      {label:'Сав суулга, тоног төхөөрөмж цэвэр, зэгсэн эсэх', weight:0.20},
+      {label:'Бэлтгэл материал (ногоо, мах) зөв хадгалсан эсэх', weight:0.20},
+      {label:'Ажлын байр, шал, хана цэвэр', weight:0.20},
+      {label:'Хог хаягдлыг цаг тухайд зайлуулсан эсэх', weight:0.15},
+      {label:'Багийн гишүүдтэй зохицож ажилласан эсэх', weight:0.10},
+      {label:'Аюулгүй ажиллагааны дэг журам (хутга, халуун ус) мөрдсөн эсэх', weight:0.15},
+    ], 950000),
+    mk('room','Өрөө үйлчилгээний ажилтан',[
+      {label:'Орны хэрэглэл, нөөц материалын бүрэн бүтэн, цаг тухайд солилт', weight:0.40},
+      {label:'Дэг журам, тооллого, аюулгүй ажиллагаа мөрдөлт', weight:0.35},
+      {label:'Цэвэрлэгээний хуваарь, тэмдэглэл зөв хөтлөлт', weight:0.25},
+    ],[
+      {label:'Өрөөний цэвэрлэгээ стандарт (орны даавуу, угаалгын өрөө, тоос)', weight:0.25},
+      {label:'Нөөц материал (саван, цаасан алчуур, ус) бүрэн эсэх', weight:0.15},
+      {label:'Эд хогшил бүрэн бүтэн, гэмтэлгүй эсэх', weight:0.10},
+      {label:'Аюулгүй байдал (цахилгаан, галын хэрэгсэл) шаардлага хангасан эсэх', weight:0.15},
+      {label:'Зочны хувийн зүйлд хэрэглээгүй, нууцлал хадгалсан эсэх', weight:0.15},
+      {label:'Цэвэрлэгээний хуваарь, тэмдэглэл зөв хөтөлсөн эсэх', weight:0.10},
+      {label:'Өрөөний тохижилт стандартын дагуу эсэх', weight:0.10},
+    ], 950000),
+    mk('massage','Бариач, асаргааны ажилтан',[
+      {label:'Эмчилгээ/массажны мэргэжлийн чанар, арга барил', weight:0.45},
+      {label:'Цаг барих, захиалгын дэг журам мөрдөлт', weight:0.25},
+      {label:'Эрүүл ахуй, орчны цэвэрлэгээ мөрдөлт', weight:0.30},
+    ],[
+      {label:'Эмчилгээ/массажны техник стандарт дагасан эсэх', weight:0.25},
+      {label:'Эрүүл ахуй (алчуур, тос, хэрэглэл цэвэр, солигдсон)', weight:0.20},
+      {label:'Зочны эрүүл мэндийн мэдээлэл асууж, тохируулсан эсэх (харшил, өвчин)', weight:0.15},
+      {label:'Цаг баримталгаа, захиалгын дэг журам', weight:0.15},
+      {label:'Орчны тохь тух (температур, тайван байдал, дуу чимээ)', weight:0.10},
+      {label:'Тоног төхөөрөмж (ор, даавуу) цэвэр, бэлэн эсэх', weight:0.15},
+    ], 2600000),
+    mk('galch','Галч',[
+      {label:'Зуух/халаалтын тасралтгүй, тогтвортой ажиллагаа хангах', weight:0.45},
+      {label:'Түлшний (мод/нүүрс) зарцуулалтын хэмнэлт, нөөцийн менежмент', weight:0.30},
+      {label:'Аюулгүй ажиллагаа (гал түймрийн эрсдэл), хэрэгслийн бэлэн байдал', weight:0.25},
+    ],[
+      {label:'Зуух/халаалтын систем хэвийн, тасралтгүй ажиллаж байгаа эсэх', weight:0.30},
+      {label:'Түлшний нөөц хангалттай, зохистой зарцуулсан эсэх', weight:0.20},
+      {label:'Галын аюулгүй байдлын хэрэгсэл (унтраагуур, мэдрэгч) бэлэн эсэх', weight:0.20},
+      {label:'Халаалтын өрөөнүүд тэнцвэртэй дулаацсан эсэх (термометрээр шалгах)', weight:0.15},
+      {label:'Ажлын байр (зуухны өрөө) цэвэр, эмх цэгцтэй эсэх', weight:0.15},
+    ], 900000),
+    mk('ground','Гадна талбайн ажилтан',[
+      {label:'Орчны цэвэрлэгээ, тохижилт', weight:0.35},
+      {label:'Ногоон байгууламж, арчилгаа', weight:0.30},
+      {label:'Барилга байгууламж, тоног төхөөрөмжийн арчилгаа', weight:0.35},
+    ],[
+      {label:'Орчин тойрон цэвэр, хог хаягдалгүй эсэх', weight:0.25},
+      {label:'Ногоон байгууламж, зам харгуй зохистой арчилагдсан эсэх', weight:0.20},
+      {label:'Тоног төхөөрөмж (тоглоомын талбай, сав хэрэгсэл) гэмтэлгүй, аюулгүй эсэх', weight:0.20},
+      {label:'Гадна гэрэлтүүлэг, тэмдэг хэвийн ажиллаж байгаа эсэх', weight:0.15},
+      {label:'Онцгой нөхцөл (цас, мөс, шуурга) үед хурдан арга хэмжээ авсан эсэх', weight:0.10},
+      {label:'Ажлын хувцас, хамгаалах хэрэглэл зөв хэрэглэсэн эсэх', weight:0.10},
+    ], 900000),
+  ];
+}
+
+function defaults(){
+  return {
+    roles: DEFAULT_ROLES(),
+    serviceCriteria: DEFAULT_SERVICE_CRITERIA(),
+    config: {
+      bonusPct:0.20,
+      weights: { inspection:0.35, peer:0.15, service:0.20, quality:0.20, std:0.10 },
+      highThresh:0.80, lowThresh:0.60, midFactor:0.80,
+      ndshEmployeePct:0.115, ndshEmployerPct:0.125, incomeTaxPct:0.10,
+      applyDeductions:true,
+      retired: { ndshEmployeePct:0.03, ndshEmployerPct:0.03, incomeTaxPct:0.10 },
+      advanceDay:15, advancePct:0.50,
+    },
+    staff: [],
+    records: {},     // key `${staffId}|${ym}` -> {crit:[], std:[], service:[], tip:0, daysWorked}
+    violations: [],  // {id, staffId, ym, note, deduction}
+    peerScores: [],  // {id, ym, raterId, ratedId, score}
+    inspections: [], // {id, staffId, ym, date, note, items:[{label,weight,passed}]}
+    debts: [],       // {id, staffId, amount, note, ymAdded, paidYm}
+    curYM: nowYM(),
+    tab: 'config',
+  };
+}
+
+function migrate(s){
+  const d = defaults();
+  s.roles = Array.isArray(s.roles) && s.roles.length ? s.roles : d.roles;
+  s.serviceCriteria = Array.isArray(s.serviceCriteria) && s.serviceCriteria.length ? s.serviceCriteria : d.serviceCriteria;
+  s.config = Object.assign({}, d.config, s.config||{});
+  s.config.weights = Object.assign({}, d.config.weights, (s.config&&s.config.weights)||{});
+  s.config.retired = Object.assign({}, d.config.retired, (s.config&&s.config.retired)||{});
+  s.staff = Array.isArray(s.staff) ? s.staff : [];
+  s.records = s.records && typeof s.records==='object' ? s.records : {};
+  s.violations = Array.isArray(s.violations) ? s.violations : [];
+  s.peerScores = Array.isArray(s.peerScores) ? s.peerScores : [];
+  s.inspections = Array.isArray(s.inspections) ? s.inspections : [];
+  s.debts = Array.isArray(s.debts) ? s.debts : [];
+  s.curYM = s.curYM || d.curYM;
+  s.tab = s.tab || 'config';
+  const defRoles = d.roles;
+  s.roles.forEach(r=>{
+    if(!Array.isArray(r.stdLabels) || !r.stdLabels.length) r.stdLabels = STD_LABELS_DEFAULT.slice();
+    if(typeof r.targetPay!=='number') r.targetPay = 900000;
+    if(!Array.isArray(r.inspectionChecklist) || !r.inspectionChecklist.length){
+      const dr = defRoles.find(x=>x.id===r.id);
+      r.inspectionChecklist = dr ? dr.inspectionChecklist.map(c=>({...c})) : [{label:'Ажлын байрны үндсэн шаардлага хангасан эсэх', weight:1}];
+    }
+  });
+  s.staff.forEach(st=>{
+    if(typeof st.targetPay!=='number') st.targetPay = 900000;
+    if(typeof st.requiredDays!=='number') st.requiredDays = 30;
+    if(typeof st.bankName!=='string') st.bankName = '';
+    if(typeof st.bankAccount!=='string') st.bankAccount = '';
+    if(typeof st.isRetired!=='boolean') st.isRetired = false;
+    if(typeof st.advanceDay!=='number') st.advanceDay = null; // null = use global config.advanceDay
+  });
+  return s;
+}
+
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    S = raw ? migrate(JSON.parse(raw)) : defaults();
+  }catch(e){ S = defaults(); }
+}
+function save(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(S)); }catch(e){ /* ignore */ }
+}
+
+/* ===================== HELPERS ===================== */
+function roleById(id){ return S.roles.find(r=>r.id===id); }
+function staffById(id){ return S.staff.find(s=>s.id===id); }
+function recKey(staffId, ym){ return staffId+'|'+ym; }
+function getRec(staffId, ym){
+  const k = recKey(staffId, ym);
+  if(!S.records[k]) S.records[k] = { crit:[], std:[], service:[], tip:0 };
+  const r = S.records[k];
+  if(!r.service) r.service = [];
+  // migrate old single "paid" flag into the two-installment flags
+  if(typeof r.paidAdvance!=='boolean') r.paidAdvance = (r.paid===true);
+  if(typeof r.paidFinal!=='boolean') r.paidFinal = (r.paid===true);
+  delete r.paid;
+  return r;
+}
+function setPaidAdvance(staffId, val){ const rec = getRec(staffId, S.curYM); rec.paidAdvance = !!val; save(); render(); }
+function setPaidFinal(staffId, val){ const rec = getRec(staffId, S.curYM); rec.paidFinal = !!val; save(); render(); }
+function violationsFor(staffId, ym){
+  return S.violations.filter(v=>v.staffId===staffId && v.ym===ym);
+}
+function activeStaffList(){ return S.staff.filter(s=>s.active!==false); }
+
+/* Compensation: base salary + bonus pool derived from each staff's total target pay */
+function deriveComp(staff){
+  const target = staff.targetPay||0;
+  const bonusPct = S.config.bonusPct;
+  return { base: Math.round(target*(1-bonusPct)), maxBonus: Math.round(target*bonusPct) };
+}
+
+/* ---- Score category calculators (each returns 0-100, or null if not applicable) ---- */
+function calcQualityPct(role, rec){
+  let sum = 0;
+  role.criteria.forEach((c,i)=>{ const sc = rec.crit[i]; sum += (typeof sc==='number' ? sc/5 : 0) * c.weight; });
+  return sum*100;
+}
+function calcStdPct(role, rec){
+  const n = role.stdLabels.length;
+  if(!n) return 0;
+  let sum=0;
+  for(let i=0;i<n;i++){ const sc = rec.std[i]; sum += (typeof sc==='number'? sc/5 : 0); }
+  return (sum/n)*100;
+}
+function calcServicePct(rec){
+  let sum = 0;
+  S.serviceCriteria.forEach((c,i)=>{ const sc = rec.service[i]; sum += (typeof sc==='number' ? sc/5 : 0) * c.weight; });
+  return sum*100;
+}
+function peerAvgFor(staffId, ym){
+  const rows = S.peerScores.filter(p=>p.ym===ym && p.ratedId===staffId && typeof p.score==='number');
+  if(!rows.length) return null;
+  return rows.reduce((a,r)=>a+r.score,0)/rows.length; // 1-5
+}
+function inspectionScore(insp){
+  const totalW = insp.items.reduce((a,i)=>a+i.weight,0);
+  if(totalW<=0) return 0;
+  const got = insp.items.reduce((a,i)=>a+(i.passed?i.weight:0),0);
+  return (got/totalW)*100;
+}
+function inspectionsFor(staffId, ym){ return S.inspections.filter(i=>i.staffId===staffId && i.ym===ym); }
+function inspectionPctForMonth(staffId, ym){
+  const rows = inspectionsFor(staffId, ym);
+  if(!rows.length) return null;
+  return rows.reduce((a,r)=>a+inspectionScore(r),0)/rows.length;
+}
+
+function calcViolationDeduction(staffId, ym){
+  return violationsFor(staffId, ym).reduce((a,v)=>a+(v.deduction||0),0); // negative points
+}
+
+/* Combine the 5 categories with weights, renormalizing over whichever are present.
+   Quality/Std/Service are always counted (missing entry = 0, since they're expected monthly inputs).
+   Peer/Inspection are optional/event-based: if absent this month, their weight is redistributed
+   proportionally among the categories that ARE present. */
+function calcTotalPct(role, rec, staffId, ym){
+  const w = S.config.weights;
+  const quality = calcQualityPct(role, rec);
+  const std = calcStdPct(role, rec);
+  const service = calcServicePct(rec);
+  const peer = peerAvgFor(staffId, ym);
+  const insp = inspectionPctForMonth(staffId, ym);
+
+  let num = quality*w.quality + std*w.std + service*w.service;
+  let denom = w.quality + w.std + w.service;
+  if(peer!=null){ num += (peer/5*100)*w.peer; denom += w.peer; }
+  if(insp!=null){ num += insp*w.inspection; denom += w.inspection; }
+  const combined = denom>0 ? num/denom : 0;
+  const ded = calcViolationDeduction(staffId, ym);
+  return clamp(combined+ded, 0, 100);
+}
+function calcBonus(totalPct, maxBonus){
+  const frac = totalPct/100;
+  if(frac >= S.config.highThresh) return maxBonus;
+  if(frac >= S.config.lowThresh) return Math.round(maxBonus * S.config.midFactor);
+  return 0;
+}
+function tierOf(totalPct){
+  const frac = totalPct/100;
+  if(frac>=S.config.highThresh) return {label:'Бүтэн урамшуулал', cls:'good'};
+  if(frac>=S.config.lowThresh) return {label:'Дунд шат ('+Math.round(S.config.midFactor*100)+'%)', cls:'mid'};
+  return {label:'Урамшуулалгүй', cls:'bad'};
+}
+
+/* Days worked / proration */
+function daysWorkedFor(staff, rec){
+  return typeof rec.daysWorked==='number' ? rec.daysWorked : staff.requiredDays;
+}
+function proratedBaseFor(staff, rec, base){
+  const req = staff.requiredDays||30;
+  const worked = clamp(daysWorkedFor(staff, rec), 0, req);
+  if(req<=0) return base;
+  return Math.round(base * (worked/req));
+}
+
+/* Debts / suutgal */
+function unpaidDebtsFor(staffId){
+  return S.debts.filter(d=>d.staffId===staffId && !d.paidYm);
+}
+function addDebt(staffId, amount, note){
+  const amt = parseFloat(amount)||0;
+  if(amt<=0) return;
+  S.debts.push({ id:uid(), staffId, amount:amt, note:note||'(тайлбаргүй)', ymAdded:S.curYM, paidYm:null });
+  save(); render();
+}
+function delDebt(id){ S.debts = S.debts.filter(d=>d.id!==id); save(); render(); }
+function settleDebts(staffId, ym){
+  S.debts.forEach(d=>{ if(d.staffId===staffId && !d.paidYm) d.paidYm = ym; });
+  save(); render();
+}
+function unsettleDebts(staffId, ym){
+  S.debts.forEach(d=>{ if(d.staffId===staffId && d.paidYm===ym) d.paidYm = null; });
+  save(); render();
+}
+
+/* Full payroll for a staff/month */
+function calcPayroll(staff, ym){
+  const role = roleById(staff.roleId) || S.roles[0];
+  const rec = getRec(staff.id, ym);
+  const comp = deriveComp(staff);
+  const total = calcTotalPct(role, rec, staff.id, ym);
+  const bonus = calcBonus(total, comp.maxBonus);
+  const proratedBase = proratedBaseFor(staff, rec, comp.base);
+  const grossSalary = proratedBase + bonus;
+  const apply = S.config.applyDeductions;
+  const rates = staff.isRetired ? S.config.retired : S.config;
+  const ndshEmployee = apply ? Math.round(grossSalary * rates.ndshEmployeePct) : 0;
+  const ndshEmployer = apply ? Math.round(grossSalary * rates.ndshEmployerPct) : 0;
+  const incomeTax = apply ? Math.round((grossSalary-ndshEmployee) * rates.incomeTaxPct) : 0;
+  const debtDue = S.debts.filter(d=>d.staffId===staff.id && d.paidYm===ym).reduce((a,d)=>a+d.amount,0);
+  const tip = (rec.tip||0);
+  const net = grossSalary - ndshEmployee - incomeTax - debtDue + tip;
+  const employerCost = grossSalary + ndshEmployer;
+  // Semi-monthly payout: an advance (урьдчилгаа) around advanceDay, based only on prorated base
+  // (bonus/KPI isn't final until month end), then a final settlement for the remainder.
+  const advancePct = S.config.advancePct;
+  const advanceDay = (typeof staff.advanceDay==='number') ? staff.advanceDay : S.config.advanceDay;
+  const advanceAmount = Math.round(proratedBase * advancePct);
+  const finalAmount = net - advanceAmount;
+  return { total, bonus, proratedBase, grossSalary, ndshEmployee, ndshEmployer, incomeTax, debtDue, tip, net, employerCost, comp, advanceAmount, finalAmount, advanceDay };
+}
+
+/* Peer scoring */
+function setPeerScore(raterId, ratedId, ym, score){
+  let row = S.peerScores.find(p=>p.ym===ym && p.raterId===raterId && p.ratedId===ratedId);
+  if(score===null || score===undefined || score===''){
+    if(row) S.peerScores = S.peerScores.filter(p=>p!==row);
+    return;
+  }
+  const v = clamp(parseFloat(score)||0, 1, 5);
+  if(row) row.score = v;
+  else S.peerScores.push({ id:uid(), ym, raterId, ratedId, score:v });
+}
+
+/* Inspections */
+function addInspection(staffId, ym, date, note, passedFlags){
+  const role = roleById(staffById(staffId).roleId) || S.roles[0];
+  const items = role.inspectionChecklist.map((c,i)=>({ label:c.label, weight:c.weight, passed: !!passedFlags[i] }));
+  S.inspections.push({ id:uid(), staffId, ym, date: date||todayISO(), note: note||'', items });
+  save(); render();
+}
+function delInspection(id){ S.inspections = S.inspections.filter(i=>i.id!==id); save(); render(); }
+
+/* ===================== NAV / RENDER SHELL ===================== */
+const TABS = [
+  {id:'config', label:'⚙️ Тохиргоо'},
+  {id:'staff', label:'👥 Ажилчид'},
+  {id:'score', label:'📊 Сарын KPI'},
+  {id:'peer', label:'🤝 Үнэлгээ'},
+  {id:'inspection', label:'🔍 Гэнэтийн шалгалт'},
+  {id:'violations', label:'⚠️ Зөрчил'},
+  {id:'payroll', label:'💰 Цалин'},
+  {id:'summary', label:'📋 Нэгтгэл/Тайлан'},
+];
+
+function setTab(id){ S.tab = id; save(); render(); }
+function renderTabs(){
+  const el = document.getElementById('tabs');
+  el.innerHTML = TABS.map(t=>`<button class="${S.tab===t.id?'on':''}" onclick="setTab('${t.id}')">${t.label}</button>`).join('');
+}
+function render(){
+  renderTabs();
+  const body = document.getElementById('body');
+  let html = '';
+  if(S.tab==='config') html = renderConfig();
+  else if(S.tab==='staff') html = renderStaff();
+  else if(S.tab==='score') html = renderScore();
+  else if(S.tab==='peer') html = renderPeer();
+  else if(S.tab==='inspection') html = renderInspection();
+  else if(S.tab==='violations') html = renderViolations();
+  else if(S.tab==='payroll') html = renderPayroll();
+  else if(S.tab==='summary') html = renderSummary();
+  body.innerHTML = html;
+}
+function escapeAttr(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+/* ===================== CONFIG TAB ===================== */
+function weightBarHtml(w){
+  const colors = {inspection:'#b5572c', peer:'#4a7c59', service:'#2b6ca3', quality:'#8a7a3a', std:'#8a8a8a'};
+  const order = ['inspection','peer','service','quality','std'];
+  return `<div class="wbar">${order.map(k=>`<span style="width:${(w[k]*100).toFixed(1)}%;background:${colors[k]}"></span>`).join('')}</div>`;
+}
+function renderConfig(){
+  const c = S.config;
+  const wsum = round3(Object.values(c.weights).reduce((a,v)=>a+v,0));
+  let h = `<div class="card">
+    <h2>KPI жингийн бүтэц (5 эх үүсвэр)</h2>
+    ${weightBarHtml(c.weights)}
+    <div class="row"><label>Гэнэтийн шалгалт</label><input type="number" step="1" min="0" max="100" value="${Math.round(c.weights.inspection*100)}" onchange="setWeightPct('inspection',this.value)"> %</div>
+    <div class="row"><label>Хамт олны үнэлгээ</label><input type="number" step="1" min="0" max="100" value="${Math.round(c.weights.peer*100)}" onchange="setWeightPct('peer',this.value)"> %</div>
+    <div class="row"><label>Үйлчлүүлэгчтэй харилцах ёс зүй</label><input type="number" step="1" min="0" max="100" value="${Math.round(c.weights.service*100)}" onchange="setWeightPct('service',this.value)"> %</div>
+    <div class="row"><label>Чанарын шалгуур</label><input type="number" step="1" min="0" max="100" value="${Math.round(c.weights.quality*100)}" onchange="setWeightPct('quality',this.value)"> %</div>
+    <div class="row"><label>Стандарт нийцэл</label><input type="number" step="1" min="0" max="100" value="${Math.round(c.weights.std*100)}" onchange="setWeightPct('std',this.value)"> %</div>
+    <div class="row"><span class="muted">Нийлбэр: ${(wsum*100).toFixed(1)}%</span> <button class="sec sm" onclick="normalizeWeights()">100%-д тэнцүүлэх</button></div>
+    <div class="muted">Тухайн сард Гэнэтийн шалгалт/Хамт олны үнэлгээ хийгдээгүй бол тэдгээрийн жин бусад гурав (шалгуур, ёс зүй, стандарт) дээр автоматаар дахин хуваарилагдана.</div>
+  </div>
+  <div class="card">
+    <h2>Үйлчлүүлэгчтэй харилцах ёс зүйн шалгуур (бүх албан тушаалд ижил)</h2>
+    ${S.serviceCriteria.map((cr,i)=>`
+      <div class="crit-row">
+        <input type="text" value="${escapeAttr(cr.label)}" onchange="setServiceLabel(${i},this.value)">
+        <input type="number" step="1" min="0" max="100" value="${Math.round(cr.weight*100)}" onchange="setServiceWeight(${i},this.value)" style="width:56px"> %
+        <button class="sec sm" onclick="delServiceCrit(${i})">✕</button>
+      </div>`).join('')}
+    <button class="sec sm" onclick="addServiceCrit()">+ Нэмэх</button>
+    <button class="sec sm" onclick="rescaleService()">100%-д тэнцүүлэх</button>
+  </div>
+  <div class="card">
+    <h2>Орлогын бүтэц</h2>
+    <div class="row">
+      <label>Үндсэн цалин: <b>${Math.round((1-c.bonusPct)*100)}%</b></label>
+      <label>Урамшууллын сан:</label>
+      <input type="number" step="1" min="0" max="100" value="${Math.round(c.bonusPct*100)}" onchange="setCfgPct('bonusPct',this.value)"> %
+      <span class="muted">нийт зорилтот орлогоос</span>
+    </div>
+    <div class="muted">Жишээ: зорилтот орлого 1'000'000₮ бол үндсэн цалин ${fmtMoney(1000000*(1-c.bonusPct))}₮, урамшууллын дээд дүн ${fmtMoney(1000000*c.bonusPct)}₮. (Хэрэв танд "урамшуулал = үндсэн цалингийн 20%" байх ёстой гэсэн санаа байгаа бол хэлээрэй — одоогоор энэ бол НИЙТ зорилтот орлогын 20% тул үндсэн цалингийн ≈25%-тай тэнцэнэ.)</div>
+  </div>
+  <div class="card">
+    <h2>Татвар, НДШ</h2>
+    <div class="row">
+      <label><input type="checkbox" ${c.applyDeductions?'checked':''} onchange="setApplyDeductions(this.checked)"> НДШ, ХХОАТ тооцоолох</label>
+      <span class="muted">(тэмдэглэл арилгасан бол Цалин/Нэгтгэл табад гарт олгох дүн = НДШ, татваргүй бүх орлого)</span>
+    </div>
+    <div class="row">
+      <label>НДШ, ажилтны тал (ХХ, цалингаас суутгагдана)</label>
+      <input type="number" step="0.1" min="0" max="100" value="${(c.ndshEmployeePct*100).toFixed(1)}" onchange="setCfgPct('ndshEmployeePct',this.value)"> %
+    </div>
+    <div class="row">
+      <label>НДШ, байгууллагын тал (ББ, гарт олгохоос суутгахгүй)</label>
+      <input type="number" step="0.1" min="0" max="100" value="${(c.ndshEmployerPct*100).toFixed(1)}" onchange="setCfgPct('ndshEmployerPct',this.value)"> %
+    </div>
+    <div class="row">
+      <label>ХХОАТ (хувь хүний орлогын албан татвар)</label>
+      <input type="number" step="0.1" min="0" max="100" value="${(c.incomeTaxPct*100).toFixed(1)}" onchange="setCfgPct('incomeTaxPct',this.value)"> %
+    </div>
+    <div class="muted">ХХОАТ нь (цалин − НДШ ХХ)-д тооцогддоно.</div>
+  </div>
+  <div class="card">
+    <h2>Тэтгэврийн насны ажилтны НДШ/Татвар (бага хувиар суутгадаг)</h2>
+    <div class="row">
+      <label>НДШ, ажилтны тал (ХХ)</label>
+      <input type="number" step="0.1" min="0" max="100" value="${(c.retired.ndshEmployeePct*100).toFixed(1)}" onchange="setRetiredPct('ndshEmployeePct',this.value)"> %
+    </div>
+    <div class="row">
+      <label>НДШ, байгууллагын тал (ББ)</label>
+      <input type="number" step="0.1" min="0" max="100" value="${(c.retired.ndshEmployerPct*100).toFixed(1)}" onchange="setRetiredPct('ndshEmployerPct',this.value)"> %
+    </div>
+    <div class="row">
+      <label>ХХОАТ</label>
+      <input type="number" step="0.1" min="0" max="100" value="${(c.retired.incomeTaxPct*100).toFixed(1)}" onchange="setRetiredPct('incomeTaxPct',this.value)"> %
+    </div>
+    <div class="muted">Эдгээр хувь нь зөвхөн Ажилчид табад "Тэтгэврийн насны" гэж тэмдэглэсэн ажилтанд хэрэглэгдэнэ. Одоогийн тоонууд ойролцоо жишиг тул хуулийн яг хувийг нягтлан бодогчоороо шалгаж, шаардлагатай бол засаарай.</div>
+  </div>
+  <div class="card">
+    <h2>Цалингийн олголт (15 хоногоор)</h2>
+    <div class="row">
+      <label>Урьдчилгаа олгох өдөр (сарын)</label>
+      <input type="number" step="1" min="1" max="28" value="${c.advanceDay}" onchange="setCfgInt('advanceDay',this.value)">
+      <label>Урьдчилгааны хувь (үндсэн цалингаас)</label>
+      <input type="number" step="1" min="0" max="100" value="${Math.round(c.advancePct*100)}" onchange="setCfgPct('advancePct',this.value)"> %
+    </div>
+    <div class="muted">Сард 2 удаа олгоно: тухайн өдөр үндсэн цалингийн ${Math.round(c.advancePct*100)}%-ийг урьдчилгаа болгон олгож, сарын эцэст KPI урамшуулал/суутгал тооцсоны дараа үлдэгдлийг эцсийн тооцоогоор олгоно. Шинэ ажилтанд урьдчилгаа олгох өдрийг Ажилчид табаас тухайлан өөр өдрөөр тохируулж болно.</div>
+  </div>
+  <div class="card">
+    <h2>Урамшууллын шатлал</h2>
+    <div class="row">
+      <label>Бүтэн урамшуулал босго (≥)</label>
+      <input type="number" step="1" min="0" max="100" value="${Math.round(c.highThresh*100)}" onchange="setCfgPct('highThresh',this.value)"> %
+      <label>Хагас урамшуулал босго (≥)</label>
+      <input type="number" step="1" min="0" max="100" value="${Math.round(c.lowThresh*100)}" onchange="setCfgPct('lowThresh',this.value)"> %
+      <label>Хагас шатны хувь</label>
+      <input type="number" step="1" min="0" max="100" value="${Math.round(c.midFactor*100)}" onchange="setCfgPct('midFactor',this.value)"> %
+    </div>
+    <div class="muted">Зөрчлийн хасалт: 1 дэх удаа = 0, 2 дахь удаа = −5 оноо, 3 ба түүнээс дээш = −10 оноо (Зөрчил табад бүртгэнэ).</div>
+  </div>`;
+
+  S.roles.forEach(r=>{
+    const wsumR = round3(r.criteria.reduce((a,c)=>a+c.weight,0));
+    const wsumI = round3(r.inspectionChecklist.reduce((a,c)=>a+c.weight,0));
+    h += `<div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">${r.name}</h2>
+      </div>
+      <div class="row">
+        <label>Нийт зорилтот сарын орлого (₮)</label>
+        <input type="number" step="10000" value="${r.targetPay}" style="width:130px" onchange="setRoleField('${r.id}','targetPay',this.value)">
+      </div>
+      <h3>Чанарын шалгуур (нийлбэр ${(wsumR*100).toFixed(1)}%)</h3>
+      ${r.criteria.map((c,i)=>`
+        <div class="crit-row">
+          <input type="text" value="${escapeAttr(c.label)}" onchange="setCritLabel('${r.id}',${i},this.value)">
+          <input type="number" step="1" min="0" max="100" value="${Math.round(c.weight*100)}" onchange="setCritWeight('${r.id}',${i},this.value)" style="width:56px"> %
+          <button class="sec sm" onclick="delCrit('${r.id}',${i})">✕</button>
+        </div>`).join('')}
+      <button class="sec sm" onclick="addCrit('${r.id}')">+ Нэмэх</button>
+      <button class="sec sm" onclick="rescaleRole('${r.id}')">100%-д тэнцүүлэх</button>
+      <h3>Стандарт нийцлийн талбарууд</h3>
+      ${r.stdLabels.map((lab,i)=>`
+        <div class="crit-row">
+          <input type="text" value="${escapeAttr(lab)}" onchange="setStdLabel('${r.id}',${i},this.value)">
+          <button class="sec sm" onclick="delStdLabel('${r.id}',${i})">✕</button>
+        </div>`).join('')}
+      <button class="sec sm" onclick="addStdLabel('${r.id}')">+ Нэмэх</button>
+      <h3>Гэнэтийн шалгалтын шаардлага (нийлбэр ${(wsumI*100).toFixed(1)}%)</h3>
+      ${r.inspectionChecklist.map((c,i)=>`
+        <div class="crit-row">
+          <input type="text" value="${escapeAttr(c.label)}" onchange="setInspLabel('${r.id}',${i},this.value)">
+          <input type="number" step="1" min="0" max="100" value="${Math.round(c.weight*100)}" onchange="setInspWeight('${r.id}',${i},this.value)" style="width:56px"> %
+          <button class="sec sm" onclick="delInsp('${r.id}',${i})">✕</button>
+        </div>`).join('')}
+      <button class="sec sm" onclick="addInsp('${r.id}')">+ Нэмэх</button>
+      <button class="sec sm" onclick="rescaleInsp('${r.id}')">100%-д тэнцүүлэх</button>
+    </div>`;
+  });
+  h += `<div class="card no-print">
+      <h2>Нөөцлөл</h2>
+      <div class="row">
+        <button onclick="exportJSON()">⬇ Өгөгдлийг татах (backup)</button>
+        <button class="sec" onclick="document.getElementById('importFile').click()">⬆ Сэргээх (JSON)</button>
+      </div>
+      <div class="muted">Энэ систем зөвхөн энэ хөтөч/төхөөрөмж дээр хадгалагддаг тул өөр төхөөрөмж дээр ашиглах, эсвэл устгаж алдахаас сэргийлж тогтмол backup татаарай.</div>
+    </div>`;
+  return h;
+}
+
+function setCfgPct(key,v){ S.config[key] = clamp(parseFloat(v)||0,0,100)/100; save(); render(); }
+function setApplyDeductions(v){ S.config.applyDeductions = !!v; save(); render(); }
+function setCfgInt(key,v){ S.config[key] = clamp(parseFloat(v)||1,1,28); save(); render(); }
+function setRetiredPct(key,v){ S.config.retired[key] = clamp(parseFloat(v)||0,0,100)/100; save(); render(); }
+function setWeightPct(key,v){ S.config.weights[key] = clamp(parseFloat(v)||0,0,100)/100; save(); render(); }
+function normalizeWeights(){
+  const w = S.config.weights;
+  const arr = rescaleWeights(Object.keys(w).map(k=>({label:k,weight:w[k]})), 1);
+  arr.forEach(c=>{ w[c.label]=c.weight; });
+  save(); render();
+}
+function setServiceLabel(i,v){ S.serviceCriteria[i].label=v; save(); render(); }
+function setServiceWeight(i,v){ S.serviceCriteria[i].weight=clamp(parseFloat(v)||0,0,100)/100; save(); render(); }
+function addServiceCrit(){ S.serviceCriteria.push({label:'Шинэ шалгуур', weight:0.1}); save(); render(); }
+function delServiceCrit(i){ S.serviceCriteria.splice(i,1); save(); render(); }
+function rescaleService(){ S.serviceCriteria = rescaleWeights(S.serviceCriteria, 1); save(); render(); }
+
+function setRoleField(roleId, field, v){ const r=roleById(roleId); r[field]=parseFloat(v)||0; save(); render(); }
+function setCritLabel(roleId,i,v){ roleById(roleId).criteria[i].label=v; save(); render(); }
+function setCritWeight(roleId,i,v){ roleById(roleId).criteria[i].weight = clamp(parseFloat(v)||0,0,100)/100; save(); render(); }
+function addCrit(roleId){ roleById(roleId).criteria.push({label:'Шинэ шалгуур', weight:0.1}); save(); render(); }
+function delCrit(roleId,i){ roleById(roleId).criteria.splice(i,1); save(); render(); }
+function rescaleRole(roleId){ const r=roleById(roleId); r.criteria = rescaleWeights(r.criteria, 1); save(); render(); }
+function setStdLabel(roleId,i,v){ roleById(roleId).stdLabels[i]=v; save(); render(); }
+function addStdLabel(roleId){ roleById(roleId).stdLabels.push('Шинэ талбар'); save(); render(); }
+function delStdLabel(roleId,i){ roleById(roleId).stdLabels.splice(i,1); save(); render(); }
+function setInspLabel(roleId,i,v){ roleById(roleId).inspectionChecklist[i].label=v; save(); render(); }
+function setInspWeight(roleId,i,v){ roleById(roleId).inspectionChecklist[i].weight=clamp(parseFloat(v)||0,0,100)/100; save(); render(); }
+function addInsp(roleId){ roleById(roleId).inspectionChecklist.push({label:'Шинэ шаардлага', weight:0.1}); save(); render(); }
+function delInsp(roleId,i){ roleById(roleId).inspectionChecklist.splice(i,1); save(); render(); }
+function rescaleInsp(roleId){ const r=roleById(roleId); r.inspectionChecklist = rescaleWeights(r.inspectionChecklist, 1); save(); render(); }
+
+/* ===================== STAFF TAB ===================== */
+function renderStaff(){
+  let h = `<div class="card">
+    <h2>Шинэ ажилтан нэмэх</h2>
+    <div class="row">
+      <input type="text" id="newStaffName" placeholder="Нэр">
+      <select id="newStaffRole">${S.roles.map(r=>`<option value="${r.id}">${r.name}</option>`).join('')}</select>
+      <button onclick="addStaff()">+ Нэмэх</button>
+    </div>
+  </div>`;
+  if(!S.staff.length) h += `<div class="muted">Ажилтан бүртгэгдээгүй байна.</div>`;
+  S.staff.forEach(st=>{
+    const r = roleById(st.roleId) || S.roles[0];
+    const comp = deriveComp(st);
+    h += `<div class="staff-card">
+      <div class="head">
+        <b>${escapeAttr(st.name)}</b>
+        <span>${st.active===false?'идэвхгүй':'идэвхтэй'}</span>
+      </div>
+      <div class="row">
+        <label>Нэр</label><input type="text" value="${escapeAttr(st.name)}" onchange="setStaffField('${st.id}','name',this.value)">
+      </div>
+      <div class="row">
+        <label>Албан тушаал</label>
+        <select onchange="setStaffField('${st.id}','roleId',this.value)">
+          ${S.roles.map(rr=>`<option value="${rr.id}" ${rr.id===st.roleId?'selected':''}>${rr.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="row">
+        <label>Нийт зорилтот сарын орлого (₮)</label>
+        <input type="number" step="10000" value="${st.targetPay}" style="width:130px" onchange="setStaffField('${st.id}','targetPay',this.value)">
+        <label>Сарын ажиллах ёстой хоног</label>
+        <input type="number" step="1" min="1" max="31" value="${st.requiredDays}" style="width:60px" onchange="setStaffField('${st.id}','requiredDays',this.value)">
+      </div>
+      <div class="muted">→ Үндсэн цалин (бүтэн сар): <b>${fmtMoney(comp.base)}₮</b> · Урамшууллын дээд дүн: <b>${fmtMoney(comp.maxBonus)}₮</b></div>
+      <div class="row">
+        <label>Банк</label>
+        <input type="text" value="${escapeAttr(st.bankName)}" placeholder="Жишээ: Хаан банк" style="width:140px" onchange="setStaffField('${st.id}','bankName',this.value)">
+        <label>Дансны дугаар</label>
+        <input type="text" value="${escapeAttr(st.bankAccount)}" placeholder="Данс" style="width:160px" onchange="setStaffField('${st.id}','bankAccount',this.value)">
+      </div>
+      <div class="row">
+        <label><input type="checkbox" ${st.isRetired?'checked':''} onchange="setStaffField('${st.id}','isRetired',this.checked)"> Тэтгэврийн насны ажилтан (НДШ/татвар бага хувиар суутгана)</label>
+      </div>
+      <div class="row">
+        <label>Урьдчилгаа олгох өдөр</label>
+        <input type="number" step="1" min="1" max="28" placeholder="${S.config.advanceDay}" value="${st.advanceDay!=null?st.advanceDay:''}" style="width:60px" onchange="setStaffField('${st.id}','advanceDay',this.value)">
+        <span class="muted">хоосон = ердийн ${S.config.advanceDay}-нд (шинэ ажилтны эхний цалинг өөр өдрөөр тохируулахад хэрэглэнэ)</span>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <button class="sec sm" onclick="setStaffField('${st.id}','active', ${st.active===false})">${st.active===false?'Идэвхжүүлэх':'Идэвхгүйжүүлэх'}</button>
+        <button class="danger sm" onclick="delStaff('${st.id}')">Устгах</button>
+      </div>
+    </div>`;
+  });
+  return h;
+}
+function addStaff(){
+  const name = document.getElementById('newStaffName').value.trim();
+  const roleId = document.getElementById('newStaffRole').value;
+  if(!name) return;
+  const r = roleById(roleId);
+  S.staff.push({ id:uid(), name, roleId, active:true, targetPay:r.targetPay, requiredDays:30, bankName:'', bankAccount:'', isRetired:false, advanceDay:null });
+  save(); render();
+}
+function setStaffField(id, field, v){
+  const st = staffById(id);
+  if(field==='targetPay' || field==='requiredDays') st[field]=parseFloat(v)||0;
+  else if(field==='advanceDay') st.advanceDay = (v===''||v==null) ? null : clamp(parseFloat(v)||15,1,28);
+  else if(field==='active') st.active = (v===true||v==='true');
+  else if(field==='isRetired') st.isRetired = !!v;
+  else st[field]=v;
+  save(); render();
+}
+function delStaff(id){
+  if(!confirm('Энэ ажилтныг устгах уу? Түүний KPI түүх хадгалагдахгүй.')) return;
+  S.staff = S.staff.filter(s=>s.id!==id);
+  save(); render();
+}
+
+/* ===================== SCORE TAB ===================== */
+function setYM(v){ S.curYM=v; save(); render(); }
+function renderScore(){
+  let h = `<div class="card no-print">
+    <div class="row"><label>Сар</label><input type="month" value="${S.curYM}" onchange="setYM(this.value)"></div>
+  </div>`;
+  const list = activeStaffList();
+  if(!list.length) h += `<div class="muted">Эхлээд Ажилчид табад ажилтан нэмнэ үү.</div>`;
+  list.forEach(st=>{
+    const role = roleById(st.roleId) || S.roles[0];
+    const rec = getRec(st.id, S.curYM);
+    const comp = deriveComp(st);
+    const q = calcQualityPct(role, rec);
+    const stp = calcStdPct(role, rec);
+    const sv = calcServicePct(rec);
+    const ded = calcViolationDeduction(st.id, S.curYM);
+    const total = calcTotalPct(role, rec, st.id, S.curYM);
+    const bonus = calcBonus(total, comp.maxBonus);
+    const tier = tierOf(total);
+    h += `<div class="staff-card">
+      <div class="head"><b>${escapeAttr(st.name)}</b><span>${role.name}</span></div>
+      <h3>Чанарын шалгуур (оноо 1–5)</h3>
+      ${role.criteria.map((c,i)=>`
+        <div class="score-grid">
+          <label>${escapeAttr(c.label)} <span class="muted">(${Math.round(c.weight*100)}%)</span></label>
+          <input type="number" min="0" max="5" step="1" value="${typeof rec.crit[i]==='number'?rec.crit[i]:''}" onchange="setCrit('${st.id}',${i},this.value)">
+        </div>`).join('')}
+      <h3>Стандарт нийцэл (оноо 1–5)</h3>
+      ${role.stdLabels.map((lab,i)=>`
+        <div class="score-grid">
+          <label>${escapeAttr(lab)}</label>
+          <input type="number" min="0" max="5" step="1" value="${typeof rec.std[i]==='number'?rec.std[i]:''}" onchange="setStd('${st.id}',${i},this.value)">
+        </div>`).join('')}
+      <h3>Үйлчлүүлэгчтэй харилцах ёс зүй (оноо 1–5)</h3>
+      ${S.serviceCriteria.map((c,i)=>`
+        <div class="score-grid">
+          <label>${escapeAttr(c.label)} <span class="muted">(${Math.round(c.weight*100)}%)</span></label>
+          <input type="number" min="0" max="5" step="1" value="${typeof rec.service[i]==='number'?rec.service[i]:''}" onchange="setService('${st.id}',${i},this.value)">
+        </div>`).join('')}
+      <div class="row">
+        <label>Бусад нэмэгдэл орлого (бариа г.м, ₮)</label>
+        <input type="number" step="1000" value="${rec.tip||0}" style="width:110px" onchange="setTip('${st.id}',this.value)">
+      </div>
+      ${ded<0?`<div class="muted">Зөрчлийн хасалт энэ сард: <b style="color:var(--bad)">${ded}</b> оноо</div>`:''}
+      <div class="totals">
+        <div>Чанар: <b>${q.toFixed(1)}%</b></div>
+        <div>Стандарт: <b>${stp.toFixed(1)}%</b></div>
+        <div>Ёс зүй: <b>${sv.toFixed(1)}%</b></div>
+        <div>Нийт KPI: <b>${total.toFixed(1)}%</b></div>
+        <div><span class="pill ${tier.cls}">${tier.label}</span></div>
+      </div>
+      <div class="totals">
+        <div>Урамшуулал: <b>${fmtMoney(bonus)}₮</b> / ${fmtMoney(comp.maxBonus)}₮</div>
+        <div class="muted">Эцсийн дүнг Цалин/Нэгтгэл табаас харна (НДШ, хоногоор тэнцүүлэлттэй)</div>
+      </div>
+    </div>`;
+  });
+  return h;
+}
+function setCrit(staffId,i,v){
+  const rec = getRec(staffId, S.curYM);
+  rec.crit[i] = v===''? undefined : clamp(parseFloat(v)||0,0,5);
+  save(); render();
+}
+function setStd(staffId,i,v){
+  const rec = getRec(staffId, S.curYM);
+  rec.std[i] = v===''? undefined : clamp(parseFloat(v)||0,0,5);
+  save(); render();
+}
+function setService(staffId,i,v){
+  const rec = getRec(staffId, S.curYM);
+  rec.service[i] = v===''? undefined : clamp(parseFloat(v)||0,0,5);
+  save(); render();
+}
+function setTip(staffId,v){
+  const rec = getRec(staffId, S.curYM);
+  rec.tip = parseFloat(v)||0;
+  save(); render();
+}
+
+/* ===================== PEER RATING TAB ===================== */
+let peerRaterSel = null;
+function setPeerRater(id){ peerRaterSel = id; render(); }
+function renderPeer(){
+  const list = activeStaffList();
+  if(!peerRaterSel || !staffById(peerRaterSel)) peerRaterSel = list[0] ? list[0].id : null;
+  let h = `<div class="card no-print">
+    <div class="row"><label>Сар</label><input type="month" value="${S.curYM}" onchange="setYM(this.value)"></div>
+    <div class="muted">Шуурхай хамт олны үнэлгээ: сар бүр ажилтан бүр өөр хамт олноосоо 1–5 оноогоор "хамтран ажиллах байдал"-аа үнэлнэ. Дундаж нь KPI-ийн Хамт олны үнэлгээ бүрэлдэхүүн хэсэгт шууд ордог. Хэн хэнд ямар оноо өгсөн нь зөвхөн энэ табад харагдана.</div>
+  </div>`;
+  if(!list.length) return h + `<div class="muted">Ажилтан бүртгэгдээгүй байна.</div>`;
+  h += `<div class="card no-print">
+    <h2>Үнэлгээ өгөх хүн</h2>
+    <select onchange="setPeerRater(this.value)">
+      ${list.map(s=>`<option value="${s.id}" ${s.id===peerRaterSel?'selected':''}>${escapeAttr(s.name)}</option>`).join('')}
+    </select>
+  </div>`;
+  const others = list.filter(s=>s.id!==peerRaterSel);
+  if(!others.length){
+    h += `<div class="muted">Үнэлэх өөр ажилтан алга.</div>`;
+  } else {
+    h += `<div class="card">
+      <h2>${escapeAttr(staffById(peerRaterSel).name)} → хамт олонд өгөх оноо (1–5)</h2>
+      ${others.map(o=>{
+        const row = S.peerScores.find(p=>p.ym===S.curYM && p.raterId===peerRaterSel && p.ratedId===o.id);
+        return `<div class="score-grid">
+          <label>${escapeAttr(o.name)}</label>
+          <input type="number" min="1" max="5" step="1" value="${row?row.score:''}" onchange="submitPeer('${o.id}',this.value)">
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+  h += `<div class="card"><h2>Энэ сарын хүлээн авсан дундаж (${S.curYM})</h2><table><tr><th>Ажилтан</th><th>Дундаж</th><th>Оноо өгсөн хүний тоо</th></tr>`;
+  list.forEach(s=>{
+    const rows = S.peerScores.filter(p=>p.ym===S.curYM && p.ratedId===s.id);
+    const avg = rows.length ? (rows.reduce((a,r)=>a+r.score,0)/rows.length) : null;
+    h += `<tr><td>${escapeAttr(s.name)}</td><td>${avg!=null?avg.toFixed(1):'—'}</td><td>${rows.length}</td></tr>`;
+  });
+  h += `</table></div>`;
+  return h;
+}
+function submitPeer(ratedId, v){
+  setPeerScore(peerRaterSel, ratedId, S.curYM, v);
+  save(); render();
+}
+
+/* ===================== INSPECTION TAB ===================== */
+let inspStaffSel = null;
+function setInspStaff(id){ inspStaffSel = id; render(); }
+function renderInspection(){
+  const list = activeStaffList();
+  if(!inspStaffSel || !staffById(inspStaffSel)) inspStaffSel = list[0] ? list[0].id : null;
+  let h = `<div class="card no-print">
+    <div class="row"><label>Сар</label><input type="month" value="${S.curYM}" onchange="setYM(this.value)"></div>
+    <div class="muted">Мэдэгдэлгүй очиж шалгасан гэнэтийн шалгалтын дүнг бүртгэнэ. Сард хэд ч удаа бүртгэж болно — дундаж нь нийт KPI-д давамгай жинтэй орно.</div>
+  </div>`;
+  if(!list.length) return h + `<div class="muted">Ажилтан бүртгэгдээгүй байна.</div>`;
+  h += `<div class="card no-print">
+    <h2>Шинэ шалгалт бүртгэх</h2>
+    <select onchange="setInspStaff(this.value)">
+      ${list.map(s=>`<option value="${s.id}" ${s.id===inspStaffSel?'selected':''}>${escapeAttr(s.name)}</option>`).join('')}
+    </select>`;
+  const st = staffById(inspStaffSel);
+  if(st){
+    const role = roleById(st.roleId) || S.roles[0];
+    h += `
+    <div class="row"><label>Огноо</label><input type="date" id="inspDate" value="${todayISO()}"></div>
+    <div id="inspChecklist">
+      ${role.inspectionChecklist.map((c,i)=>`
+        <div class="chk-row"><input type="checkbox" id="inspChk${i}"><label for="inspChk${i}">${escapeAttr(c.label)} <span class="muted">(${Math.round(c.weight*100)}%)</span></label></div>`).join('')}
+    </div>
+    <div class="row"><input type="text" id="inspNote" placeholder="Тэмдэглэл (сонголтоор)"></div>
+    <button onclick="submitInspection()">+ Шалгалт бүртгэх</button>`;
+  }
+  h += `</div>`;
+  h += `<div class="card"><h2>${S.curYM} сарын шалгалтууд</h2>`;
+  const rows = S.inspections.filter(i=>i.ym===S.curYM);
+  if(!rows.length) h += `<div class="muted">Энэ сар шалгалт хийгдээгүй байна.</div>`;
+  else{
+    h += `<table><tr><th>Ажилтан</th><th>Огноо</th><th>Оноо</th><th>Тэмдэглэл</th><th></th></tr>`;
+    rows.forEach(r=>{
+      const stf = staffById(r.staffId);
+      h += `<tr><td>${stf?escapeAttr(stf.name):'—'}</td><td>${r.date}</td><td>${inspectionScore(r).toFixed(0)}%</td><td>${escapeAttr(r.note)}</td>
+        <td><button class="danger sm" onclick="delInspection('${r.id}')">✕</button></td></tr>`;
+    });
+    h += `</table>`;
+  }
+  h += `</div>`;
+  return h;
+}
+function submitInspection(){
+  const st = staffById(inspStaffSel);
+  if(!st) return;
+  const role = roleById(st.roleId) || S.roles[0];
+  const flags = role.inspectionChecklist.map((c,i)=>{
+    const el = document.getElementById('inspChk'+i);
+    return el ? el.checked : false;
+  });
+  const date = document.getElementById('inspDate').value;
+  const note = document.getElementById('inspNote').value.trim();
+  addInspection(inspStaffSel, S.curYM, date, note, flags);
+}
+
+/* ===================== VIOLATIONS TAB ===================== */
+function renderViolations(){
+  const list = activeStaffList();
+  let h = `<div class="card no-print">
+    <h2>Шинэ зөрчил бүртгэх — ${S.curYM}</h2>
+    <div class="row">
+      <select id="vStaff">${list.map(s=>`<option value="${s.id}">${escapeAttr(s.name)}</option>`).join('')}</select>
+      <select id="vDed">
+        <option value="0">1 дэх удаа (хасалтгүй)</option>
+        <option value="-5">2 дахь удаа (−5)</option>
+        <option value="-10">3 ба түүнээс дээш (−10)</option>
+      </select>
+      <input type="text" id="vNote" placeholder="Тайлбар">
+      <button onclick="addViolation()">+ Бүртгэх</button>
+    </div>
+  </div>`;
+  const rows = S.violations.filter(v=>v.ym===S.curYM);
+  h += `<div class="card"><h2>Энэ сарын зөрчлийн бүртгэл</h2>`;
+  if(!rows.length) h += `<div class="muted">Энэ сар зөрчил бүртгэгдээгүй байна.</div>`;
+  else{
+    h += `<table><tr><th>Ажилтан</th><th>Тайлбар</th><th>Хасалт</th><th></th></tr>`;
+    rows.forEach(v=>{
+      const st = staffById(v.staffId);
+      h += `<tr><td>${st?escapeAttr(st.name):'—'}</td><td>${escapeAttr(v.note)}</td><td>${v.deduction}</td>
+        <td><button class="danger sm" onclick="delViolation('${v.id}')">✕</button></td></tr>`;
+    });
+    h += `</table>`;
+  }
+  h += `</div>`;
+  return h;
+}
+function addViolation(){
+  const staffId = document.getElementById('vStaff').value;
+  const deduction = parseInt(document.getElementById('vDed').value,10);
+  const note = document.getElementById('vNote').value.trim() || '(тайлбаргүй)';
+  if(!staffId) return;
+  S.violations.push({ id:uid(), staffId, ym:S.curYM, note, deduction });
+  save(); render();
+}
+function delViolation(id){ S.violations = S.violations.filter(v=>v.id!==id); save(); render(); }
+
+/* ===================== PAYROLL TAB ===================== */
+function setDaysWorked(staffId, v){
+  const rec = getRec(staffId, S.curYM);
+  rec.daysWorked = v===''? undefined : clamp(parseFloat(v)||0, 0, 31);
+  save(); render();
+}
+function renderPayroll(){
+  let h = `<div class="card no-print">
+    <div class="row"><label>Сар</label><input type="month" value="${S.curYM}" onchange="setYM(this.value)"></div>
+    <div class="muted">Ажилласан хоног, зээл/өглөгийн суутгалыг энд оруулна. НДШ/ХХОАТ тооцоолох эсэхийг Тохиргоо табаас унтраах/асаах боломжтой.</div>
+  </div>`;
+  const list = activeStaffList();
+  if(!list.length) return h + `<div class="muted">Ажилтан бүртгэгдээгүй байна.</div>`;
+
+  h += `<div class="card no-print">
+    <h2>Шинэ зээл/өглөг нэмэх</h2>
+    <div class="row">
+      <select id="dStaff">${list.map(s=>`<option value="${s.id}">${escapeAttr(s.name)}</option>`).join('')}</select>
+      <input type="number" id="dAmount" placeholder="Дүн (₮)" style="width:110px">
+      <input type="text" id="dNote" placeholder="Тайлбар (жишээ: дэлгүүрээс зээлсэн)">
+      <button onclick="addDebtFromForm()">+ Нэмэх</button>
+    </div>
+  </div>`;
+
+  list.forEach(st=>{
+    const rec = getRec(st.id, S.curYM);
+    const worked = daysWorkedFor(st, rec);
+    const debts = unpaidDebtsFor(st.id);
+    const debtTotal = debts.reduce((a,d)=>a+d.amount,0);
+    const p = calcPayroll(st, S.curYM);
+    h += `<div class="staff-card">
+      <div class="head"><b>${escapeAttr(st.name)}</b><span>${(roleById(st.roleId)||{}).name||''}</span></div>
+      <div class="muted">${st.bankAccount?`${escapeAttr(st.bankName)} · ${escapeAttr(st.bankAccount)}`:'Данс бүртгэгдээгүй — Ажилчид табад нэмнэ үү'}${st.isRetired?' · <span class="badge">тэтгэврийн насны</span>':''}</div>
+      <div class="row">
+        <label>Ажилласан хоног</label>
+        <input type="number" min="0" max="${st.requiredDays}" step="1" value="${worked}" style="width:60px" onchange="setDaysWorked('${st.id}',this.value)">
+        <span class="muted">/ ${st.requiredDays} (ёстой)</span>
+      </div>
+      <div class="totals">
+        <div>Хувь тэнцүүлсэн үндсэн: <b>${fmtMoney(p.proratedBase)}₮</b></div>
+        <div>Урамшуулал: <b>${fmtMoney(p.bonus)}₮</b></div>
+        ${S.config.applyDeductions?`<div>НДШ (ХХ, −): <b>${fmtMoney(p.ndshEmployee)}₮</b></div><div>ХХОАТ (−): <b>${fmtMoney(p.incomeTax)}₮</b></div>`:`<div class="muted">НДШ/ХХОАТ тооцоологдохгүй байна</div>`}
+      </div>
+      <h3>Төлөгдөөгүй зээл/өглөг ${debtTotal>0?`— нийт <b style="color:var(--bad)">${fmtMoney(debtTotal)}₮</b>`:''}</h3>
+      ${!debts.length?`<div class="muted">Байхгүй</div>`:`
+        <table><tr><th>Тайлбар</th><th>Дүн</th><th></th></tr>
+        ${debts.map(d=>`<tr><td>${escapeAttr(d.note)}</td><td>${fmtMoney(d.amount)}</td><td><button class="danger sm" onclick="delDebt('${d.id}')">✕</button></td></tr>`).join('')}
+        </table>
+        <button class="sec sm" onclick="settleDebts('${st.id}','${S.curYM}')">Энэ сарын цалингаас бүгдийг суутгах</button>
+      `}
+      ${p.debtDue>0?`<div class="muted">Энэ сард суутгасан: <b style="color:var(--bad)">${fmtMoney(p.debtDue)}₮</b> <button class="sec sm" onclick="unsettleDebts('${st.id}','${S.curYM}')">Буцаах</button></div>`:''}
+      <div class="totals" style="margin-top:8px">
+        <div>Нэмэгдэл (бариа г.м): <b>${fmtMoney(p.tip)}₮</b></div>
+        <div>Сарын нийт гарт олгох: <b style="font-size:16px">${fmtMoney(p.net)}₮</b></div>
+        <div class="muted">Байгууллагын нийт зардал: ${fmtMoney(p.employerCost)}₮</div>
+      </div>
+      <h3>Олголт 2 үе шаттай (15 хоногоор)</h3>
+      <div class="totals">
+        <div>Урьдчилгаа (${p.advanceDay}-нд, үндсэн цалингийн ${Math.round(S.config.advancePct*100)}%): <b>${fmtMoney(p.advanceAmount)}₮</b></div>
+        <div>Эцсийн тооцоо (сарын эцэст, урамшуулал/суутгалтай): <b>${fmtMoney(p.finalAmount)}₮</b></div>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <label><input type="checkbox" ${rec.paidAdvance?'checked':''} onchange="setPaidAdvance('${st.id}',this.checked)"> Урьдчилгаа шилжүүлсэн</label>
+        <label><input type="checkbox" ${rec.paidFinal?'checked':''} onchange="setPaidFinal('${st.id}',this.checked)"> Эцсийн тооцоо шилжүүлсэн</label>
+      </div>
+    </div>`;
+  });
+  return h;
+}
+function addDebtFromForm(){
+  const staffId = document.getElementById('dStaff').value;
+  const amount = document.getElementById('dAmount').value;
+  const note = document.getElementById('dNote').value.trim();
+  addDebt(staffId, amount, note);
+  document.getElementById('dAmount').value='';
+  document.getElementById('dNote').value='';
+}
+
+/* ===================== SUMMARY / REPORT TAB ===================== */
+let reportStaffSel = null;
+function setReportStaff(id){ reportStaffSel = id; render(); }
+function renderStaffReport(staffId){
+  const st = staffById(staffId);
+  if(!st) return '';
+  const role = roleById(st.roleId) || S.roles[0];
+  const rec = getRec(st.id, S.curYM);
+  const p = calcPayroll(st, S.curYM);
+  const tier = tierOf(p.total);
+  const peer = peerAvgFor(st.id, S.curYM);
+  const insps = inspectionsFor(st.id, S.curYM);
+  const viols = violationsFor(st.id, S.curYM);
+  return `<div class="card print-target">
+    <h2>Гүйцэтгэлийн тайлан — ${escapeAttr(st.name)} (${role.name}) — ${S.curYM}</h2>
+    <div class="muted">${st.bankAccount?`Данс: ${escapeAttr(st.bankName)} ${escapeAttr(st.bankAccount)} · `:''}Урьдчилгаа (${p.advanceDay}-нд): ${fmtMoney(p.advanceAmount)}₮ ${rec.paidAdvance?'(шилжүүлсэн)':'(шилжүүлээгүй)'} · Эцсийн тооцоо: ${fmtMoney(p.finalAmount)}₮ ${rec.paidFinal?'(шилжүүлсэн)':'(шилжүүлээгүй)'}</div>
+    <h3>Чанарын шалгуур</h3>
+    <table><tr><th>Шалгуур</th><th>Жин</th><th>Оноо</th></tr>
+      ${role.criteria.map((c,i)=>`<tr><td>${escapeAttr(c.label)}</td><td>${Math.round(c.weight*100)}%</td><td>${typeof rec.crit[i]==='number'?rec.crit[i]:'—'}/5</td></tr>`).join('')}
+    </table>
+    <h3>Стандарт нийцэл</h3>
+    <table><tr><th>Талбар</th><th>Оноо</th></tr>
+      ${role.stdLabels.map((lab,i)=>`<tr><td>${escapeAttr(lab)}</td><td>${typeof rec.std[i]==='number'?rec.std[i]:'—'}/5</td></tr>`).join('')}
+    </table>
+    <h3>Үйлчлүүлэгчтэй харилцах ёс зүй</h3>
+    <table><tr><th>Шалгуур</th><th>Жин</th><th>Оноо</th></tr>
+      ${S.serviceCriteria.map((c,i)=>`<tr><td>${escapeAttr(c.label)}</td><td>${Math.round(c.weight*100)}%</td><td>${typeof rec.service[i]==='number'?rec.service[i]:'—'}/5</td></tr>`).join('')}
+    </table>
+    <h3>Хамт олны үнэлгээ</h3>
+    <div class="muted">${peer!=null?('Дундаж: '+peer.toFixed(1)+'/5'):'Энэ сард үнэлгээ хийгдээгүй'}</div>
+    <h3>Гэнэтийн шалгалт</h3>
+    ${!insps.length?`<div class="muted">Энэ сард шалгалт хийгдээгүй</div>`:`<table><tr><th>Огноо</th><th>Оноо</th><th>Тэмдэглэл</th></tr>${insps.map(i=>`<tr><td>${i.date}</td><td>${inspectionScore(i).toFixed(0)}%</td><td>${escapeAttr(i.note)}</td></tr>`).join('')}</table>`}
+    <h3>Зөрчил</h3>
+    ${!viols.length?`<div class="muted">Энэ сард зөрчил бүртгэгдээгүй</div>`:`<table><tr><th>Тайлбар</th><th>Хасалт</th></tr>${viols.map(v=>`<tr><td>${escapeAttr(v.note)}</td><td>${v.deduction}</td></tr>`).join('')}</table>`}
+    <div class="totals" style="margin-top:10px">
+      <div>Нийт KPI: <b>${p.total.toFixed(1)}%</b></div>
+      <div><span class="pill ${tier.cls}">${tier.label}</span></div>
+      <div>Урамшуулал: <b>${fmtMoney(p.bonus)}₮</b></div>
+      <div>Гарт олгох: <b>${fmtMoney(p.net)}₮</b></div>
+    </div>
+  </div>`;
+}
+function renderSummary(){
+  let h = `<div class="card no-print">
+    <div class="row">
+      <label>Сар</label><input type="month" value="${S.curYM}" onchange="setYM(this.value)">
+      <button onclick="window.print()">🖨 Хэвлэх / PDF</button>
+    </div>
+  </div>`;
+  const list = activeStaffList();
+  let totalBase=0, totalBonus=0, totalNdsh=0, totalTax=0, totalDebt=0, totalTip=0, totalNet=0, totalEmployer=0;
+  h += `<div class="card print-target"><h2>Нэгтгэл — ${S.curYM}</h2>
+    <table><tr><th>Ажилтан</th><th>Данс</th><th>Албан тушаал</th><th>Нийт KPI</th><th>Шат</th><th>Хоног</th><th>Үндсэн</th><th>Урамшуулал</th><th>НДШ+Татвар</th><th>Суутгал</th><th>Нэмэгдэл</th><th>Гарт олгох</th><th>Шилжүүлсэн (урьдч/эцс)</th></tr>`;
+  list.forEach(st=>{
+    const rec = getRec(st.id, S.curYM);
+    const p = calcPayroll(st, S.curYM);
+    const tier = tierOf(p.total);
+    totalBase+=p.proratedBase; totalBonus+=p.bonus; totalNdsh+=p.ndshEmployee; totalTax+=p.incomeTax; totalDebt+=p.debtDue; totalTip+=p.tip; totalNet+=p.net; totalEmployer+=p.employerCost;
+    h += `<tr>
+      <td>${escapeAttr(st.name)}</td>
+      <td>${st.bankAccount?`${escapeAttr(st.bankName)} ${escapeAttr(st.bankAccount)}`:'—'}</td>
+      <td>${(roleById(st.roleId)||{}).name||''}</td>
+      <td>${p.total.toFixed(1)}%</td>
+      <td><span class="pill ${tier.cls}">${tier.label}</span></td>
+      <td>${daysWorkedFor(st,rec)}/${st.requiredDays}</td>
+      <td>${fmtMoney(p.proratedBase)}</td>
+      <td>${fmtMoney(p.bonus)}</td>
+      <td>−${fmtMoney(p.ndshEmployee+p.incomeTax)}</td>
+      <td>−${fmtMoney(p.debtDue)}</td>
+      <td>${fmtMoney(p.tip)}</td>
+      <td><b>${fmtMoney(p.net)}</b></td>
+      <td><span class="pill ${rec.paidAdvance?'good':'bad'}">${rec.paidAdvance?'Тийм':'Үгүй'}</span> / <span class="pill ${rec.paidFinal?'good':'bad'}">${rec.paidFinal?'Тийм':'Үгүй'}</span></td>
+    </tr>`;
+  });
+  h += `<tr><td colspan="6"><b>Нийт</b></td><td><b>${fmtMoney(totalBase)}</b></td><td><b>${fmtMoney(totalBonus)}</b></td><td><b>−${fmtMoney(totalNdsh+totalTax)}</b></td><td><b>−${fmtMoney(totalDebt)}</b></td><td><b>${fmtMoney(totalTip)}</b></td><td><b>${fmtMoney(totalNet)}</b></td><td></td></tr>`;
+  h += `</table></div>`;
+  h += `<div class="muted no-print">Байгууллагын нийт зардал (НДШ ББ-тай): <b>${fmtMoney(totalEmployer)}₮</b>.</div>`;
+
+  h += `<div class="card no-print">
+    <h2>Ажилтны дэлгэрэнгүй гүйцэтгэлийн тайлан</h2>
+    <div class="muted">Сар бүр ажилтанд тайлагнах бэлэн хуудас — сонгоод хэвлэх/PDF хийж болно.</div>
+    <select onchange="setReportStaff(this.value)">
+      <option value="">— сонгох —</option>
+      ${list.map(s=>`<option value="${s.id}" ${s.id===reportStaffSel?'selected':''}>${escapeAttr(s.name)}</option>`).join('')}
+    </select>
+  </div>`;
+  if(reportStaffSel && staffById(reportStaffSel)) h += renderStaffReport(reportStaffSel);
+  return h;
+}
+
+/* ===================== EXPORT / IMPORT ===================== */
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(S,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'gurvan_tooroi_kpi_backup_'+nowYM()+'.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+document.getElementById('importFile').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(){
+    try{
+      const data = JSON.parse(reader.result);
+      S = migrate(data);
+      save(); render();
+      alert('Өгөгдөл амжилттай сэргээгдлээ.');
+    }catch(err){ alert('Файл уншихад алдаа гарлаа: '+err.message); }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+});
+
+/* ===================== INIT ===================== */
+load();
+render();
+</script>
+</body>
+</html>
