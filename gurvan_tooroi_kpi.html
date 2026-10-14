@@ -73,6 +73,7 @@
 </header>
 <nav class="tabs" id="tabs"></nav>
 <main>
+  <div id="reminders"></div>
   <div class="note no-print">
     KPI оноо 5 эх үүсвэрээс бүрдэнэ: <b>Гэнэтийн шалгалт</b> (давамгай жин), <b>Хамт олны үнэлгээ</b>, <b>Үйлчлүүлэгчтэй харилцах ёс зүй</b>, <b>Чанарын шалгуур</b>, <b>Стандарт нийцэл</b>. Жингийн харьцааг Тохиргоо табаас өөрчилнө. Тухайн сард Гэнэтийн шалгалт эсвэл Хамт олны үнэлгээ хийгдээгүй бол тэдгээрийн жин бусад дөрвөн эх үүсвэрт автоматаар дахин хуваарилагдана.
   </div>
@@ -174,29 +175,26 @@ function DEFAULT_ROLES(){
       {label:'Орчны тохь тух (температур, тайван байдал, дуу чимээ)', weight:0.10},
       {label:'Тоног төхөөрөмж (ор, даавуу) цэвэр, бэлэн эсэх', weight:0.15},
     ], 2600000),
-    mk('galch','Галч',[
-      {label:'Зуух/халаалтын тасралтгүй, тогтвортой ажиллагаа хангах', weight:0.45},
-      {label:'Түлшний (мод/нүүрс) зарцуулалтын хэмнэлт, нөөцийн менежмент', weight:0.30},
-      {label:'Аюулгүй ажиллагаа (гал түймрийн эрсдэл), хэрэгслийн бэлэн байдал', weight:0.25},
+    mk('ground','Гадна талбай, галчийн ажилтан',[
+      {label:'Орчны цэвэрлэгээ, тохижилт', weight:0.20},
+      {label:'Ногоон байгууламж, арчилгаа', weight:0.15},
+      {label:'Барилга байгууламж, тоног төхөөрөмжийн арчилгаа', weight:0.15},
+      {label:'Зуух/халаалтын тасралтгүй, тогтвортой ажиллагаа хангах', weight:0.25},
+      {label:'Түлшний (мод/нүүрс) зарцуулалтын хэмнэлт, нөөцийн менежмент', weight:0.15},
+      {label:'Аюулгүй ажиллагаа (гал түймрийн эрсдэл, орчны аюулгүй байдал)', weight:0.10},
     ],[
-      {label:'Зуух/халаалтын систем хэвийн, тасралтгүй ажиллаж байгаа эсэх', weight:0.30},
-      {label:'Түлшний нөөц хангалттай, зохистой зарцуулсан эсэх', weight:0.20},
-      {label:'Галын аюулгүй байдлын хэрэгсэл (унтраагуур, мэдрэгч) бэлэн эсэх', weight:0.20},
-      {label:'Халаалтын өрөөнүүд тэнцвэртэй дулаацсан эсэх (термометрээр шалгах)', weight:0.15},
-      {label:'Ажлын байр (зуухны өрөө) цэвэр, эмх цэгцтэй эсэх', weight:0.15},
-    ], 900000),
-    mk('ground','Гадна талбайн ажилтан',[
-      {label:'Орчны цэвэрлэгээ, тохижилт', weight:0.35},
-      {label:'Ногоон байгууламж, арчилгаа', weight:0.30},
-      {label:'Барилга байгууламж, тоног төхөөрөмжийн арчилгаа', weight:0.35},
-    ],[
-      {label:'Орчин тойрон цэвэр, хог хаягдалгүй эсэх', weight:0.25},
-      {label:'Ногоон байгууламж, зам харгуй зохистой арчилагдсан эсэх', weight:0.20},
-      {label:'Тоног төхөөрөмж (тоглоомын талбай, сав хэрэгсэл) гэмтэлгүй, аюулгүй эсэх', weight:0.20},
-      {label:'Гадна гэрэлтүүлэг, тэмдэг хэвийн ажиллаж байгаа эсэх', weight:0.15},
-      {label:'Онцгой нөхцөл (цас, мөс, шуурга) үед хурдан арга хэмжээ авсан эсэх', weight:0.10},
-      {label:'Ажлын хувцас, хамгаалах хэрэглэл зөв хэрэглэсэн эсэх', weight:0.10},
-    ], 900000),
+      {label:'Орчин тойрон цэвэр, хог хаягдалгүй эсэх', weight:0.10},
+      {label:'Ногоон байгууламж, зам харгуй зохистой арчилагдсан эсэх', weight:0.08},
+      {label:'Тоног төхөөрөмж (тоглоомын талбай, сав хэрэгсэл) гэмтэлгүй, аюулгүй эсэх', weight:0.08},
+      {label:'Гадна гэрэлтүүлэг, тэмдэг хэвийн ажиллаж байгаа эсэх', weight:0.07},
+      {label:'Онцгой нөхцөл (цас, мөс, шуурга) үед хурдан арга хэмжээ авсан эсэх', weight:0.07},
+      {label:'Зуух/халаалтын систем хэвийн, тасралтгүй ажиллаж байгаа эсэх', weight:0.20},
+      {label:'Түлшний нөөц хангалттай, зохистой зарцуулсан эсэх', weight:0.12},
+      {label:'Галын аюулгүй байдлын хэрэгсэл (унтраагуур, мэдрэгч) бэлэн эсэх', weight:0.12},
+      {label:'Халаалтын өрөөнүүд тэнцвэртэй дулаацсан эсэх (термометрээр шалгах)', weight:0.08},
+      {label:'Ажлын байр (зуухны өрөө) цэвэр, эмх цэгцтэй эсэх', weight:0.05},
+      {label:'Ажлын хувцас, хамгаалах хэрэглэл зөв хэрэглэсэн эсэх', weight:0.03},
+    ], 950000),
   ];
 }
 
@@ -212,13 +210,17 @@ function defaults(){
       applyDeductions:true,
       retired: { ndshEmployeePct:0.03, ndshEmployerPct:0.03, incomeTaxPct:0.10 },
       advanceDay:15, advancePct:0.50,
+      pinEnabled:false, pin:'',
     },
     staff: [],
     records: {},     // key `${staffId}|${ym}` -> {crit:[], std:[], service:[], tip:0, daysWorked}
     violations: [],  // {id, staffId, ym, note, deduction}
     peerScores: [],  // {id, ym, raterId, ratedId, score}
-    inspections: [], // {id, staffId, ym, date, note, items:[{label,weight,passed}]}
+    inspections: [], // {id, staffId, ym, date, note, items:[{label,weight,passed}], photo}
     debts: [],       // {id, staffId, amount, note, ymAdded, paidYm}
+    extras: [],       // {id, staffId, ym, date, label, amount} — нэмэлт үйлчилгээ/захиалга, тэмдэглэл ЗӨВХӨН, цалинд нөлөөлөхгүй
+    leaves: [],       // {id, staffId, ym, date, type, note} — чөлөө/өвчний бүртгэл
+    awards: [],       // {id, staffId, quarter, note, amount, date} — улирлын шилдэг ажилтны шагнал
     curYM: nowYM(),
     tab: 'config',
   };
@@ -237,6 +239,9 @@ function migrate(s){
   s.peerScores = Array.isArray(s.peerScores) ? s.peerScores : [];
   s.inspections = Array.isArray(s.inspections) ? s.inspections : [];
   s.debts = Array.isArray(s.debts) ? s.debts : [];
+  s.extras = Array.isArray(s.extras) ? s.extras : [];
+  s.leaves = Array.isArray(s.leaves) ? s.leaves : [];
+  s.awards = Array.isArray(s.awards) ? s.awards : [];
   s.curYM = s.curYM || d.curYM;
   s.tab = s.tab || 'config';
   const defRoles = d.roles;
@@ -249,6 +254,7 @@ function migrate(s){
     }
   });
   s.staff.forEach(st=>{
+    if(st.roleId==='galch') st.roleId = 'ground'; // 2026 оны засвар: Галч, Гадна талбай нэгдсэн
     if(typeof st.targetPay!=='number') st.targetPay = 900000;
     if(typeof st.requiredDays!=='number') st.requiredDays = 30;
     if(typeof st.bankName!=='string') st.bankName = '';
@@ -290,6 +296,24 @@ function violationsFor(staffId, ym){
   return S.violations.filter(v=>v.staffId===staffId && v.ym===ym);
 }
 function activeStaffList(){ return S.staff.filter(s=>s.active!==false); }
+
+/* Нэмэлт үйлчилгээ/захиалга — тэмдэглэл ЗӨВХӨН, цалин/KPI тооцоололд нөлөөлөхгүй */
+function extrasFor(staffId, ym){ return S.extras.filter(e=>e.staffId===staffId && e.ym===ym); }
+function extrasTotalFor(staffId, ym){ return extrasFor(staffId,ym).reduce((a,e)=>a+(e.amount||0),0); }
+function addExtra(staffId, label, amount, date){
+  S.extras.push({ id:uid(), staffId, ym:S.curYM, date: date||todayISO(), label: label||'(тайлбаргүй)', amount: parseFloat(amount)||0 });
+  save(); render();
+}
+function delExtra(id){ S.extras = S.extras.filter(e=>e.id!==id); save(); render(); }
+
+/* Ирц/чөлөөний бүртгэл — ажилласан хоногийг автоматаар тохируулахад ашиглана (гараар засаж болно) */
+function leavesFor(staffId, ym){ return S.leaves.filter(l=>l.staffId===staffId && l.ym===ym); }
+function leaveDaysFor(staffId, ym){ return leavesFor(staffId, ym).length; }
+function addLeave(staffId, date, type, note){
+  S.leaves.push({ id:uid(), staffId, ym:S.curYM, date: date||todayISO(), type: type||'чөлөө', note: note||'' });
+  save(); render();
+}
+function delLeave(id){ S.leaves = S.leaves.filter(l=>l.id!==id); save(); render(); }
 
 /* Compensation: base salary + bonus pool derived from each staff's total target pay */
 function deriveComp(staff){
@@ -372,12 +396,15 @@ function tierOf(totalPct){
 }
 
 /* Days worked / proration */
-function daysWorkedFor(staff, rec){
-  return typeof rec.daysWorked==='number' ? rec.daysWorked : staff.requiredDays;
+function daysWorkedFor(staff, rec, ym){
+  if(typeof rec.daysWorked==='number') return rec.daysWorked;
+  const useYm = ym || S.curYM;
+  const lv = leaveDaysFor(staff.id, useYm);
+  return clamp(staff.requiredDays - lv, 0, staff.requiredDays);
 }
-function proratedBaseFor(staff, rec, base){
+function proratedBaseFor(staff, rec, base, ym){
   const req = staff.requiredDays||30;
-  const worked = clamp(daysWorkedFor(staff, rec), 0, req);
+  const worked = clamp(daysWorkedFor(staff, rec, ym), 0, req);
   if(req<=0) return base;
   return Math.round(base * (worked/req));
 }
@@ -409,7 +436,7 @@ function calcPayroll(staff, ym){
   const comp = deriveComp(staff);
   const total = calcTotalPct(role, rec, staff.id, ym);
   const bonus = calcBonus(total, comp.maxBonus);
-  const proratedBase = proratedBaseFor(staff, rec, comp.base);
+  const proratedBase = proratedBaseFor(staff, rec, comp.base, ym);
   const grossSalary = proratedBase + bonus;
   const apply = S.config.applyDeductions;
   const rates = staff.isRetired ? S.config.retired : S.config;
@@ -442,13 +469,151 @@ function setPeerScore(raterId, ratedId, ym, score){
 }
 
 /* Inspections */
-function addInspection(staffId, ym, date, note, passedFlags){
+function addInspection(staffId, ym, date, note, passedFlags, photo){
   const role = roleById(staffById(staffId).roleId) || S.roles[0];
   const items = role.inspectionChecklist.map((c,i)=>({ label:c.label, weight:c.weight, passed: !!passedFlags[i] }));
-  S.inspections.push({ id:uid(), staffId, ym, date: date||todayISO(), note: note||'', items });
+  S.inspections.push({ id:uid(), staffId, ym, date: date||todayISO(), note: note||'', items, photo: photo||null });
   save(); render();
 }
 function delInspection(id){ S.inspections = S.inspections.filter(i=>i.id!==id); save(); render(); }
+/* Compress & downscale a photo before storing as a dataURL, to keep localStorage usage sane */
+function compressImageFile(file, maxDim, quality, cb){
+  try{
+    const reader = new FileReader();
+    reader.onload = function(e){
+      const img = new Image();
+      img.onload = function(){
+        let w = img.width, h = img.height;
+        if(w>=h){ if(w>maxDim){ h = Math.round(h*maxDim/w); w = maxDim; } }
+        else { if(h>maxDim){ w = Math.round(w*maxDim/h); h = maxDim; } }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        cb(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = function(){ cb(null); };
+      img.src = e.target.result;
+    };
+    reader.onerror = function(){ cb(null); };
+    reader.readAsDataURL(file);
+  }catch(e){ cb(null); }
+}
+
+/* ---- KPI хугацааны чиг хандлага (сараар) ---- */
+function monthsBack(ym, n){
+  const parts = ym.split('-').map(Number);
+  const y = parts[0], m = parts[1];
+  const arr = [];
+  for(let i=n-1;i>=0;i--){
+    let mm = m - i, yy = y;
+    while(mm<=0){ mm += 12; yy -= 1; }
+    arr.push(yy+'-'+pad2(mm));
+  }
+  return arr;
+}
+function trendDataFor(staffId, ym, n){
+  const st = staffById(staffId);
+  const role = roleById(st.roleId) || S.roles[0];
+  return monthsBack(ym, n||6).map(m=>({ ym:m, total: calcTotalPct(role, getRec(staffId, m), staffId, m) }));
+}
+function renderTrendSvg(data){
+  const w=280, h=90, padL=26, padR=8, padT=10, padB=16;
+  const plotW = w-padL-padR, plotH = h-padT-padB;
+  const n = data.length;
+  const x = i => padL + (n<=1 ? plotW/2 : (i/(n-1))*plotW);
+  const y = v => padT + plotH - (clamp(v,0,100)/100)*plotH;
+  const highY = y(S.config.highThresh*100), lowY = y(S.config.lowThresh*100);
+  const pathD = data.map((d,i)=> (i===0?'M':'L') + x(i).toFixed(1) + ' ' + y(d.total).toFixed(1)).join(' ');
+  const dots = data.map((d,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(d.total).toFixed(1)}" r="3.5" fill="#4a7c59"><title>${d.ym}: ${d.total.toFixed(1)}%</title></circle>`).join('');
+  const lastIdx = n-1;
+  const lastLabel = n? `<text x="${x(lastIdx).toFixed(1)}" y="${(y(data[lastIdx].total)-8).toFixed(1)}" font-size="11" fill="#2b2b26" text-anchor="middle" font-weight="700">${data[lastIdx].total.toFixed(0)}%</text>` : '';
+  const step = Math.max(1, Math.ceil(n/6));
+  const xLabels = data.map((d,i)=> (i%step===0 || i===lastIdx) ? `<text x="${x(i).toFixed(1)}" y="${h-4}" font-size="9" fill="#7a7a70" text-anchor="middle">${d.ym.slice(5)}</text>` : '').join('');
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="max-width:360px;display:block" role="img" aria-label="Сарын KPI чиг хандлага">
+    <line x1="${padL}" y1="${highY.toFixed(1)}" x2="${w-padR}" y2="${highY.toFixed(1)}" stroke="#3d7a3d" stroke-width="1" stroke-dasharray="3,3" opacity=".5"/>
+    <line x1="${padL}" y1="${lowY.toFixed(1)}" x2="${w-padR}" y2="${lowY.toFixed(1)}" stroke="#b7892b" stroke-width="1" stroke-dasharray="3,3" opacity=".5"/>
+    <path d="${pathD}" fill="none" stroke="#4a7c59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${dots}${lastLabel}${xLabels}
+  </svg>`;
+}
+function weakAreas(role, rec, serviceCriteria){
+  const items = [];
+  role.criteria.forEach((c,i)=>{ const sc=rec.crit[i]; if(typeof sc==='number' && sc<3) items.push({label:c.label, score:sc, cat:'Чанар'}); });
+  role.stdLabels.forEach((lab,i)=>{ const sc=rec.std[i]; if(typeof sc==='number' && sc<3) items.push({label:lab, score:sc, cat:'Стандарт'}); });
+  serviceCriteria.forEach((c,i)=>{ const sc=rec.service[i]; if(typeof sc==='number' && sc<3) items.push({label:c.label, score:sc, cat:'Ёс зүй'}); });
+  return items.sort((a,b)=>a.score-b.score);
+}
+
+/* ---- Улирлын шилдэг ажилтан ---- */
+function quarterOf(ym){
+  const parts = ym.split('-').map(Number);
+  const q = Math.ceil(parts[1]/3);
+  return parts[0]+'-Q'+q;
+}
+function monthsOfQuarter(qStr){
+  const bits = qStr.split('-Q');
+  const y = Number(bits[0]), q = Number(bits[1]);
+  const startM = (q-1)*3+1;
+  return [0,1,2].map(i=> y+'-'+pad2(startM+i));
+}
+function quarterAvgFor(staffId, qStr){
+  const role = roleById(staffById(staffId).roleId) || S.roles[0];
+  const vals = monthsOfQuarter(qStr).map(m=>calcTotalPct(role, getRec(staffId, m), staffId, m));
+  return vals.reduce((a,v)=>a+v,0)/vals.length;
+}
+function quarterRanking(qStr){
+  return activeStaffList().map(st=>({ staffId:st.id, name:st.name, avg: quarterAvgFor(st.id, qStr) })).sort((a,b)=>b.avg-a.avg);
+}
+function awardsFor(quarter){ return S.awards.filter(a=>a.quarter===quarter); }
+function addAward(staffId, quarter, note, amount){
+  if(!staffId) return;
+  S.awards.push({ id:uid(), staffId, quarter, note: note||'', amount: parseFloat(amount)||0, date: todayISO() });
+  save(); render();
+}
+function delAward(id){ S.awards = S.awards.filter(a=>a.id!==id); save(); render(); }
+
+/* ---- Сануулга (reminder) ---- */
+function computeReminders(){
+  if(S.curYM !== nowYM()) return []; // зөвхөн энэ сарыг харж байгаа үед утга учиртай
+  const msgs = [];
+  const today = new Date();
+  const day = today.getDate();
+  const lastDay = new Date(today.getFullYear(), today.getMonth()+1, 0).getDate();
+  activeStaffList().forEach(st=>{
+    const rec = getRec(st.id, S.curYM);
+    const advDay = (typeof st.advanceDay==='number') ? st.advanceDay : S.config.advanceDay;
+    if(!rec.paidAdvance && day >= advDay) msgs.push(`${st.name}: урьдчилгаа (${advDay}-нд) хараахан шилжүүлээгүй`);
+    const role = roleById(st.roleId) || S.roles[0];
+    const anyCrit = role.criteria.some((c,i)=> typeof rec.crit[i]==='number');
+    if(!anyCrit) msgs.push(`${st.name}: ${S.curYM} сарын чанарын шалгуурын оноо бөглөгдөөгүй`);
+    if(day >= lastDay-3 && !rec.paidFinal) msgs.push(`${st.name}: эцсийн тооцоо хараахан хийгдээгүй (${lastDay-day} хоног үлдлээ)`);
+  });
+  return msgs;
+}
+function renderReminders(){
+  const el = document.getElementById('reminders');
+  if(!el) return;
+  const msgs = computeReminders();
+  el.innerHTML = !msgs.length ? '' : `<div class="note no-print" style="background:#fdecea;border-color:#f3c7bd;color:#7a2e1e;">⏰ ${msgs.map(escapeAttr).join(' · ')}</div>`;
+}
+
+/* ---- PIN хамгаалалт (хөнгөн, жинхэнэ олон хэрэглэгчийн эрх биш) ---- */
+let pinUnlocked = false;
+const PIN_GUARDED_TABS = ['config','payroll'];
+function setPinEnabled(v){ S.config.pinEnabled = !!v; if(!v) S.config.pin=''; save(); render(); }
+function setPinCode(v){ S.config.pin = v||''; save(); render(); }
+function renderPinLock(){
+  return `<div class="card no-print">
+    <h2>🔒 Хамгаалагдсан хэсэг</h2>
+    <div class="muted">Энэ таб PIN кодоор хамгаалагдсан байна.</div>
+    <div class="row"><input type="text" id="pinInput" placeholder="PIN код"><button onclick="tryUnlockPin()">Нээх</button></div>
+  </div>`;
+}
+function tryUnlockPin(){
+  const v = document.getElementById('pinInput').value;
+  if(v === S.config.pin){ pinUnlocked = true; render(); }
+  else alert('PIN буруу байна.');
+}
 
 /* ===================== NAV / RENDER SHELL ===================== */
 const TABS = [
@@ -458,6 +623,7 @@ const TABS = [
   {id:'peer', label:'🤝 Үнэлгээ'},
   {id:'inspection', label:'🔍 Гэнэтийн шалгалт'},
   {id:'violations', label:'⚠️ Зөрчил'},
+  {id:'extras', label:'➕ Нэмэлт/Ирц'},
   {id:'payroll', label:'💰 Цалин'},
   {id:'summary', label:'📋 Нэгтгэл/Тайлан'},
 ];
@@ -469,7 +635,12 @@ function renderTabs(){
 }
 function render(){
   renderTabs();
+  renderReminders();
   const body = document.getElementById('body');
+  if(S.config.pinEnabled && PIN_GUARDED_TABS.includes(S.tab) && !pinUnlocked){
+    body.innerHTML = renderPinLock();
+    return;
+  }
   let html = '';
   if(S.tab==='config') html = renderConfig();
   else if(S.tab==='staff') html = renderStaff();
@@ -477,6 +648,7 @@ function render(){
   else if(S.tab==='peer') html = renderPeer();
   else if(S.tab==='inspection') html = renderInspection();
   else if(S.tab==='violations') html = renderViolations();
+  else if(S.tab==='extras') html = renderExtras();
   else if(S.tab==='payroll') html = renderPayroll();
   else if(S.tab==='summary') html = renderSummary();
   body.innerHTML = html;
@@ -569,6 +741,12 @@ function renderConfig(){
       <input type="number" step="1" min="0" max="100" value="${Math.round(c.advancePct*100)}" onchange="setCfgPct('advancePct',this.value)"> %
     </div>
     <div class="muted">Сард 2 удаа олгоно: тухайн өдөр үндсэн цалингийн ${Math.round(c.advancePct*100)}%-ийг урьдчилгаа болгон олгож, сарын эцэст KPI урамшуулал/суутгал тооцсоны дараа үлдэгдлийг эцсийн тооцоогоор олгоно. Шинэ ажилтанд урьдчилгаа олгох өдрийг Ажилчид табаас тухайлан өөр өдрөөр тохируулж болно.</div>
+  </div>
+  <div class="card">
+    <h2>Хамгаалалт</h2>
+    <div class="row"><label><input type="checkbox" ${c.pinEnabled?'checked':''} onchange="setPinEnabled(this.checked)"> Тохиргоо, Цалин табыг нээхэд PIN код асуух</label></div>
+    ${c.pinEnabled?`<div class="row"><label>PIN код</label><input type="text" value="${escapeAttr(c.pin)}" style="width:100px" onchange="setPinCode(this.value)" placeholder="жишээ 1234"></div>`:''}
+    <div class="muted">Анхаар: энэ бол зөвхөн хажуугийн хүн санамсаргүй харахаас сэргийлэх хөнгөн хамгаалалт — өгөгдөл бүхэлдээ энэ төхөөрөмж дээр л хадгалагддаг тул жинхэнэ олон хэрэглэгчийн эрх/нэвтрэлтийн систем биш гэдгийг анхаараарай. PIN-ээ мартахгүйгээр санаарай — сэргээх механизм байхгүй (шаардлагатай бол backup JSON файл дотроос "pin" талбарыг шууд засаж болно).</div>
   </div>
   <div class="card">
     <h2>Урамшууллын шатлал</h2>
@@ -896,6 +1074,7 @@ function renderInspection(){
         <div class="chk-row"><input type="checkbox" id="inspChk${i}"><label for="inspChk${i}">${escapeAttr(c.label)} <span class="muted">(${Math.round(c.weight*100)}%)</span></label></div>`).join('')}
     </div>
     <div class="row"><input type="text" id="inspNote" placeholder="Тэмдэглэл (сонголтоор)"></div>
+    <div class="row"><label>Зураг (сонголтоор, дутагдал/зөрчил илрүүлсэн тохиолдолд)</label><input type="file" id="inspPhoto" accept="image/*"></div>
     <button onclick="submitInspection()">+ Шалгалт бүртгэх</button>`;
   }
   h += `</div>`;
@@ -903,10 +1082,11 @@ function renderInspection(){
   const rows = S.inspections.filter(i=>i.ym===S.curYM);
   if(!rows.length) h += `<div class="muted">Энэ сар шалгалт хийгдээгүй байна.</div>`;
   else{
-    h += `<table><tr><th>Ажилтан</th><th>Огноо</th><th>Оноо</th><th>Тэмдэглэл</th><th></th></tr>`;
+    h += `<table><tr><th>Ажилтан</th><th>Огноо</th><th>Оноо</th><th>Тэмдэглэл</th><th>Зураг</th><th></th></tr>`;
     rows.forEach(r=>{
       const stf = staffById(r.staffId);
       h += `<tr><td>${stf?escapeAttr(stf.name):'—'}</td><td>${r.date}</td><td>${inspectionScore(r).toFixed(0)}%</td><td>${escapeAttr(r.note)}</td>
+        <td>${r.photo?`<img src="${r.photo}" style="max-width:40px;max-height:40px;border-radius:4px;cursor:pointer" onclick="window.open(this.src,'_blank')">`:'—'}</td>
         <td><button class="danger sm" onclick="delInspection('${r.id}')">✕</button></td></tr>`;
     });
     h += `</table>`;
@@ -924,7 +1104,15 @@ function submitInspection(){
   });
   const date = document.getElementById('inspDate').value;
   const note = document.getElementById('inspNote').value.trim();
-  addInspection(inspStaffSel, S.curYM, date, note, flags);
+  const fileInput = document.getElementById('inspPhoto');
+  const file = fileInput && fileInput.files && fileInput.files[0];
+  if(file){
+    compressImageFile(file, 700, 0.6, function(dataUrl){
+      addInspection(inspStaffSel, S.curYM, date, note, flags, dataUrl);
+    });
+  } else {
+    addInspection(inspStaffSel, S.curYM, date, note, flags, null);
+  }
 }
 
 /* ===================== VIOLATIONS TAB ===================== */
@@ -968,6 +1156,82 @@ function addViolation(){
 }
 function delViolation(id){ S.violations = S.violations.filter(v=>v.id!==id); save(); render(); }
 
+/* ===================== EXTRAS / LEAVE TAB ===================== */
+function renderExtras(){
+  let h = `<div class="card no-print">
+    <div class="row"><label>Сар</label><input type="month" value="${S.curYM}" onchange="setYM(this.value)"></div>
+    <div class="muted">Эдгээр тэмдэглэл ЦАЛИН/KPI тооцоололд НӨЛӨӨЛӨХГҮЙ — зөвхөн тайланд харуулж, ажилтны идэвхи/гүйцэтгэлийг хянахад ашиглана.</div>
+  </div>`;
+  const list = activeStaffList();
+  if(!list.length) return h + `<div class="muted">Ажилтан бүртгэгдээгүй байна.</div>`;
+
+  h += `<div class="card no-print">
+    <h2>Нэмэлт үйлчилгээ/захиалга бүртгэх</h2>
+    <div class="row">
+      <select id="exStaff">${list.map(s=>`<option value="${s.id}">${escapeAttr(s.name)}</option>`).join('')}</select>
+      <input type="text" id="exLabel" placeholder="Тайлбар (жишээ: нэмэлт массаж, нэмэлт захиалга)">
+      <input type="number" id="exAmount" placeholder="Дүн (₮, сонголтоор)" style="width:120px">
+      <button onclick="addExtraFromForm()">+ Бүртгэх</button>
+    </div>
+  </div>`;
+  h += `<div class="card"><h2>${S.curYM} сарын нэмэлт үйлчилгээ/захиалга</h2><table><tr><th>Ажилтан</th><th>Тайлбар</th><th>Дүн</th><th></th></tr>`;
+  const exRows = S.extras.filter(e=>e.ym===S.curYM);
+  if(!exRows.length) h += `<tr><td colspan="4" class="muted">Бүртгэл алга</td></tr>`;
+  else exRows.forEach(e=>{
+    const st = staffById(e.staffId);
+    h += `<tr><td>${st?escapeAttr(st.name):'—'}</td><td>${escapeAttr(e.label)}</td><td>${e.amount?fmtMoney(e.amount)+'₮':'—'}</td><td><button class="danger sm" onclick="delExtra('${e.id}')">✕</button></td></tr>`;
+  });
+  h += `</table>`;
+  h += `<table style="margin-top:8px"><tr><th>Ажилтан</th><th>Тоо</th><th>Нийт дүн</th></tr>`;
+  list.forEach(s=>{
+    const rows = extrasFor(s.id, S.curYM);
+    h += `<tr><td>${escapeAttr(s.name)}</td><td>${rows.length}</td><td>${fmtMoney(extrasTotalFor(s.id,S.curYM))}₮</td></tr>`;
+  });
+  h += `</table></div>`;
+
+  h += `<div class="card no-print">
+    <h2>Ирц/чөлөөний бүртгэл</h2>
+    <div class="muted">Чөлөө/өвчний өдрүүдийг энд бүртгэвэл Цалин табын "ажилласан хоног" автоматаар тохируулагдана (шаардлагатай бол Цалин табаас гараар дахин засаж болно).</div>
+    <div class="row">
+      <select id="lvStaff">${list.map(s=>`<option value="${s.id}">${escapeAttr(s.name)}</option>`).join('')}</select>
+      <input type="date" id="lvDate" value="${todayISO()}">
+      <select id="lvType">
+        <option value="чөлөө">Чөлөөтэй</option>
+        <option value="өвчтэй">Өвчтэй</option>
+        <option value="бусад">Бусад</option>
+      </select>
+      <input type="text" id="lvNote" placeholder="Тэмдэглэл (сонголтоор)">
+      <button onclick="addLeaveFromForm()">+ Бүртгэх</button>
+    </div>
+  </div>`;
+  h += `<div class="card"><h2>${S.curYM} сарын чөлөө/өвчний бүртгэл</h2><table><tr><th>Ажилтан</th><th>Огноо</th><th>Төрөл</th><th>Тэмдэглэл</th><th></th></tr>`;
+  const lvRows = S.leaves.filter(l=>l.ym===S.curYM);
+  if(!lvRows.length) h += `<tr><td colspan="5" class="muted">Бүртгэл алга</td></tr>`;
+  else lvRows.forEach(l=>{
+    const st = staffById(l.staffId);
+    h += `<tr><td>${st?escapeAttr(st.name):'—'}</td><td>${l.date}</td><td>${escapeAttr(l.type)}</td><td>${escapeAttr(l.note)}</td><td><button class="danger sm" onclick="delLeave('${l.id}')">✕</button></td></tr>`;
+  });
+  h += `</table></div>`;
+  return h;
+}
+function addExtraFromForm(){
+  const staffId = document.getElementById('exStaff').value;
+  const label = document.getElementById('exLabel').value.trim();
+  const amount = document.getElementById('exAmount').value;
+  if(!staffId) return;
+  addExtra(staffId, label, amount, todayISO());
+  document.getElementById('exLabel').value=''; document.getElementById('exAmount').value='';
+}
+function addLeaveFromForm(){
+  const staffId = document.getElementById('lvStaff').value;
+  const date = document.getElementById('lvDate').value || todayISO();
+  const type = document.getElementById('lvType').value;
+  const note = document.getElementById('lvNote').value.trim();
+  if(!staffId) return;
+  addLeave(staffId, date, type, note);
+  document.getElementById('lvNote').value='';
+}
+
 /* ===================== PAYROLL TAB ===================== */
 function setDaysWorked(staffId, v){
   const rec = getRec(staffId, S.curYM);
@@ -991,10 +1255,14 @@ function renderPayroll(){
       <button onclick="addDebtFromForm()">+ Нэмэх</button>
     </div>
   </div>`;
+  h += `<div class="card no-print">
+    <button class="sec" onclick="exportBankCsv()">⬇ Банкны шилжүүлгийн CSV татах (${S.curYM})</button>
+    <div class="muted">Эцсийн тооцоо дүнгээр, банкны шилжүүлэгт бэлэн CSV файл татна.</div>
+  </div>`;
 
   list.forEach(st=>{
     const rec = getRec(st.id, S.curYM);
-    const worked = daysWorkedFor(st, rec);
+    const worked = daysWorkedFor(st, rec, S.curYM);
     const debts = unpaidDebtsFor(st.id);
     const debtTotal = debts.reduce((a,d)=>a+d.amount,0);
     const p = calcPayroll(st, S.curYM);
@@ -1033,6 +1301,9 @@ function renderPayroll(){
         <label><input type="checkbox" ${rec.paidAdvance?'checked':''} onchange="setPaidAdvance('${st.id}',this.checked)"> Урьдчилгаа шилжүүлсэн</label>
         <label><input type="checkbox" ${rec.paidFinal?'checked':''} onchange="setPaidFinal('${st.id}',this.checked)"> Эцсийн тооцоо шилжүүлсэн</label>
       </div>
+      <div class="row no-print" style="margin-top:6px">
+        <button class="sec sm" onclick="goToPayslip('${st.id}')">🧾 Цалингийн хуудас (Нэгтгэл таб)</button>
+      </div>
     </div>`;
   });
   return h;
@@ -1045,10 +1316,59 @@ function addDebtFromForm(){
   document.getElementById('dAmount').value='';
   document.getElementById('dNote').value='';
 }
+function exportBankCsv(){
+  const list = activeStaffList();
+  const rows = [['Нэр','Банк','Данс','Сар','Эцсийн тооцоо (дүн, ₮)','Шилжүүлсэн эсэх']];
+  list.forEach(st=>{
+    const rec = getRec(st.id, S.curYM);
+    const p = calcPayroll(st, S.curYM);
+    rows.push([st.name, st.bankName||'', st.bankAccount||'', S.curYM, p.finalAmount, rec.paidFinal?'Тийм':'Үгүй']);
+  });
+  const csv = rows.map(r=>r.map(v=>{
+    const s = String(v==null?'':v);
+    return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+  }).join(',')).join('\r\n');
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'gurvan_tooroi_bank_transfer_'+S.curYM+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+function goToPayslip(staffId){ payslipStaffSel = staffId; setTab('summary'); }
 
 /* ===================== SUMMARY / REPORT TAB ===================== */
 let reportStaffSel = null;
+let payslipStaffSel = null;
+let awardQuarterSel = null;
 function setReportStaff(id){ reportStaffSel = id; render(); }
+function setPayslipStaff(id){ payslipStaffSel = id; render(); }
+function setAwardQuarter(v){ awardQuarterSel = v; render(); }
+function renderPayslip(staffId){
+  const st = staffById(staffId);
+  if(!st) return '';
+  const role = roleById(st.roleId) || S.roles[0];
+  const rec = getRec(st.id, S.curYM);
+  const p = calcPayroll(st, S.curYM);
+  return `<div class="card print-target">
+    <h2>Цалингийн хуудас — ${escapeAttr(st.name)}</h2>
+    <div class="muted">${role.name} · ${S.curYM} · ${st.bankAccount?`${escapeAttr(st.bankName)} ${escapeAttr(st.bankAccount)}`:'Данс бүртгэгдээгүй'}</div>
+    <table>
+      <tr><td>Ажилласан хоног</td><td>${daysWorkedFor(st,rec,S.curYM)} / ${st.requiredDays}</td></tr>
+      <tr><td>Хувь тэнцүүлсэн үндсэн цалин</td><td>${fmtMoney(p.proratedBase)}₮</td></tr>
+      <tr><td>KPI урамшуулал (нийт KPI ${p.total.toFixed(1)}%)</td><td>${fmtMoney(p.bonus)}₮</td></tr>
+      <tr><td>Нэмэгдэл (бариа г.м)</td><td>${fmtMoney(p.tip)}₮</td></tr>
+      <tr><td><b>Нийт орлого (НДШ/татвараас өмнө)</b></td><td><b>${fmtMoney(p.grossSalary+p.tip)}₮</b></td></tr>
+      ${S.config.applyDeductions?`
+      <tr><td>НДШ (ажилтны тал, −)</td><td>−${fmtMoney(p.ndshEmployee)}₮</td></tr>
+      <tr><td>ХХОАТ (−)</td><td>−${fmtMoney(p.incomeTax)}₮</td></tr>`:'<tr><td colspan="2" class="muted">НДШ/ХХОАТ тооцоологдохгүй байна</td></tr>'}
+      ${p.debtDue>0?`<tr><td>Зээл/өглөгийн суутгал (−)</td><td>−${fmtMoney(p.debtDue)}₮</td></tr>`:''}
+      <tr><td><b>Сарын нийт гарт олгох дүн</b></td><td><b style="font-size:16px">${fmtMoney(p.net)}₮</b></td></tr>
+      <tr><td>— Урьдчилгаа (${p.advanceDay}-нд)</td><td>${fmtMoney(p.advanceAmount)}₮ ${rec.paidAdvance?'(шилжүүлсэн)':'(шилжүүлээгүй)'}</td></tr>
+      <tr><td>— Эцсийн тооцоо (сарын эцэст)</td><td>${fmtMoney(p.finalAmount)}₮ ${rec.paidFinal?'(шилжүүлсэн)':'(шилжүүлээгүй)'}</td></tr>
+    </table>
+    <div class="muted" style="margin-top:14px">Ажилтны гарын үсэг: _______________&nbsp;&nbsp;&nbsp; Огноо: _______________</div>
+  </div>`;
+}
 function renderStaffReport(staffId){
   const st = staffById(staffId);
   if(!st) return '';
@@ -1059,9 +1379,15 @@ function renderStaffReport(staffId){
   const peer = peerAvgFor(st.id, S.curYM);
   const insps = inspectionsFor(st.id, S.curYM);
   const viols = violationsFor(st.id, S.curYM);
+  const weak = weakAreas(role, rec, S.serviceCriteria);
+  const exRows = extrasFor(st.id, S.curYM);
+  const lvRows = leavesFor(st.id, S.curYM);
   return `<div class="card print-target">
     <h2>Гүйцэтгэлийн тайлан — ${escapeAttr(st.name)} (${role.name}) — ${S.curYM}</h2>
     <div class="muted">${st.bankAccount?`Данс: ${escapeAttr(st.bankName)} ${escapeAttr(st.bankAccount)} · `:''}Урьдчилгаа (${p.advanceDay}-нд): ${fmtMoney(p.advanceAmount)}₮ ${rec.paidAdvance?'(шилжүүлсэн)':'(шилжүүлээгүй)'} · Эцсийн тооцоо: ${fmtMoney(p.finalAmount)}₮ ${rec.paidFinal?'(шилжүүлсэн)':'(шилжүүлээгүй)'}</div>
+    <h3>Сарын чиг хандлага</h3>
+    ${renderTrendSvg(trendDataFor(st.id, S.curYM, 6))}
+    ${weak.length?`<h3>Анхаарах зүйлс (оноо 3/5-аас доош)</h3><ul>${weak.map(w=>`<li>[${escapeAttr(w.cat)}] ${escapeAttr(w.label)} — ${w.score}/5</li>`).join('')}</ul>`:''}
     <h3>Чанарын шалгуур</h3>
     <table><tr><th>Шалгуур</th><th>Жин</th><th>Оноо</th></tr>
       ${role.criteria.map((c,i)=>`<tr><td>${escapeAttr(c.label)}</td><td>${Math.round(c.weight*100)}%</td><td>${typeof rec.crit[i]==='number'?rec.crit[i]:'—'}/5</td></tr>`).join('')}
@@ -1080,6 +1406,10 @@ function renderStaffReport(staffId){
     ${!insps.length?`<div class="muted">Энэ сард шалгалт хийгдээгүй</div>`:`<table><tr><th>Огноо</th><th>Оноо</th><th>Тэмдэглэл</th></tr>${insps.map(i=>`<tr><td>${i.date}</td><td>${inspectionScore(i).toFixed(0)}%</td><td>${escapeAttr(i.note)}</td></tr>`).join('')}</table>`}
     <h3>Зөрчил</h3>
     ${!viols.length?`<div class="muted">Энэ сард зөрчил бүртгэгдээгүй</div>`:`<table><tr><th>Тайлбар</th><th>Хасалт</th></tr>${viols.map(v=>`<tr><td>${escapeAttr(v.note)}</td><td>${v.deduction}</td></tr>`).join('')}</table>`}
+    <h3>Нэмэлт үйлчилгээ/захиалга</h3>
+    ${!exRows.length?`<div class="muted">Энэ сард бүртгэл алга</div>`:`<table><tr><th>Тайлбар</th><th>Дүн</th></tr>${exRows.map(e=>`<tr><td>${escapeAttr(e.label)}</td><td>${e.amount?fmtMoney(e.amount)+'₮':'—'}</td></tr>`).join('')}</table>`}
+    <h3>Чөлөө/өвчний хоног</h3>
+    <div class="muted">${lvRows.length} хоног${lvRows.length?' ('+lvRows.map(l=>l.date+' — '+l.type).join(', ')+')':''}</div>
     <div class="totals" style="margin-top:10px">
       <div>Нийт KPI: <b>${p.total.toFixed(1)}%</b></div>
       <div><span class="pill ${tier.cls}">${tier.label}</span></div>
@@ -1110,7 +1440,7 @@ function renderSummary(){
       <td>${(roleById(st.roleId)||{}).name||''}</td>
       <td>${p.total.toFixed(1)}%</td>
       <td><span class="pill ${tier.cls}">${tier.label}</span></td>
-      <td>${daysWorkedFor(st,rec)}/${st.requiredDays}</td>
+      <td>${daysWorkedFor(st,rec,S.curYM)}/${st.requiredDays}</td>
       <td>${fmtMoney(p.proratedBase)}</td>
       <td>${fmtMoney(p.bonus)}</td>
       <td>−${fmtMoney(p.ndshEmployee+p.incomeTax)}</td>
@@ -1124,6 +1454,35 @@ function renderSummary(){
   h += `</table></div>`;
   h += `<div class="muted no-print">Байгууллагын нийт зардал (НДШ ББ-тай): <b>${fmtMoney(totalEmployer)}₮</b>.</div>`;
 
+  const curQ = quarterOf(S.curYM);
+  if(!awardQuarterSel) awardQuarterSel = curQ;
+  h += `<div class="card no-print">
+    <h2>🏆 Улирлын шилдэг ажилтан</h2>
+    <div class="row"><label>Улирал</label><input type="text" value="${escapeAttr(awardQuarterSel)}" style="width:90px" onchange="setAwardQuarter(this.value)"> <span class="muted">(жишээ: ${curQ})</span></div>
+    <table><tr><th>Байр</th><th>Ажилтан</th><th>3 сарын дундаж KPI</th></tr>
+    ${quarterRanking(awardQuarterSel).map((r,i)=>`<tr><td>${i+1}</td><td>${escapeAttr(r.name)}</td><td>${r.avg.toFixed(1)}%</td></tr>`).join('')}
+    </table>
+    <div class="row" style="margin-top:8px">
+      <select id="awStaff">${list.map(s=>`<option value="${s.id}">${escapeAttr(s.name)}</option>`).join('')}</select>
+      <input type="number" id="awAmount" placeholder="Шагналын дүн (₮, сонголтоор)" style="width:150px">
+      <input type="text" id="awNote" placeholder="Тэмдэглэл (жишээ: бэлэг, батламж)">
+      <button onclick="addAwardFromForm()">+ Шагнал бүртгэх</button>
+    </div>
+    ${awardsFor(awardQuarterSel).length?`<table style="margin-top:8px"><tr><th>Ажилтан</th><th>Дүн</th><th>Тэмдэглэл</th><th></th></tr>${awardsFor(awardQuarterSel).map(a=>{const st=staffById(a.staffId); return `<tr><td>${st?escapeAttr(st.name):'—'}</td><td>${a.amount?fmtMoney(a.amount)+'₮':'—'}</td><td>${escapeAttr(a.note)}</td><td><button class="danger sm" onclick="delAward('${a.id}')">✕</button></td></tr>`;}).join('')}</table>`:''}
+  </div>`;
+
+  h += `<div class="card no-print">
+    <h2>Цалингийн хуудас (ажилтанд өгөх)</h2>
+    <div class="row">
+      <select onchange="setPayslipStaff(this.value)">
+        <option value="">— сонгох —</option>
+        ${list.map(s=>`<option value="${s.id}" ${s.id===payslipStaffSel?'selected':''}>${escapeAttr(s.name)}</option>`).join('')}
+      </select>
+      <button onclick="window.print()">🖨 Хэвлэх/PDF</button>
+    </div>
+  </div>`;
+  if(payslipStaffSel && staffById(payslipStaffSel)) h += renderPayslip(payslipStaffSel);
+
   h += `<div class="card no-print">
     <h2>Ажилтны дэлгэрэнгүй гүйцэтгэлийн тайлан</h2>
     <div class="muted">Сар бүр ажилтанд тайлагнах бэлэн хуудас — сонгоод хэвлэх/PDF хийж болно.</div>
@@ -1134,6 +1493,14 @@ function renderSummary(){
   </div>`;
   if(reportStaffSel && staffById(reportStaffSel)) h += renderStaffReport(reportStaffSel);
   return h;
+}
+function addAwardFromForm(){
+  const staffId = document.getElementById('awStaff').value;
+  const amount = document.getElementById('awAmount').value;
+  const note = document.getElementById('awNote').value.trim();
+  if(!staffId) return;
+  addAward(staffId, awardQuarterSel, note, amount);
+  document.getElementById('awAmount').value=''; document.getElementById('awNote').value='';
 }
 
 /* ===================== EXPORT / IMPORT ===================== */
